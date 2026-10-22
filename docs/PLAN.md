@@ -1,0 +1,243 @@
+# Plan: Cuerda, la app del Carnaval y las Llamadas
+
+Actualizado: 2026-10-22. Versión editable: <https://claude.ai/artifact/BaEsAAZw8mWdyUjJ7VSM2C>
+
+> **Prioridad:** si algo de este plan choca con `docs/DECISIONES.md`, manda DECISIONES.md.
+> Los datos semilla y sus conteos actuales están en `research/CAMBIOS.md`.
+
+## Resumen
+
+Objetivo: tener publicada en App Store y Google Play, antes del Desfile Inaugural del Carnaval 2027 (jueves 2027-01-21), una app que responda «¿qué hay hoy de carnaval, dónde y a qué hora?», con las Llamadas (5 y 6 de febrero de 2027) como sello. Nombre de trabajo: **Cuerda**.
+
+- **Qué es:** la guía del Carnaval de Montevideo. Pizarrón diario de tablados, Concurso Oficial del Teatro de Verano, desfiles y un modo especial para las Llamadas. Fuera de temporada, mapa de salidas de tambores.
+- **Para quién:** el carnavalero local (uso diario), el turista (pico de descargas en temporada) y los conjuntos (generan y validan la información).
+- **Stack:** React + TypeScript + Vite + Capacitor + Supabase + Tailwind (el mismo de Travel).
+- **Competencia:** existe Carnaval App (Pedro Franco), centrada en el Concurso, pencas y comunidad. Cuerda se diferencia por alertas por conjunto, escenarios gratuitos, mapa, hora estimada en Llamadas, inglés y uso todo el año. Ver `docs/competencia-carnaval-app.md`.
+- **Plazo:** enviar a revisión de Apple y Google antes del 2027-01-05.
+
+## Alcance por versión
+
+El MVP cubre todo el carnaval con datos cargados desde un panel de admin; lo colaborativo y lo «en vivo» queda para después.
+
+| Funcionalidad | Versión | Cuándo |
+| --- | --- | --- |
+| Pizarrón «Hoy»: actuaciones del día en todos los escenarios, filtros cerca / gratis / mis conjuntos | MVP | Antes del Inaugural |
+| Mapa de escenarios con ficha (tipo, precio, dirección, grilla de la noche) | MVP | Antes del Inaugural |
+| Fichas de conjuntos por categoría y botón Seguir | MVP | Antes del Inaugural |
+| Push «tu conjunto actúa hoy» y aviso de suspensión o cambio | MVP | Antes del Inaugural |
+| Calendario del carnaval: desfiles, etapas del concurso, corsos | MVP | Antes del Inaugural |
+| Modo Llamadas: orden por noche, **hora estimada de paso por cuadra**, fichas de comparsas, recorrido, cortes de calle, glosario | MVP | Antes del Inaugural |
+| Panel admin web con importación de la grilla (CSV o texto de prensa) | MVP | Antes del Inaugural |
+| Idiomas español e inglés | MVP | Antes del Inaugural |
+| «¿Por dónde va el desfile?» con reportes de la gente | v2 | Durante el carnaval |
+| Resultados del concurso por rueda y categoría | v2 | Durante el carnaval |
+| Ingesta asistida desde Instagram con aprobación manual | v2 | Durante el carnaval |
+| Modo barrio: mapa de salidas de tambores | v3 | Desde marzo 2027 |
+| «Seguí la cuerda»: ubicación en vivo de la comparsa | v3 | Desde marzo 2027 |
+| Cuentas verificadas de conjuntos y comparsas | v3 | Desde marzo 2027 |
+| Portugués | v3 | Antes del Carnaval 2028 |
+
+Fuera de alcance: pencas, reseñas y comentarios (es el terreno de Carnaval App).
+
+Recorte de emergencia si no da el tiempo: Hoy + Conjuntos + Modo Llamadas, con el calendario como lista estática.
+
+## Cronograma
+
+| Fase | Fechas |
+| --- | --- |
+| 0 · Investigación y validación | 23 oct – 2 nov (hecha: `research/`) |
+| 1 · Setup técnico | 3 – 5 nov |
+| 2 · Modelo de datos | 6 – 9 nov |
+| 3 · Hoy y escenarios | 10 – 23 nov |
+| 4 · Conjuntos, Seguir y push | 24 – 30 nov |
+| 5 · Calendario y Concurso | 1 – 7 dic |
+| 6 · Modo Llamadas | 8 – 13 dic |
+| 7 · Datos y panel admin | 1 dic – 10 ene (en paralelo) |
+| 8 · QA, beta y publicación | 14 dic – 20 ene |
+| Envío a revisión de tiendas | **2027-01-05** (fecha que no se mueve) |
+| Desfile Inaugural | 2027-01-21 |
+| 9 · Operación en temporada | 21 ene – 7 mar |
+| Desfile de Llamadas | 2027-02-05 y 2027-02-06 |
+
+Hitos externos: Prueba de Admisión al Concurso del 10 al 16 de noviembre (actualizar `research/conjuntos.csv` el 17/11 y correr `python research/validate.py --post-prueba`). Acuerdo con DAECPU por la grilla: antes del 2026-12-15.
+
+## Fase 0 · Investigación y validación (hecha)
+
+Resultado en `research/`: `informe_fase0.md`, `conjuntos.csv` (110), `escenarios.csv` (42), `calendario_2027.csv` (19), `CAMBIOS.md` y `validate.py`. Pendientes de datos en `research/CAMBIOS.md`.
+
+Pendiente con personas (lo hace Emiliano, no Claude Code):
+
+- [ ] DAECPU: mail de alianza para recibir la grilla en CSV o planilla (borrador en `research/informe_fase0.md`, sección 8.1).
+- [ ] AUDECA: orden de desfile y contenido de Llamadas (borrador 8.2).
+- [ ] DM a conjuntos y comparsas (borrador 8.3).
+- [ ] Cuenta de Instagram profesional vinculada a una Página de Facebook, para probar Business Discovery.
+
+## Fase 1 · Setup técnico (3 – 5 nov)
+
+Listo cuando: una app vacía corre en simulador iOS y emulador Android, muestra un mapa de Montevideo y lee una tabla de Supabase.
+
+1. Monorepo con pnpm workspaces: `app/`, `admin/`, `supabase/`, `packages/shared/`. `research/` y `docs/` ya existen.
+2. Supabase local (Docker) y remoto en São Paulo, con PostGIS y unaccent.
+3. App: TypeScript estricto, Tailwind, React Router, TanStack Query.
+4. Capacitor iOS y Android con un Bundle ID nuevo.
+5. Mapa con MapLibre GL y tiles de MapTiler.
+6. i18n con react-i18next, español e inglés desde el día uno.
+7. Zona horaria fija `America/Montevideo`: las funciones pasan de medianoche (una actuación a las 00:40 cuenta para la noche anterior).
+8. `CLAUDE.md` en la raíz.
+9. CI en GitHub Actions: lint, typecheck y tests con Vitest.
+
+Prompt listo: `prompts/fase-1-setup.md`.
+
+## Fase 2 · Modelo de datos en Supabase (6 – 9 nov)
+
+La tabla central es `actuaciones`: cada fila es «tal conjunto, en tal escenario, a tal hora», y de ahí salen el pizarrón, el mapa, las fichas y las push.
+
+| Tabla | Campos clave | Versión |
+| --- | --- | --- |
+| `temporadas` | anio, fecha_inicio, fecha_fin, modo_llamadas_desde, modo_llamadas_hasta | MVP |
+| `conjuntos` | slug, nombre, alias[], categoria (murga, parodistas, humoristas, revista, comparsa, samba, otro), barrio, bio, instagram, facebook, foto_url, verificado, fuente_url[] | MVP |
+| `conjunto_temporada` | conjunto_id, temporada_id, en_concurso (nullable = pendiente), en_llamadas | MVP |
+| `escenarios` | slug, nombre, alias[], tipo (teatro_verano, privado, popular, movil, gratuito, barrio_a_barrio; nullable), direccion, barrio, ubicacion (PostGIS Point), precio_texto, gratis (nullable), activo, itinerante (nullable), fuente_url[] | MVP |
+| `actuaciones` | escenario_id, conjunto_id, inicio, noche (fecha lógica), estado (programada, cambiada, suspendida), etapa_id, direccion_texto, ubicacion (para itinerantes), fuente, fuente_url | MVP |
+| `etapas_concurso` | temporada_id, rueda (primera, segunda, liguilla), numero, fecha | MVP |
+| `eventos` | temporada_id, slug, tipo (inaugural, samba, llamadas, corso, admision, concurso, otro), nombre, inicio, fin, estado (confirmado, estimado), recorrido (PostGIS LineString), info | MVP |
+| `orden_desfile` | evento_id, conjunto_id, posicion | MVP |
+| `favoritos` | user_id, conjunto_id | MVP |
+| `dispositivos_push` | user_id, token, plataforma, idioma | MVP |
+| `reportes` | user_id, evento_id, conjunto_id, ubicacion, creado | v2 |
+| `borradores_ingesta` | fuente_url, texto, datos_extraidos (jsonb), estado | v2 |
+| `salidas` | conjunto_id, inicio, recurrencia, punto_partida, recorrido, estado | v3 |
+
+**Reglas de acceso (RLS):** lectura pública de todo lo publicado; escritura sólo para el rol admin; `favoritos` y `dispositivos_push` sólo para su dueño.
+
+**Usuarios:** auth anónima de Supabase, para que nadie tenga que registrarse para seguir conjuntos.
+
+**Funciones SQL (RPC):**
+
+- `actuaciones_de_la_noche(noche, lat, lng, solo_gratis, solo_favoritos)` — alimenta la pantalla Hoy.
+- `proximas_de_conjunto(conjunto_id)` — para la ficha.
+- `escenarios_cercanos(lat, lng, radio_m)` — para el mapa.
+- `buscar_por_nombre(texto)` — matching exacto normalizado contra nombre + alias (ver DECISIONES.md).
+
+**Seed:** desde los CSV de `research/` (validados con `research/validate.py`).
+
+## Fases 3 a 6 · Funcionalidades del MVP (10 nov – 13 dic)
+
+Cada fase termina con algo usable en el simulador y sus tests en verde; los datos de prueba salen de `research/`.
+
+### Fase 3 · Pizarrón «Hoy» y escenarios (10 – 23 nov)
+
+1. Pantalla Hoy: actuaciones de la noche agrupadas por escenario y ordenadas por hora.
+2. Filtros: cerca mío (con permiso de ubicación), gratis, mis conjuntos, categoría.
+3. Estados visibles: suspendida, cambiada, «ahora en escena» según la hora.
+4. Mapa de escenarios con pines por tipo y lo que hay esa noche. Los itinerantes se ubican por la actuación de esa noche.
+5. Ficha de escenario: dirección, precio, grilla de la noche y botón «cómo llegar» que abre el mapa del teléfono.
+
+Listo cuando: con datos de una noche real de 2026 (ej. sábado 28 de febrero de 2026, cartelera de El Observador), la pantalla Hoy muestra lo mismo que la cartelera publicada.
+
+### Fase 4 · Conjuntos, Seguir y push (24 – 30 nov)
+
+1. Lista de conjuntos por categoría, con buscador.
+2. Ficha: bio, próximas actuaciones, links a redes.
+3. Seguir con auth anónima; favoritos sincronizados en Supabase.
+4. Registro del token push (APNs y FCM) en `dispositivos_push`.
+5. Edge Function programada al mediodía: «hoy actúa X a las 22:50 en Y» a quien lo sigue.
+6. Edge Function disparada al cambiar `actuaciones.estado`: aviso de suspensión o cambio.
+
+Listo cuando: seguir un conjunto en TestFlight y recibir la push de prueba en un teléfono real.
+
+### Fase 5 · Calendario y Concurso (1 – 7 dic)
+
+1. Calendario de la temporada: desfiles, etapas del concurso y corsos, con vista por mes y por día. Los eventos estimados se marcan como tales.
+2. Concurso Oficial: fixture por rueda y etapa, con link a la venta oficial de entradas (la app no vende).
+3. Agregar al calendario del teléfono un evento o una etapa.
+
+### Fase 6 · Modo Llamadas (8 – 13 dic)
+
+1. La app cambia sola de pantalla principal entre `modo_llamadas_desde` y `modo_llamadas_hasta` de la temporada (nunca por tipo de evento).
+2. Orden de desfile por noche y ficha de cada comparsa (barrio, cuerda, personajes).
+3. **Hora estimada de paso por cuadra:** primera comparsa a las 20:00, cada una larga 10 minutos y 150 metros después de la anterior (reglamento 2026). Recorrido: Carlos Gardel e Isla de Flores, de Zelmar Michelini a Minas (nueve cuadras).
+4. Mapa del recorrido con cortes de calle y servicios.
+5. Glosario español e inglés: chico, repique, piano, cuerda, mama vieja, gramillero, escobero.
+6. Ajuste manual desde el admin: marcar qué comparsa está pasando para corregir la estimación. En v2 lo alimentan los reportes de la gente.
+
+## Fase 7 · Datos y panel admin (1 dic – 10 ene, en paralelo)
+
+La app vale lo que vale su grilla: cada actuación guarda de dónde salió y la app muestra «actualizado hace X».
+
+**Panel admin (web)**
+
+1. Login por email con rol admin en Supabase.
+2. Alta y edición de conjuntos, escenarios, eventos, etapas y actuaciones.
+3. Importar la grilla de una noche desde CSV o pegando el texto tal como lo publica la prensa (nombre del escenario y debajo líneas «20:00 - CABALLEROS»), con vista previa y detección de conjuntos o escenarios desconocidos (matching por nombre + alias normalizados).
+4. Botón «suspender noche» por escenario o global (lluvia), que marca las actuaciones y dispara la push.
+5. Control del estado del desfile de Llamadas.
+
+**Carga inicial**
+
+- Seed desde `research/`: conjuntos, escenarios y calendario 2027.
+- Fixture de la primera rueda del concurso apenas se publique.
+- Orden oficial de Llamadas 2027 cuando lo publique la IM (en 2026 salió dos días antes).
+
+**Rutina diaria en temporada**
+
+- Ideal: DAECPU carga o manda la grilla en CSV.
+- Plan B: cargarla a mano desde su web («Seguí a tu conjunto») y las carteleras de prensa, unos 20 minutos por noche.
+
+**Ingesta asistida (v2)**
+
+- Edge Function programada que lee posts recientes de los conjuntos por la Instagram Business Discovery API (nada de scraping).
+- Un LLM extrae conjunto, escenario, fecha y hora, y guarda un borrador en `borradores_ingesta`.
+- Aprobación o descarte manual desde el admin.
+
+## Fase 8 · QA, beta y publicación (14 dic – 20 ene)
+
+La fecha que no se mueve: enviar a revisión de Apple y Google antes del 5 de enero, para tener dos semanas de margen antes del Inaugural.
+
+1. Tests unitarios de la lógica de fechas: noche lógica, zona horaria, «ahora en escena», modo Llamadas por fecha, hora estimada de paso.
+2. QA en simulador y en teléfonos reales iOS y Android.
+3. Beta cerrada en TestFlight y en Google Play (prueba interna) con 20 a 30 carnavaleros, desde el 14 de diciembre.
+4. Fichas de tienda: nombre, descripción en español e inglés, capturas, categoría (Viajes o Entretenimiento), política de privacidad que explique ubicación y push. Mensaje: «Qué hay de carnaval hoy, cerca tuyo y gratis. Y la guía de las Llamadas.»
+5. Envío a revisión: antes del 5 de enero.
+6. Lanzamiento público en la semana del Inaugural: Instagram de la app, conjuntos que la compartan, DAECPU si hay alianza, hostels y hoteles de Ciudad Vieja y Barrio Sur.
+
+Oportunidad: el 3 de diciembre es el Día Nacional del Candombe. Sirve para mostrar la beta o abrir una lista de espera.
+
+## Fase 9 · Operación en temporada y después (21 ene en adelante)
+
+**En temporada**
+
+- Carga o chequeo diario de la grilla antes de las 18:00.
+- Monitoreo de errores con Sentry y de uso con PostHog: aperturas por noche, conjuntos más seguidos, filtros más usados.
+- Sacar v2 en partes: resultados del concurso, «¿por dónde va el desfile?» antes de las Llamadas, ingesta desde Instagram.
+- Botón «esto está mal» en cada actuación.
+
+**Después (marzo 2027)**
+
+- Retro con métricas: usuarios, retención por semana, noches pico.
+- Arrancar v3, el modo barrio con salidas de tambores.
+- Cuentas verificadas de conjuntos y sponsors para el Carnaval 2028.
+
+## Cómo trabajar con Claude Code
+
+1. Un paso numerado de este plan = una tarea, con plan mode antes de tocar código y un commit al terminar.
+2. Arrancá cada sesión con: «Leé CLAUDE.md, docs/PLAN.md y docs/DECISIONES.md. Vamos con la Fase N, paso M».
+3. No marques un paso como hecho sin el «Listo cuando» de su fase.
+4. Los prompts largos de cada fase van en `prompts/`.
+
+## Riesgos
+
+| Riesgo | Qué pasa | Mitigación |
+| --- | --- | --- |
+| No conseguir la grilla de DAECPU en formato usable | Pizarrón vacío o atrasado | Carga manual desde su web y la prensa; importador rápido de texto y CSV |
+| No llegar al Inaugural | Se pierde la temporada | Recorte de emergencia; envío a revisión el 5 de enero |
+| Rechazo o demora en App Store | Lanzamiento tarde | Beta desde el 14 de diciembre; política de privacidad lista |
+| Cambios de último momento (lluvia, etapas movidas) | Gente que va y no hay función | Botón «suspender noche» con push; «actualizado hace X» |
+| Carnaval App copia alertas y gratuitos | Se achica el diferencial | Datos completos, mapa y hora estimada en Llamadas como foso |
+| Fotos y logos de conjuntos | Reclamos | Pedir permiso o usar fotos propias; link al Instagram original |
+| Bloqueo de Meta | Se cae la ingesta | Sólo API oficial; la ingesta es v2 |
+
+**Decisiones abiertas**
+
+- [ ] Nombre final de la app.
+- [ ] Monetización en la primera temporada: gratis sin anuncios, o un sponsor.

@@ -1,0 +1,12 @@
+node_modules/
+dist/
+.env
+.env.*
+!.env.example
+.DS_Store
+*.log
+supabase/.branches/
+supabase/.temp/
+android/app/build/
+ios/App/Pods/
+__pycache__/
