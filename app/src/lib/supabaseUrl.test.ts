@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { resolveSupabaseUrl } from './supabase'
+import { resolveSupabaseUrl } from './supabaseUrl'
 
 describe('resolveSupabaseUrl', () => {
   it('en Android cambia 127.0.0.1 y localhost por 10.0.2.2', () => {
