@@ -1,0 +1,9 @@
+research/
+docs/
+prompts/
+*.md
+pnpm-lock.yaml
+dist/
+android/
+ios/
+supabase/.temp/
