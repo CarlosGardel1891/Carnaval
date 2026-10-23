@@ -24,7 +24,9 @@ React 19 + TypeScript (strict) + Vite + Capacitor 8 + Tailwind 4, Supabase (Post
 
 ## Comandos
 
-Requisitos: Node 24 (`.nvmrc`), `corepack enable` (pnpm fijado en `package.json`), Docker Desktop, Python 3 + pandas (para `research/`), Android Studio (Android) y una Mac con Xcode (iOS).
+Requisitos: Node 24 (`.nvmrc`), `corepack enable` (pnpm fijado en `package.json`), Docker Desktop, Python 3 + pandas (para `research/`), Android Studio + **JDK 21** (Android) y una Mac con Xcode (iOS).
+
+Android en Windows: `JAVA_HOME` tiene que apuntar al JDK 21 (`C:\Program Files\Microsoft\jdk-21…`), no al JBR de Android Studio (Java 25, que Gradle 8.14 no soporta). `ANDROID_HOME` = `%LOCALAPPDATA%\Android\Sdk`. Emulador creado: `Medium_Phone_API_37.0`.
 
 ```bash
 pnpm install                 # dependencias de todo el monorepo
