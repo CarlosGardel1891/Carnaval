@@ -1,0 +1,19 @@
+{
+  "app": {
+    "name": "Cuerda",
+    "tagline": "Montevideo's carnival, night by night"
+  },
+  "map": {
+    "label": "Map of Montevideo",
+    "missingKey": "The MapTiler key (VITE_MAPTILER_KEY) is missing, so the map can't be shown."
+  },
+  "season": {
+    "title": "Carnival {{year}}",
+    "dates": "From {{start}} to {{end}}",
+    "llamadas": "Llamadas parade: {{start}} and {{end}}",
+    "loading": "Loading the season…",
+    "error": "We couldn't load the season.",
+    "empty": "No season has been loaded yet.",
+    "retry": "Try again"
+  }
+}

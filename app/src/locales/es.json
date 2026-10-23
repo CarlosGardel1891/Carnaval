@@ -1,0 +1,19 @@
+{
+  "app": {
+    "name": "Cuerda",
+    "tagline": "El carnaval de Montevideo, noche a noche"
+  },
+  "map": {
+    "label": "Mapa de Montevideo",
+    "missingKey": "Falta la key de MapTiler (VITE_MAPTILER_KEY) para mostrar el mapa."
+  },
+  "season": {
+    "title": "Carnaval {{year}}",
+    "dates": "Del {{start}} al {{end}}",
+    "llamadas": "Desfile de Llamadas: {{start}} y {{end}}",
+    "loading": "Cargando la temporada…",
+    "error": "No pudimos cargar la temporada.",
+    "empty": "Todavía no hay temporada cargada.",
+    "retry": "Reintentar"
+  }
+}
