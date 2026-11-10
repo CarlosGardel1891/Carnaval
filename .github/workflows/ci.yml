@@ -23,7 +23,11 @@ jobs:
       - run: pnpm format:check
       - run: pnpm typecheck
       - run: pnpm test
+      # Valores de relleno: sin ellos el bundle se reduce al error de «faltan variables».
       - run: pnpm build
+        env:
+          VITE_SUPABASE_URL: http://127.0.0.1:55321
+          VITE_SUPABASE_ANON_KEY: placeholder-ci
 
   research:
     name: Validar datos semilla
