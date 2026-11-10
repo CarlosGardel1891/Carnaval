@@ -62,8 +62,9 @@ jobs:
       # tests no usan.
       - run: pnpm supabase start -x studio,imgproxy,edge-runtime,logflare,vector,mailpit,realtime,storage-api,supavisor
       - run: pnpm test:db
-      # Carga y quita la grilla ficticia por el mismo camino que en desarrollo.
+      # Carga y quita los datos de prueba por el mismo camino que en desarrollo.
       - run: pnpm db:grilla && pnpm db:grilla --quitar
+      - run: pnpm db:noche-real && pnpm db:noche-real --quitar
       # Los tipos de la base se regeneran, nunca se editan a mano.
       - run: pnpm gen:types
       - run: git diff --exit-code -- packages/shared/src/database.types.ts
