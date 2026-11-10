@@ -1,5 +1,5 @@
 import { expect } from 'vitest'
-import { anonClient, ctx, userClient, type Db } from './clients'
+import { anonClient, ctx, userClient, withSql, type Db } from './clients'
 
 export type Quien = [nombre: string, cliente: () => Db]
 
@@ -31,4 +31,21 @@ export function ok<T>(res: { data: T; error: unknown }): NonNullable<T> {
 export function expectRechazo(res: { data: unknown; error: { code: string } | null }) {
   if (res.error) expect(res.error.code).toBe('42501')
   else expect(res.data).toEqual([])
+}
+
+/**
+ * Borra los datos de prueba. Los conjuntos y escenarios de los tests llevan nombres inventados
+ * con el prefijo «zz», para no chocar con los del seed; las etapas, números de 90 para arriba.
+ */
+export async function limpiar(): Promise<void> {
+  await withSql(async (sql) => {
+    await sql.query(
+      `delete from public.actuaciones
+        where conjunto_id in (select id from public.conjuntos where slug like 'zz-%')
+           or escenario_id in (select id from public.escenarios where slug like 'zz-%')`,
+    )
+    await sql.query(`delete from public.conjuntos where slug like 'zz-%'`)
+    await sql.query(`delete from public.escenarios where slug like 'zz-%'`)
+    await sql.query(`delete from public.etapas_concurso where numero >= 90`)
+  })
 }

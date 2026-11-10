@@ -1,14 +1,7 @@
 import { norm } from '@cuerda/shared'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { anonClient, serviceClient } from './clients'
-import { admin, expectRechazo, intrusos, lectores, ok } from './helpers'
-
-// Nombres inventados, con el prefijo «zz», para no chocar con los del seed.
-const limpiar = async () => {
-  const service = serviceClient()
-  ok(await service.from('conjuntos').delete().like('slug', 'zz-%').select('id'))
-  ok(await service.from('escenarios').delete().like('slug', 'zz-%').select('id'))
-}
+import { admin, expectRechazo, intrusos, lectores, limpiar, ok } from './helpers'
 
 beforeAll(limpiar)
 afterAll(limpiar)

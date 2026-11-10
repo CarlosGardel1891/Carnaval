@@ -3,6 +3,77 @@ export type Json = string | number | boolean | null | { [key: string]: Json | un
 export type Database = {
   public: {
     Tables: {
+      actuaciones: {
+        Row: {
+          actualizado_en: string
+          conjunto_id: number
+          creado_en: string
+          direccion_texto: string | null
+          escenario_id: number
+          estado: Database['public']['Enums']['estado_actuacion']
+          etapa_id: number | null
+          fuente: string
+          fuente_url: string | null
+          id: number
+          inicio: string
+          noche: string
+          ubicacion: unknown
+        }
+        ComputedFields: never
+        Insert: {
+          actualizado_en?: string
+          conjunto_id: number
+          creado_en?: string
+          direccion_texto?: string | null
+          escenario_id: number
+          estado?: Database['public']['Enums']['estado_actuacion']
+          etapa_id?: number | null
+          fuente: string
+          fuente_url?: string | null
+          id?: never
+          inicio: string
+          noche?: never
+          ubicacion?: unknown
+        }
+        Update: {
+          actualizado_en?: string
+          conjunto_id?: number
+          creado_en?: string
+          direccion_texto?: string | null
+          escenario_id?: number
+          estado?: Database['public']['Enums']['estado_actuacion']
+          etapa_id?: number | null
+          fuente?: string
+          fuente_url?: string | null
+          id?: never
+          inicio?: string
+          noche?: never
+          ubicacion?: unknown
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'actuaciones_conjunto_id_fkey'
+            columns: ['conjunto_id']
+            isOneToOne: false
+            referencedRelation: 'conjuntos'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'actuaciones_escenario_id_fkey'
+            columns: ['escenario_id']
+            isOneToOne: false
+            referencedRelation: 'escenarios'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'actuaciones_etapa_id_fkey'
+            columns: ['etapa_id']
+            isOneToOne: false
+            referencedRelation: 'etapas_concurso'
+            referencedColumns: ['id']
+          },
+        ]
+      }
       conjunto_nombres: {
         Row: {
           conjunto_id: number
@@ -195,6 +266,39 @@ export type Database = {
         }
         Relationships: []
       }
+      etapas_concurso: {
+        Row: {
+          fecha: string
+          id: number
+          numero: number
+          rueda: Database['public']['Enums']['rueda_concurso']
+          temporada_id: number
+        }
+        ComputedFields: never
+        Insert: {
+          fecha: string
+          id?: never
+          numero: number
+          rueda: Database['public']['Enums']['rueda_concurso']
+          temporada_id: number
+        }
+        Update: {
+          fecha?: string
+          id?: never
+          numero?: number
+          rueda?: Database['public']['Enums']['rueda_concurso']
+          temporada_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'etapas_concurso_temporada_id_fkey'
+            columns: ['temporada_id']
+            isOneToOne: false
+            referencedRelation: 'temporadas'
+            referencedColumns: ['id']
+          },
+        ]
+      }
       temporadas: {
         Row: {
           anio: number
@@ -235,6 +339,8 @@ export type Database = {
     Enums: {
       categoria_conjunto:
         'murga' | 'parodistas' | 'humoristas' | 'revista' | 'comparsa' | 'samba' | 'otro'
+      estado_actuacion: 'programada' | 'cambiada' | 'suspendida'
+      rueda_concurso: 'primera' | 'segunda' | 'liguilla'
       tipo_escenario:
         'teatro_verano' | 'privado' | 'popular' | 'movil' | 'gratuito' | 'barrio_a_barrio'
     }
@@ -357,6 +463,8 @@ export const Constants = {
         'samba',
         'otro',
       ],
+      estado_actuacion: ['programada', 'cambiada', 'suspendida'],
+      rueda_concurso: ['primera', 'segunda', 'liguilla'],
       tipo_escenario: [
         'teatro_verano',
         'privado',
