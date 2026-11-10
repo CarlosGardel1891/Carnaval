@@ -5,7 +5,8 @@
   },
   "map": {
     "label": "Map of Montevideo",
-    "missingKey": "The MapTiler key (VITE_MAPTILER_KEY) is missing, so the map can't be shown."
+    "missingKey": "The MapTiler key (VITE_MAPTILER_KEY) is missing, so the map can't be shown.",
+    "title": "Stage map"
   },
   "season": {
     "title": "Carnival {{year}}",
@@ -15,5 +16,16 @@
     "error": "We couldn't load the season.",
     "empty": "No season has been loaded yet.",
     "retry": "Try again"
+  },
+  "nav": {
+    "label": "Main navigation",
+    "today": "Today",
+    "map": "Map"
+  },
+  "today": {
+    "title": "Today"
+  },
+  "stage": {
+    "title": "Stage"
   }
 }

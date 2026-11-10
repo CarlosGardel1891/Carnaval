@@ -135,7 +135,7 @@ Cada fase termina con algo usable en el simulador y sus tests en verde; los dato
 ### Fase 3 · Pizarrón «Hoy» y escenarios (10 – 23 nov)
 
 1. Pantalla Hoy: actuaciones de la noche agrupadas por escenario y ordenadas por hora.
-2. Filtros: cerca mío (con permiso de ubicación), gratis, mis conjuntos, categoría.
+2. Filtros: cerca mío (con permiso de ubicación), gratis y categoría. El filtro «mis conjuntos» va en la Fase 4, junto con Seguir.
 3. Estados visibles: suspendida, cambiada, «ahora en escena» según la hora.
 4. Mapa de escenarios con pines por tipo y lo que hay esa noche. Los itinerantes se ubican por la actuación de esa noche.
 5. Ficha de escenario: dirección, precio, grilla de la noche y botón «cómo llegar» que abre el mapa del teléfono.
@@ -146,10 +146,11 @@ Listo cuando: con datos de una noche real de 2026 (ej. sábado 28 de febrero de 
 
 1. Lista de conjuntos por categoría, con buscador.
 2. Ficha: bio, próximas actuaciones, links a redes.
-3. Seguir con auth anónima; favoritos sincronizados en Supabase.
-4. Registro del token push (APNs y FCM) en `dispositivos_push`.
-5. Edge Function programada al mediodía: «hoy actúa X a las 22:50 en Y» a quien lo sigue.
-6. Edge Function disparada al cambiar `actuaciones.estado`: aviso de suspensión o cambio.
+3. Seguir con auth anónima; favoritos sincronizados en Supabase. La sesión anónima se crea en esta fase (no antes) y se guarda con `@capacitor/preferences`.
+4. Filtro «mis conjuntos» en el pizarrón «Hoy» (el parámetro `p_solo_favoritos` de `actuaciones_de_la_noche` ya existe).
+5. Registro del token push (APNs y FCM) en `dispositivos_push`.
+6. Edge Function programada al mediodía: «hoy actúa X a las 22:50 en Y» a quien lo sigue.
+7. Edge Function disparada al cambiar `actuaciones.estado`: aviso de suspensión o cambio.
 
 Listo cuando: seguir un conjunto en TestFlight y recibir la push de prueba en un teléfono real.
 

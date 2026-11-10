@@ -25,7 +25,7 @@ export function MontevideoMap() {
 
   if (!apiKey) {
     return (
-      <div className="flex h-full items-center justify-center bg-slate-200 p-6 text-center text-slate-700">
+      <div className="flex h-full items-center justify-center bg-surface text-soft p-6 text-center">
         {t('map.missingKey')}
       </div>
     )
