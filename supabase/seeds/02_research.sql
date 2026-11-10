@@ -45,17 +45,17 @@ from (values
   ('valores', 'Valores', '{}'::text[], 'comparsa', 'Palermo (Barrio Ansina)', 'https://www.instagram.com/valoresansina/', null, true, array['https://www.elobservador.com.uy/cultura-y-espectaculos/el-concurso-carnaval-pone-primera-rumbo-febrero-todos-los-detalles-la-prueba-admision-n6060452', 'https://www.elobservador.com.uy/cultura-y-espectaculos/todos-los-detalles-las-llamadas-admision-que-se-haran-el-prado-y-32-comparsas-n6058759', 'https://municipiob.montevideo.gub.uy/candombe-patrimonio-vivo-del-b']),
   ('la-sara-del-cordon', 'La Sara del Cordón', array['LA SARA DEL CORDON'], 'comparsa', 'Cordón', 'https://www.instagram.com/sarabandacandombe/', null, true, array['https://www.elobservador.com.uy/cultura-y-espectaculos/el-concurso-carnaval-pone-primera-rumbo-febrero-todos-los-detalles-la-prueba-admision-n6060452', 'https://www.elobservador.com.uy/cultura-y-espectaculos/todos-los-detalles-las-llamadas-admision-que-se-haran-el-prado-y-32-comparsas-n6058759', 'https://municipiob.montevideo.gub.uy/candombe-patrimonio-vivo-del-b', 'https://www.elobservador.com.uy/cultura-y-espectaculos/la-lista-tablados-y-espectaculos-carnaval-este-fin-semana-n6035835', 'https://www.daecpu.uy/segui-a-tu-conjunto.html']),
   ('integracion', 'Integración', '{}'::text[], 'comparsa', null, 'https://www.instagram.com/espacio_integracion/', null, true, array['https://www.elobservador.com.uy/cultura-y-espectaculos/el-concurso-carnaval-pone-primera-rumbo-febrero-todos-los-detalles-la-prueba-admision-n6060452', 'https://www.elobservador.com.uy/cultura-y-espectaculos/todos-los-detalles-las-llamadas-admision-que-se-haran-el-prado-y-32-comparsas-n6058759', 'https://municipiob.montevideo.gub.uy/candombe-patrimonio-vivo-del-b']),
-  ('la-margarita', 'La Margarita', '{}'::text[], 'murga', null, 'https://www.instagram.com/lamargaritaoficial/', null, true, array['https://www.montevideo.com.uy/Tiempo-libre/Carnaval-quedo-definido-el-fixture-de-la-primera-rueda-del-Concurso-Oficial-uc946845', 'https://www.montevideo.com.uy/Tiempo-libre/Carnaval-2027-el-fixture-de-la-Prueba-de-Admision-con-34-conjuntos-uc978569']),
-  ('don-bochinche-y-cia', 'Don Bochinche y Cía', array['DON BOCHINCHE Y CIA'], 'murga', null, null, null, true, array['https://www.montevideo.com.uy/Tiempo-libre/Carnaval-quedo-definido-el-fixture-de-la-primera-rueda-del-Concurso-Oficial-uc946845', 'https://www.montevideo.com.uy/Tiempo-libre/Carnaval-2027-el-fixture-de-la-Prueba-de-Admision-con-34-conjuntos-uc978569', 'https://www.elobservador.com.uy/cultura-y-espectaculos/la-lista-tablados-y-espectaculos-carnaval-este-fin-semana-n6035835', 'https://www.elobservador.com.uy/cultura-y-espectaculos/los-tablados-el-fin-semana-y-el-feriado-carnaval-privados-populares-gratuitos-y-teatro-verano-n6034369', 'https://www.elobservador.com.uy/cultura-y-espectaculos/la-lista-tablados-donde-se-puede-ver-carnaval-pagar-entrada-n6034632', 'https://www.daecpu.uy/segui-a-tu-conjunto.html']),
-  ('a-la-bartola', 'A la Bartola', '{}'::text[], 'murga', null, 'https://www.instagram.com/murgaalabartola/', 'https://www.facebook.com/alabartoolamurga/', true, array['https://www.montevideo.com.uy/Tiempo-libre/Carnaval-quedo-definido-el-fixture-de-la-primera-rueda-del-Concurso-Oficial-uc946845', 'https://www.montevideo.com.uy/Tiempo-libre/Carnaval-2027-el-fixture-de-la-Prueba-de-Admision-con-34-conjuntos-uc978569', 'https://x.com/murgaalabartola']),
-  ('la-mojigata', 'La Mojigata', '{}'::text[], 'murga', null, 'https://www.instagram.com/murgalamojigata/', 'https://www.facebook.com/MurgaLaMojigata/', true, array['https://www.montevideo.com.uy/Tiempo-libre/Carnaval-quedo-definido-el-fixture-de-la-primera-rueda-del-Concurso-Oficial-uc946845', 'https://www.montevideo.com.uy/Tiempo-libre/Carnaval-2027-el-fixture-de-la-Prueba-de-Admision-con-34-conjuntos-uc978569']),
-  ('gente-grande', 'Gente Grande', '{}'::text[], 'murga', null, 'https://www.instagram.com/gentegrande.murga/', null, true, array['https://www.montevideo.com.uy/Tiempo-libre/Carnaval-quedo-definido-el-fixture-de-la-primera-rueda-del-Concurso-Oficial-uc946845', 'https://www.montevideo.com.uy/Tiempo-libre/Carnaval-2027-el-fixture-de-la-Prueba-de-Admision-con-34-conjuntos-uc978569']),
-  ('mi-vieja-mula', 'Mi Vieja Mula', '{}'::text[], 'murga', 'Ciudad de la Costa (Canelones)', 'https://www.instagram.com/miviejamulamurga/', 'https://www.facebook.com/MiViejaMulaMurga/', true, array['https://www.montevideo.com.uy/Tiempo-libre/Carnaval-quedo-definido-el-fixture-de-la-primera-rueda-del-Concurso-Oficial-uc946845', 'https://www.montevideo.com.uy/Tiempo-libre/Carnaval-2027-el-fixture-de-la-Prueba-de-Admision-con-34-conjuntos-uc978569', 'https://www.elobservador.com.uy/nota/lo-que-canta-mi-vieja-mula-la-murga-que-anda-sin-vueltas-para-hablar-de-varonescarnaval-202222216390']),
-  ('jardin-del-pueblo', 'Jardín del Pueblo', '{}'::text[], 'murga', 'Barrio Jardín, Paysandú', 'https://www.instagram.com/jardindelpueblo/', null, true, array['https://www.montevideo.com.uy/Tiempo-libre/Carnaval-quedo-definido-el-fixture-de-la-primera-rueda-del-Concurso-Oficial-uc946845', 'https://www.montevideo.com.uy/Tiempo-libre/Carnaval-2027-el-fixture-de-la-Prueba-de-Admision-con-34-conjuntos-uc978569', 'https://www.montevideo.com.uy/Archivo/Jardin-del-Pueblo-la-murga-de-Paysandu-que-alcanzo-la-Liguilla-en-el-templo-de-Momo-uc916609']),
-  ('carambola', 'Carambola', '{}'::text[], 'revista', null, null, null, true, array['https://www.montevideo.com.uy/Tiempo-libre/Carnaval-quedo-definido-el-fixture-de-la-primera-rueda-del-Concurso-Oficial-uc946845', 'https://www.montevideo.com.uy/Tiempo-libre/Carnaval-2027-el-fixture-de-la-Prueba-de-Admision-con-34-conjuntos-uc978569']),
-  ('house', 'House', '{}'::text[], 'revista', null, null, 'https://www.facebook.com/revistahouse', true, array['https://www.montevideo.com.uy/Tiempo-libre/Carnaval-quedo-definido-el-fixture-de-la-primera-rueda-del-Concurso-Oficial-uc946845', 'https://www.montevideo.com.uy/Tiempo-libre/Carnaval-2027-el-fixture-de-la-Prueba-de-Admision-con-34-conjuntos-uc978569']),
-  ('los-chobys', 'Los Chobys', '{}'::text[], 'humoristas', null, 'https://www.instagram.com/humoristasloschobys/', null, true, array['https://www.montevideo.com.uy/Tiempo-libre/Carnaval-quedo-definido-el-fixture-de-la-primera-rueda-del-Concurso-Oficial-uc946845', 'https://www.montevideo.com.uy/Tiempo-libre/Carnaval-2027-el-fixture-de-la-Prueba-de-Admision-con-34-conjuntos-uc978569']),
-  ('social-club', 'Social Club', '{}'::text[], 'humoristas', null, null, null, true, array['https://www.montevideo.com.uy/Tiempo-libre/Carnaval-quedo-definido-el-fixture-de-la-primera-rueda-del-Concurso-Oficial-uc946845', 'https://www.montevideo.com.uy/Tiempo-libre/Carnaval-2027-el-fixture-de-la-Prueba-de-Admision-con-34-conjuntos-uc978569']),
+  ('la-margarita', 'La Margarita', '{}'::text[], 'murga', null, 'https://www.instagram.com/lamargaritaoficial/', null, true, array['https://www.montevideo.com.uy/Tiempo-libre/Carnaval-2027-el-fixture-de-la-Prueba-de-Admision-con-34-conjuntos-uc978569', 'https://www.montevideo.com.uy/Tiempo-libre/Carnaval-quedo-definido-el-fixture-de-la-primera-rueda-del-Concurso-Oficial-uc946845']),
+  ('don-bochinche-y-cia', 'Don Bochinche y Cía', array['DON BOCHINCHE Y CIA'], 'murga', null, null, null, true, array['https://www.montevideo.com.uy/Tiempo-libre/Carnaval-2027-el-fixture-de-la-Prueba-de-Admision-con-34-conjuntos-uc978569', 'https://www.montevideo.com.uy/Tiempo-libre/Carnaval-quedo-definido-el-fixture-de-la-primera-rueda-del-Concurso-Oficial-uc946845', 'https://www.elobservador.com.uy/cultura-y-espectaculos/la-lista-tablados-y-espectaculos-carnaval-este-fin-semana-n6035835', 'https://www.elobservador.com.uy/cultura-y-espectaculos/los-tablados-el-fin-semana-y-el-feriado-carnaval-privados-populares-gratuitos-y-teatro-verano-n6034369', 'https://www.elobservador.com.uy/cultura-y-espectaculos/la-lista-tablados-donde-se-puede-ver-carnaval-pagar-entrada-n6034632', 'https://www.daecpu.uy/segui-a-tu-conjunto.html']),
+  ('a-la-bartola', 'A la Bartola', '{}'::text[], 'murga', null, 'https://www.instagram.com/murgaalabartola/', 'https://www.facebook.com/alabartoolamurga/', true, array['https://www.montevideo.com.uy/Tiempo-libre/Carnaval-2027-el-fixture-de-la-Prueba-de-Admision-con-34-conjuntos-uc978569', 'https://www.montevideo.com.uy/Tiempo-libre/Carnaval-quedo-definido-el-fixture-de-la-primera-rueda-del-Concurso-Oficial-uc946845', 'https://x.com/murgaalabartola']),
+  ('la-mojigata', 'La Mojigata', '{}'::text[], 'murga', null, 'https://www.instagram.com/murgalamojigata/', 'https://www.facebook.com/MurgaLaMojigata/', true, array['https://www.montevideo.com.uy/Tiempo-libre/Carnaval-2027-el-fixture-de-la-Prueba-de-Admision-con-34-conjuntos-uc978569', 'https://www.montevideo.com.uy/Tiempo-libre/Carnaval-quedo-definido-el-fixture-de-la-primera-rueda-del-Concurso-Oficial-uc946845']),
+  ('gente-grande', 'Gente Grande', '{}'::text[], 'murga', null, 'https://www.instagram.com/gentegrande.murga/', null, true, array['https://www.montevideo.com.uy/Tiempo-libre/Carnaval-2027-el-fixture-de-la-Prueba-de-Admision-con-34-conjuntos-uc978569', 'https://www.montevideo.com.uy/Tiempo-libre/Carnaval-quedo-definido-el-fixture-de-la-primera-rueda-del-Concurso-Oficial-uc946845']),
+  ('mi-vieja-mula', 'Mi Vieja Mula', '{}'::text[], 'murga', 'Ciudad de la Costa (Canelones)', 'https://www.instagram.com/miviejamulamurga/', 'https://www.facebook.com/MiViejaMulaMurga/', true, array['https://www.montevideo.com.uy/Tiempo-libre/Carnaval-2027-el-fixture-de-la-Prueba-de-Admision-con-34-conjuntos-uc978569', 'https://www.montevideo.com.uy/Tiempo-libre/Carnaval-quedo-definido-el-fixture-de-la-primera-rueda-del-Concurso-Oficial-uc946845', 'https://www.elobservador.com.uy/nota/lo-que-canta-mi-vieja-mula-la-murga-que-anda-sin-vueltas-para-hablar-de-varonescarnaval-202222216390']),
+  ('jardin-del-pueblo', 'Jardín del Pueblo', '{}'::text[], 'murga', 'Barrio Jardín, Paysandú', 'https://www.instagram.com/jardindelpueblo/', null, true, array['https://www.montevideo.com.uy/Tiempo-libre/Carnaval-2027-el-fixture-de-la-Prueba-de-Admision-con-34-conjuntos-uc978569', 'https://www.montevideo.com.uy/Tiempo-libre/Carnaval-quedo-definido-el-fixture-de-la-primera-rueda-del-Concurso-Oficial-uc946845', 'https://www.montevideo.com.uy/Archivo/Jardin-del-Pueblo-la-murga-de-Paysandu-que-alcanzo-la-Liguilla-en-el-templo-de-Momo-uc916609']),
+  ('carambola', 'Carambola', '{}'::text[], 'revista', null, null, null, true, array['https://www.montevideo.com.uy/Tiempo-libre/Carnaval-2027-el-fixture-de-la-Prueba-de-Admision-con-34-conjuntos-uc978569', 'https://www.montevideo.com.uy/Tiempo-libre/Carnaval-quedo-definido-el-fixture-de-la-primera-rueda-del-Concurso-Oficial-uc946845']),
+  ('house', 'House', '{}'::text[], 'revista', null, null, 'https://www.facebook.com/revistahouse', true, array['https://www.montevideo.com.uy/Tiempo-libre/Carnaval-2027-el-fixture-de-la-Prueba-de-Admision-con-34-conjuntos-uc978569', 'https://www.montevideo.com.uy/Tiempo-libre/Carnaval-quedo-definido-el-fixture-de-la-primera-rueda-del-Concurso-Oficial-uc946845']),
+  ('los-chobys', 'Los Chobys', '{}'::text[], 'humoristas', null, 'https://www.instagram.com/humoristasloschobys/', null, true, array['https://www.montevideo.com.uy/Tiempo-libre/Carnaval-2027-el-fixture-de-la-Prueba-de-Admision-con-34-conjuntos-uc978569', 'https://www.montevideo.com.uy/Tiempo-libre/Carnaval-quedo-definido-el-fixture-de-la-primera-rueda-del-Concurso-Oficial-uc946845']),
+  ('social-club', 'Social Club', '{}'::text[], 'humoristas', null, null, null, true, array['https://www.montevideo.com.uy/Tiempo-libre/Carnaval-2027-el-fixture-de-la-Prueba-de-Admision-con-34-conjuntos-uc978569', 'https://www.montevideo.com.uy/Tiempo-libre/Carnaval-quedo-definido-el-fixture-de-la-primera-rueda-del-Concurso-Oficial-uc946845']),
   ('mas-que-lonja', 'Más que Lonja', array['MAS QUE LONJA'], 'comparsa', 'Buceo', null, null, true, array['https://www.montevideo.com.uy/Tiempo-libre/Carnaval-quedo-definido-el-fixture-de-la-primera-rueda-del-Concurso-Oficial-uc946845', 'https://www.montevideo.com.uy/Tiempo-libre/Carnaval-2027-el-fixture-de-la-Prueba-de-Admision-con-34-conjuntos-uc978569', 'https://www.elobservador.com.uy/cultura-y-espectaculos/todos-los-detalles-las-llamadas-admision-que-se-haran-el-prado-y-32-comparsas-n6058759', 'https://www.elobservador.com.uy/cultura-y-espectaculos/la-lista-tablados-y-espectaculos-carnaval-este-fin-semana-n6035835', 'https://www.elobservador.com.uy/cultura-y-espectaculos/los-tablados-el-fin-semana-y-el-feriado-carnaval-privados-populares-gratuitos-y-teatro-verano-n6034369', 'https://www.daecpu.uy/segui-a-tu-conjunto.html']),
   ('curtidores-de-hongos', 'Curtidores de Hongos', '{}'::text[], 'murga', null, 'https://www.instagram.com/curtidores1912/', null, true, array['https://www.montevideo.com.uy/Tiempo-libre/Carnaval-quedo-definido-el-fixture-de-la-primera-rueda-del-Concurso-Oficial-uc946845', 'https://www.elobservador.com.uy/carnaval']),
   ('jorge', 'Jorge', '{}'::text[], 'murga', null, 'https://www.instagram.com/jorge.solo.jorge/', null, true, array['https://www.montevideo.com.uy/Tiempo-libre/Carnaval-quedo-definido-el-fixture-de-la-primera-rueda-del-Concurso-Oficial-uc946845', 'https://www.elobservador.com.uy/cultura-y-espectaculos/el-concurso-carnaval-pone-primera-rumbo-febrero-todos-los-detalles-la-prueba-admision-n6060452']),
@@ -142,7 +142,7 @@ on conflict (slug) do update set
   verificado = excluded.verificado,
   fuente_url = excluded.fuente_url;
 
--- ---------------------------------------------------------------- conjunto_temporada 2027 (87)
+-- ---------------------------------------------------------------- conjunto_temporada 2027 (98)
 
 -- Sólo los conjuntos respaldados por una lista oficial 2027. en_concurso null = pendiente.
 insert into public.conjunto_temporada (conjunto_id, temporada_id, en_concurso, en_llamadas)
@@ -172,6 +172,17 @@ from (values
   ('valores', true, true),
   ('la-sara-del-cordon', true, true),
   ('integracion', false, true),
+  ('la-margarita', null::boolean, false),
+  ('don-bochinche-y-cia', null::boolean, false),
+  ('a-la-bartola', null::boolean, false),
+  ('la-mojigata', null::boolean, false),
+  ('gente-grande', null::boolean, false),
+  ('mi-vieja-mula', null::boolean, false),
+  ('jardin-del-pueblo', null::boolean, false),
+  ('carambola', null::boolean, false),
+  ('house', null::boolean, false),
+  ('los-chobys', null::boolean, false),
+  ('social-club', null::boolean, false),
   ('mas-que-lonja', null::boolean, true),
   ('la-malandra', null::boolean, false),
   ('desiree', null::boolean, false),
@@ -242,24 +253,13 @@ on conflict (conjunto_id, temporada_id) do update set
   en_concurso = excluded.en_concurso,
   en_llamadas = excluded.en_llamadas;
 
--- Sin lista 2027 que los respalde (23): quedan en el catálogo, sin participación.
+-- Sin lista 2027 que los respalde (12): quedan en el catálogo, sin participación.
 delete from public.conjunto_temporada ct
 using public.conjuntos c, public.temporadas t
 where c.id = ct.conjunto_id
   and t.id = ct.temporada_id
   and t.anio = 2027
   and c.slug in (
-    'la-margarita',
-    'don-bochinche-y-cia',
-    'a-la-bartola',
-    'la-mojigata',
-    'gente-grande',
-    'mi-vieja-mula',
-    'jardin-del-pueblo',
-    'carambola',
-    'house',
-    'los-chobys',
-    'social-club',
     'curtidores-de-hongos',
     'jorge',
     'los-adams',

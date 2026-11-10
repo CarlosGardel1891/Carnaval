@@ -134,3 +134,12 @@ Resultado actual: **OK, sin errores**, con 5 advertencias:
 9. **Widget de DAECPU:** el HTML no expone de dónde se carga la tabla de programación. Sigue pendiente revisarlo con DevTools en temporada.
 10. **17/11:** cargar el resultado de la Prueba de Admisión y correr `validate.py --post-prueba`.
 11. **`informe_fase0.md`:** la sección 0 tiene los conteos de antes de este cambio (33 escenarios, 102 conjuntos, San Baltasar como `llamadas`). No se modificó; los valores actuales son los de este archivo.
+
+## 2026-11-10 · Aspirantes de la Prueba de Admisión con lista 2027
+
+Once conjuntos que van a la Prueba de Admisión 2027 tenían `temporada_lista=2026`, porque la fila venía del Concurso 2026. Como figuran en el fixture de la Prueba 2027 (Montevideo Portal, 14/10/2026: <https://www.montevideo.com.uy/Tiempo-libre/Carnaval-2027-el-fixture-de-la-Prueba-de-Admision-con-34-conjuntos-uc978569>, revisado de nuevo el 2026-11-10), pasaron a `temporada_lista=2027` y esa URL quedó primera en `fuente_url`. `en_concurso` sigue vacío (pendiente) hasta el 17/11.
+
+- La Margarita, Don Bochinche y Cía, A la Bartola, La Mojigata, Gente Grande, Mi Vieja Mula, Jardín del Pueblo, Carambola, House, Los Chobys y Social Club.
+- Ahora los 34 aspirantes tienen `temporada_lista=2027`, y el seed les crea la fila de `conjunto_temporada` 2027 con `en_concurso` nulo (98 filas en total).
+- Quedan 12 con `temporada_lista=2026`, sin fila 2027: Curtidores de Hongos, Los Adams, Jorge, Herencia Ancestral y los ocho fuera de concurso.
+- `python research/validate.py`: OK, sin errores, con las mismas 5 advertencias.
