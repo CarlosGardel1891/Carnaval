@@ -176,13 +176,13 @@ LEEME.md           Cómo arrancar
 
 - **Hoy** (`features/today/`): la grilla de la noche, por escenario o por hora, con filtros de gratuitos y categoría, «ahora en escena», las suspendidas y cambiadas marcadas, y «actualizado hace X». La noche sale de `nocheLogica()` o de `?noche=YYYY-MM-DD`; los filtros viven en la URL.
 - **Cerca mío** (`features/location/`): pide la ubicación aproximada sólo cuando se toca el filtro y ordena por distancia. La posición no se guarda.
-- **Mapa** (`features/map/`): los escenarios de la noche que tienen ubicación, con forma y color por tipo, y las paradas de los itinerantes. Sin key de MapTiler muestra los marcadores sobre un fondo liso y lo avisa.
+- **Mapa** (`features/map/`): los escenarios de la noche que tienen ubicación, con forma y color por tipo, y las paradas de los itinerantes. Sin key de MapTiler muestra los marcadores sobre un fondo liso y lo avisa. MapLibre va en un archivo aparte, que se carga la primera vez que se abre `/mapa`: «Hoy» arranca sin él.
 - **Ficha de escenario** (`features/stages/`): tipo, barrio, precio, dirección, «Cómo llegar» (abre la app de mapas del teléfono) y la grilla de la noche; en un itinerante, cada parada.
 - **Caché** (`lib/queryCache.ts`): las consultas se guardan 24 horas en el teléfono; sin red, la app abre con lo último que cargó y lo avisa.
 - **Ciclo de vida** (`lib/lifecycle.ts`): la grilla se refresca cada 5 minutos sólo con la app al frente y al volver a ella; el botón «atrás» de Android vuelve o minimiza.
 - Todo lo que habla con Supabase está en `lib/api.ts`. En el emulador de Android, el cliente reescribe `127.0.0.1` a `10.0.2.2` para llegar al Supabase local.
 - Todo el texto sale de `src/locales/es.json` y `en.json`; un test controla que tengan las mismas claves.
-- 126 tests.
+- 127 tests.
 
 **`admin`**
 

@@ -89,6 +89,7 @@ En el emulador Android, la app reescribe `127.0.0.1`/`localhost` a `10.0.2.2` pa
 
 - Pantallas en `app/src/features/`: `today/` (pizarrón «Hoy»), `map/` (mapa de la noche), `stages/` (ficha de escenario), `location/` («cerca mío») y `season/`. Todo lo que habla con Supabase está en `app/src/lib/api.ts`.
 - La noche que se muestra sale de `nocheLogica()` o de `?noche=YYYY-MM-DD`; los filtros viven en la URL.
+- `/mapa` se carga aparte (`features/map/LazyMapPage.tsx`), así «Hoy» arranca sin MapLibre. Fuera de `features/map/`, nadie importa `MapPage` ni `MontevideoMap`.
 - Las consultas se guardan en el teléfono 24 horas (`app/src/lib/queryCache.ts`, decisión 37). Si cambia la forma de lo que devuelve una consulta, subir `CACHE_VERSION`. Una consulta que lleve la posición del usuario va con `meta: { persist: false }`.
 - «App al frente», refresco al volver y botón «atrás» de Android: `app/src/lib/lifecycle.ts` (decisiones 32 y 33).
 
