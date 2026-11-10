@@ -21,6 +21,7 @@
     "@capacitor/core": "^8.5.3",
     "@capacitor/geolocation": "^8.2.4",
     "@capacitor/preferences": "^8.0.1",
+    "@capacitor/status-bar": "^8.0.4",
     "@cuerda/shared": "workspace:*",
     "@supabase/supabase-js": "^2.118.0",
     "@tanstack/query-async-storage-persister": "^5.107.1",

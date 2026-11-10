@@ -120,7 +120,7 @@ Android quedó confirmado el 2026-11-10: con JDK 21 (Temurin) el build de debug 
 | Capa | Con qué |
 | --- | --- |
 | App | React 19, TypeScript estricto, Vite 8, Tailwind 4, React Router, TanStack Query |
-| Empaquetado nativo | Capacitor 8 (Android: SDK mínimo 24; iOS: 15.0), con los plugins App, Geolocation y Preferences |
+| Empaquetado nativo | Capacitor 8 (Android: SDK mínimo 24; iOS: 15.0), con los plugins App, Geolocation, Preferences y Status Bar |
 | Backend | Supabase: Postgres 17 con PostGIS, auth anónima (ya habilitada), Edge Functions, Realtime |
 | Mapas | MapLibre GL con tiles de MapTiler |
 | Idiomas | react-i18next, español e inglés |
@@ -250,7 +250,7 @@ Datos cargados por el seed: 110 conjuntos (98 con fila 2027), 42 escenarios sin 
 
 ## 10. Reglas y decisiones que hay que respetar
 
-Las 40 decisiones tomadas están en `docs/DECISIONES.md`. Las que más condicionan el trabajo:
+Las 41 decisiones tomadas están en `docs/DECISIONES.md`. Las que más condicionan el trabajo:
 
 - **Zona horaria:** siempre `America/Montevideo`, nunca la del teléfono. Se usan las funciones de `@cuerda/shared`.
 - **Noche lógica:** antes de las 06:00 es la noche anterior. Vale para «hoy», para la temporada vigente y para el modo Llamadas.

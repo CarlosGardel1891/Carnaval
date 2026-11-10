@@ -13,6 +13,8 @@
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         <item name="android:background">@null</item>
+        <!-- El fondo de la app: es lo que se ve detrás de la barra de estado y de la de gestos. -->
+        <item name="android:windowBackground">@color/ground</item>
     </style>
 
 
