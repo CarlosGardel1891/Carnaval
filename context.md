@@ -113,7 +113,7 @@ Lo que falta confirmar de la Fase 1:
 - El proyecto remoto de Supabase, en São Paulo, con las migraciones aplicadas.
 - El CI en GitHub: ninguna corrida llega a arrancar (`startup_failure`) por un problema de facturación de la cuenta dueña del repo (decisión 40). Mientras tanto mandan los chequeos locales.
 
-Android quedó confirmado el 2026-11-10: con JDK 21 (Temurin) el build de debug compila y la app corrió en el emulador contra el Supabase local (Hoy, ficha, mapa, «Cómo llegar» y el botón «atrás»). Lo único que no se pudo probar ahí es «cerca mío» con una posición: el emulador no entregó ninguna y la app mostró su aviso de error.
+Android quedó confirmado el 2026-11-10: con JDK 21 (Temurin) el build de debug compila y la app corrió en el emulador contra el Supabase local (Hoy, ficha, mapa, «Cómo llegar» y el botón «atrás»). «Cerca mío» se probó ahí con la posición fija en el centro de Montevideo (`adb emu geo fix -56.1645 -34.9011`): el diálogo de Android deja elegir entre precisa y aproximada; con la precisa ordena por distancia y muestra «1,3 km» y «2,4 km»; con la aproximada muestra el aviso y «menos de 1 km», y el orden entre esos dos escenarios se invierte, que es justo lo que el aviso advierte.
 
 ## 6. Tecnología
 
