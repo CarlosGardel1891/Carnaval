@@ -165,12 +165,12 @@ LEEME.md           Cómo arrancar
 - `public.norm` en SQL, réplica de la de TypeScript y Python, comprobada contra 420 casos.
 - Seeds: `01_temporadas.sql` (temporada 2027: del 2027-01-21 al 2027-03-07, Llamadas el 5 y 6 de febrero) y `02_research.sql`, que se genera desde los CSV con `pnpm gen:seed`.
 - Grilla ficticia (`pnpm db:grilla`): tres noches de conjuntos reales en cuatro escenarios inventados, para desarrollar pantallas. Sólo se carga en el Supabase local.
-- Noche real (`pnpm db:noche-real`): la cartelera publicada del sábado 28/02/2026, para probar con una noche de tamaño real. Entran 79 de sus 82 líneas, en 17 escenarios; las otras tres son de «ESCENARIOS MÓVILES», un nombre que no coincide con ningún alias. También es sólo local, y sus escenarios no tienen coordenadas.
+- Noche real (`pnpm db:noche-real`): la cartelera publicada del sábado 28/02/2026, para probar con una noche de tamaño real. Entran 79 de sus 82 líneas, en 17 escenarios; las otras tres están bajo «ESCENARIOS MÓVILES», un encabezado que no dice cuál de los dos móviles es, y quedan afuera a propósito (decisión 39). También es sólo local, y sus escenarios no tienen coordenadas.
 - El entorno local usa puertos 553xx para convivir con otros proyectos Supabase.
 
 **`packages/db-tests`**
 
-- 145 tests contra el Supabase local: permisos tabla por tabla con usuarios anónimos, admin y falso admin; funciones; invariantes del esquema; seed contra los CSV; grilla ficticia y noche real.
+- 146 tests contra el Supabase local: permisos tabla por tabla con usuarios anónimos, admin y falso admin; funciones; invariantes del esquema; seed contra los CSV; grilla ficticia y noche real.
 
 **`app`**
 
@@ -330,7 +330,6 @@ Nativo: `pnpm --filter app android` (o `android:local` para usar el Supabase loc
 - **Supabase remoto** (São Paulo), si todavía no está creado.
 - **Key de MapTiler:** ponerla en `app/.env` y restringirla por origen en MapTiler Cloud (los orígenes están en `CLAUDE.md`). Con una key real todavía no se probó el mapa.
 - **GitHub Actions:** quien administra la cuenta dueña del repo tiene que resolver el pago fallido o subir el límite de gasto (Settings → Billing & plans) para que el CI arranque.
-- **Alias «ESCENARIOS MÓVILES»:** decidir si se agrega a `research/escenarios.csv` y para cuál de los dos móviles de la IM; con él, la noche real de prueba carga sus 82 líneas.
 - **iOS:** probar en una Mac y localizar el texto del permiso de ubicación.
 - **17/11:** cargar el resultado de la Prueba de Admisión en `research/conjuntos.csv`, correr `python research/validate.py --post-prueba` y regenerar el seed con `pnpm gen:seed --post-prueba`.
 - **Coordenadas de los escenarios** y las cinco direcciones que faltan.

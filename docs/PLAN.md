@@ -142,7 +142,7 @@ Cada fase termina con algo usable en el simulador y sus tests en verde; los dato
 
 Listo cuando: con datos de una noche real de 2026 (ej. sábado 28 de febrero de 2026, cartelera de El Observador), la pantalla Hoy muestra lo mismo que la cartelera publicada.
 
-Estado al 2026-11-10: los cinco puntos están hechos. La noche del 28/02/2026 se carga en el Supabase local con `pnpm db:noche-real` y se ve en `/?noche=2026-02-28`: entran 79 de las 82 líneas de la cartelera. Las tres que faltan son las de «ESCENARIOS MÓVILES», un título que todavía no es alias de ningún escenario en `research/escenarios.csv`. Los escenarios reales no tienen coordenadas, así que aparecen en la lista y en su ficha, pero no en el mapa ni en «cerca mío».
+Estado al 2026-11-10: los cinco puntos están hechos. La noche del 28/02/2026 se carga en el Supabase local con `pnpm db:noche-real` y se ve en `/?noche=2026-02-28`: entran 79 de las 82 líneas de la cartelera. Las tres que faltan son las de «ESCENARIOS MÓVILES», un encabezado que no dice cuál de los dos móviles de la IM es; quedan afuera a propósito (decisión 39) y el caso lo resuelve el importador de la Fase 7. Los escenarios reales no tienen coordenadas, así que aparecen en la lista y en su ficha, pero no en el mapa ni en «cerca mío».
 
 ### Fase 4 · Conjuntos, Seguir y push (24 – 30 nov)
 
@@ -180,6 +180,7 @@ La app vale lo que vale su grilla: cada actuación guarda de dónde salió y la 
 1. Login por email con rol admin en Supabase.
 2. Alta y edición de conjuntos, escenarios, eventos, etapas y actuaciones.
 3. Importar la grilla de una noche desde CSV o pegando el texto tal como lo publica la prensa (nombre del escenario y debajo líneas «20:00 - CABALLEROS»), con vista previa y detección de conjuntos o escenarios desconocidos (matching por nombre + alias normalizados).
+   - Cuando la cartelera agrupa bajo un encabezado genérico como «ESCENARIOS MÓVILES», sin decir cuál de los móviles es, la vista previa le pide al admin que elija el móvil. La parada de esa noche (por ejemplo, «Plaza Bob Marley, Ingavi y Canstatt») va en la actuación, no en el escenario. Caso de prueba: las tres líneas que quedaron afuera de la noche real del 28/02/2026 (decisión 39).
 4. Botón «suspender noche» por escenario o global (lluvia), que marca las actuaciones y dispara la push.
 5. Control del estado del desfile de Llamadas.
 

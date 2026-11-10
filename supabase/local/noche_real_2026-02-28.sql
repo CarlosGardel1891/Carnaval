@@ -8,6 +8,9 @@
 -- Fuente: la cartelera de El Observador («Los tablados del sábado 28»), copiada tal como
 -- salió publicada: https://www.elobservador.com.uy/cultura-y-espectaculos/la-lista-tablados-y-espectaculos-carnaval-este-fin-semana-n6035835
 --
+-- De sus 82 líneas quedan afuera tres, las del encabezado «ESCENARIOS MÓVILES» (están
+-- como comentario en su lugar): la cartelera no dice cuál de los dos móviles es.
+--
 -- Qué carga: una actuación por cada línea de la cartelera cuyo escenario y cuyo conjunto
 -- coinciden, por `norm`, con un nombre o alias del seed. Lo que no coincide no se carga y
 -- se lista al final. No crea escenarios ni conjuntos, y no inventa coordenadas: los
@@ -108,9 +111,11 @@ values
   ('MONTE DE LA FRANCESA', '23:50', 'CABALLEROS'),
   ('MONTE DE LA FRANCESA', '00:50', 'SOCIEDAD ANÓNIMA'),
   ('ESCENARIO EN CANELONES', '00:50', 'CAYÓ LA CABRA'),
-  ('ESCENARIOS MÓVILES - ENTRADA GRATUITA - PLAZA BOB MARLEY INGAVI Y CANSTATT', '20:00', 'MI VIEJA MULA'),
-  ('ESCENARIOS MÓVILES - ENTRADA GRATUITA - PLAZA BOB MARLEY INGAVI Y CANSTATT', '20:50', 'LOS MUCHACHOS'),
-  ('ESCENARIOS MÓVILES - ENTRADA GRATUITA - PLAZA BOB MARLEY INGAVI Y CANSTATT', '21:50', 'YAMBO KENIA'),
+  -- Afuera del fixture (decisión 39): «ESCENARIOS MÓVILES» es un encabezado de la
+  -- cartelera, no el nombre de un escenario, y no dice cuál de los dos móviles de la IM
+  -- estuvo esa noche en la plaza. Asignarlo a uno sería inventar el dato.
+  --   ESCENARIOS MÓVILES - ENTRADA GRATUITA - PLAZA BOB MARLEY INGAVI Y CANSTATT
+  --     20:00 MI VIEJA MULA · 20:50 LOS MUCHACHOS · 21:50 YAMBO KENIA
   ('BARRIO A BARRIO - ENTRADA GRATUITA - UCRANIA Y GRAL. EDUARDO DA COSTA', '20:00', 'LOS ROLIN'),
   ('BARRIO A BARRIO - ENTRADA GRATUITA - UCRANIA Y GRAL. EDUARDO DA COSTA', '20:50', 'JARDÍN DEL PUEBLO'),
   ('BARRIO A BARRIO - ENTRADA GRATUITA - UCRANIA Y GRAL. EDUARDO DA COSTA', '21:50', 'GÉMINIS'),

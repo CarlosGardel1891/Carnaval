@@ -10,8 +10,9 @@ import { repoPath } from './research'
 // `pnpm db:noche-real`. Estos tests la cargan y la quitan: al terminar no queda en la base.
 
 const FUENTE = 'cartelera-2026-02-28'
-const LINEAS = 82 // las líneas de «Los tablados del sábado 28»
-const LINEAS_MOVILES = 3 // las de «ESCENARIOS MÓVILES», que hoy no tiene alias
+// De las 82 líneas de «Los tablados del sábado 28» quedan afuera las tres del encabezado
+// «ESCENARIOS MÓVILES», que no dice cuál de los dos móviles es (decisión 39).
+const LINEAS = 79
 
 const script = (...args: string[]) =>
   spawnSync(process.execPath, [repoPath('scripts', 'db-grilla.mjs'), ...args], { encoding: 'utf8' })
@@ -25,17 +26,6 @@ const noches = () =>
       [FUENTE],
     )
     return rows.map((r) => [r.noche, r.total])
-  })
-
-// Si algún día el seed suma el alias que falta, esas tres líneas también se cargan.
-const movilesConAlias = () =>
-  withSql(async (sql) => {
-    const { rows } = await sql.query<{ hay: boolean }>(
-      `select exists (
-         select 1 from public.escenario_nombres
-          where nombre_norm = public.norm('ESCENARIOS MÓVILES')) as hay`,
-    )
-    return rows[0]!.hay
   })
 
 beforeAll(() => {
@@ -55,12 +45,12 @@ describe('noche real del 28/02/2026', () => {
     expect(await noches()).toEqual([])
   })
 
-  it('carga la cartelera en su fecha y avisa lo que no coincidió con el seed', async () => {
-    const conAlias = await movilesConAlias()
+  it('carga la cartelera en su fecha, sin nada que no coincida con el seed', async () => {
     const res = nocheReal()
     expect(res.status).toBe(0)
-    expect(await noches()).toEqual([['2026-02-28', conAlias ? LINEAS : LINEAS - LINEAS_MOVILES]])
-    expect(res.stdout.includes('ESCENARIOS MÓVILES')).toBe(!conAlias)
+    expect(await noches()).toEqual([['2026-02-28', LINEAS]])
+    // La lista de lo que no coincidió sale vacía.
+    expect(res.stdout).toMatch(/lineas_sin_cargar[\s+-]*\(0 rows\)/)
 
     const mezcla = await withSql(async (sql) => {
       const { rows } = await sql.query<{
@@ -85,6 +75,12 @@ describe('noche real del 28/02/2026', () => {
     })
     // Escenarios y conjuntos del seed, con la nota como fuente y sin coordenadas inventadas.
     expect(mezcla).toEqual({ ficticios: 0, de_prueba: 0, sin_url: 0, con_ubicacion: 0 })
+  })
+
+  it('los móviles de la IM quedan sin actuaciones: la cartelera no dice cuál es', async () => {
+    const filas = ok(await anonClient().rpc('actuaciones_de_la_noche', { p_noche: '2026-02-28' }))
+    expect(filas.filter((f) => f.escenario_slug.startsWith('escenario-movil-im'))).toEqual([])
+    expect(filas.filter((f) => f.direccion?.includes('BOB MARLEY'))).toEqual([])
   })
 
   it('la noche va de las 19:30 a las 00:50 del día siguiente', async () => {
