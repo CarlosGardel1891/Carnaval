@@ -19,6 +19,7 @@ React 19 + TypeScript (strict) + Vite + Capacitor 8 + Tailwind 4, Supabase (Post
 - `admin/` — panel web de carga de datos (por ahora, login placeholder).
 - `supabase/` — `config.toml`, `migrations/`, `seed.sql` (sólo local) y, más adelante, Edge Functions.
 - `packages/shared/` (`@cuerda/shared`) — tipos de la base (`database.types.ts`, generado), fechas (`nocheLogica`, `modoLlamadasActivo`, `calendarDateInMontevideo`) y `norm` para matching de nombres.
+- `packages/db-tests/` (`@cuerda/db-tests`) — tests de integración de la base (RLS, funciones, invariantes del esquema) contra el Supabase local. Corren con `pnpm test:db`, aparte de `pnpm test`.
 - `research/` — datos semilla de la Fase 0. **No editar a mano sin correr `python research/validate.py` después.**
 - `docs/`, `prompts/` — plan, decisiones y prompts.
 
@@ -36,6 +37,7 @@ pnpm lint                    # ESLint en todo el repo
 pnpm format                  # Prettier (format:check para CI)
 pnpm typecheck               # tsc en cada paquete
 pnpm test                    # Vitest en cada paquete
+pnpm test:db                 # tests de la base; necesita `pnpm supabase start`
 pnpm build                   # build de app y admin
 python research/validate.py  # valida los CSV semilla
 ```

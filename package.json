@@ -14,6 +14,7 @@
     "format:check": "prettier --check .",
     "typecheck": "pnpm -r typecheck",
     "test": "pnpm -r test",
+    "test:db": "pnpm --filter @cuerda/db-tests test:db",
     "gen:types": "supabase gen types typescript --local --schema public > packages/shared/src/database.types.ts && prettier --write packages/shared/src/database.types.ts"
   },
   "type": "module",
