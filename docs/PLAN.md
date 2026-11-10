@@ -59,7 +59,7 @@ Recorte de emergencia si no da el tiempo: Hoy + Conjuntos + Modo Llamadas, con e
 | 9 · Operación en temporada | 21 ene – 7 mar |
 | Desfile de Llamadas | 2027-02-05 y 2027-02-06 |
 
-Hitos externos: Prueba de Admisión al Concurso del 10 al 16 de noviembre (actualizar `research/conjuntos.csv` el 17/11 y correr `python research/validate.py --post-prueba`). Acuerdo con DAECPU por la grilla: antes del 2026-12-15.
+Hitos externos: Prueba de Admisión al Concurso del 10 al 16 de noviembre (actualizar `research/conjuntos.csv` el 17/11, correr `python research/validate.py --post-prueba` y regenerar el seed con `pnpm gen:seed --post-prueba`). Acuerdo con DAECPU por la grilla: antes del 2026-12-15.
 
 ## Fase 0 · Investigación y validación (hecha)
 
@@ -124,7 +124,9 @@ La tabla central es `actuaciones`: cada fila es «tal conjunto, en tal escenario
 - `buscar_por_nombre(texto)` — matching exacto normalizado contra nombre + alias (ver DECISIONES.md).
 - `registrar_dispositivo_push(token, plataforma, idioma)` — alta o reasignación del token al usuario actual.
 
-**Seed:** desde los CSV de `research/` (validados con `research/validate.py`), con un script que genera el SQL. La grilla ficticia para desarrollo y tests va aparte y sólo se carga en el Supabase local.
+**Seed:** desde los CSV de `research/` (validados con `research/validate.py`), con un script que genera el SQL (`pnpm gen:seed`, decisión 26). Todos los conjuntos van al catálogo; la participación en la temporada (`conjunto_temporada`) sólo se carga para los que tienen una lista 2027 que la respalde. La grilla ficticia para desarrollo y tests va aparte (`pnpm db:grilla`, decisión 27) y sólo se carga en el Supabase local.
+
+**Borrados:** un conjunto o un escenario con actuaciones no se puede borrar, ni un conjunto que está en un orden de desfile (decisión 28).
 
 ## Fases 3 a 6 · Funcionalidades del MVP (10 nov – 13 dic)
 

@@ -39,3 +39,31 @@ jobs:
           python-version: '3.12'
       - run: pip install pandas
       - run: python research/validate.py --quiet
+
+  db:
+    name: Base de datos (Supabase local)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: corepack enable
+      - run: pnpm install --frozen-lockfile
+      - run: pip install pandas
+      # Lo generado tiene que estar al día con su fuente: el seed y el fixture de norm
+      # salen de los CSV de research/.
+      - run: python scripts/gen_seed.py --check
+      - run: python scripts/gen_norm_cases.py --check
+      # Levanta la base con todas las migraciones y los seeds. Sin los servicios que los
+      # tests no usan.
+      - run: pnpm supabase start -x studio,imgproxy,edge-runtime,logflare,vector,mailpit,realtime,storage-api,supavisor
+      - run: pnpm test:db
+      # Carga y quita la grilla ficticia por el mismo camino que en desarrollo.
+      - run: pnpm db:grilla && pnpm db:grilla --quitar
+      # Los tipos de la base se regeneran, nunca se editan a mano.
+      - run: pnpm gen:types
+      - run: git diff --exit-code -- packages/shared/src/database.types.ts

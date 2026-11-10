@@ -17,11 +17,11 @@ React 19 + TypeScript (strict) + Vite + Capacitor 8 + Tailwind 4, Supabase (Post
 
 - `app/` — app móvil (Vite + Capacitor). `app/android/` y `app/ios/` son los proyectos nativos generados por Capacitor.
 - `admin/` — panel web de carga de datos (por ahora, login placeholder).
-- `supabase/` — `config.toml`, `migrations/`, `seed.sql` (sólo local) y, más adelante, Edge Functions.
+- `supabase/` — `config.toml`, `migrations/`, `seeds/` (`01_temporadas.sql` y `02_research.sql`, generado: no editar a mano), `local/` (grilla ficticia; sólo para el Supabase local) y, más adelante, Edge Functions.
 - `packages/shared/` (`@cuerda/shared`) — tipos de la base (`database.types.ts`, generado), fechas (`nocheLogica`, `modoLlamadasActivo`, `calendarDateInMontevideo`) y `norm` para matching de nombres.
 - `packages/db-tests/` (`@cuerda/db-tests`) — tests de integración de la base (RLS, funciones, invariantes del esquema) contra el Supabase local. Corren con `pnpm test:db`, aparte de `pnpm test`.
-- `scripts/` — generadores: `gen-norm-marks.mjs` (migración de `public.norm`) y `gen_norm_cases.py` (fixture de casos de `norm`). `norm` vive en tres lugares (TypeScript, Python y SQL) y tienen que dar lo mismo (decisión 22).
-- `research/` — datos semilla de la Fase 0. **No editar a mano sin correr `python research/validate.py` después.**
+- `scripts/` — generadores: `gen_seed.py` (el seed, desde los CSV de `research/`), `gen-norm-marks.mjs` (migración de `public.norm`) y `gen_norm_cases.py` (fixture de casos de `norm`); y `db-grilla.mjs`, que carga la grilla ficticia. `norm` vive en tres lugares (TypeScript, Python y SQL) y tienen que dar lo mismo (decisión 22).
+- `research/` — datos semilla de la Fase 0. **No editar a mano sin correr `python research/validate.py` después.** Si cambia un CSV, regenerar también el seed (`pnpm gen:seed`) y el fixture de `norm` (`python scripts/gen_norm_cases.py`); el CI falla si quedaron viejos.
 - `docs/`, `prompts/` — plan, decisiones y prompts.
 
 ## Comandos
@@ -48,15 +48,23 @@ Supabase local (Docker; puertos 553xx para no chocar con otros proyectos):
 ```bash
 pnpm supabase start          # levanta todo; imprime URL y keys locales
 pnpm supabase status         # vuelve a mostrar URL y keys
-pnpm supabase db reset       # recrea la base: migraciones + seed.sql
+pnpm supabase db reset       # recrea la base: migraciones + seeds
 pnpm supabase migration new <nombre>
 pnpm gen:types               # regenera packages/shared/src/database.types.ts
+pnpm gen:seed                # regenera supabase/seeds/02_research.sql desde research/
+pnpm db:grilla               # carga la grilla ficticia (tres noches desde el 2027-01-28)
+pnpm db:grilla hoy           # ídem, desde la noche de hoy (o desde una fecha: YYYY-MM-DD)
+pnpm db:grilla --quitar      # la borra
 pnpm supabase stop
 ```
 
 Studio local: http://127.0.0.1:55323. API: http://127.0.0.1:55321.
 
-Supabase remoto (São Paulo): `pnpm supabase login`, `pnpm supabase link --project-ref <ref>`, `pnpm supabase db push`. El seed no se aplica solo en remoto: cargar los datos con el SQL editor o un script con service role.
+Seed (decisión 26): `pnpm gen:seed` corre antes `research/validate.py` y no escribe nada si hay errores; con `--post-prueba` le pasa esa opción (para después del 17/11), y con `--check` sólo avisa si el seed quedó viejo. El seed se puede volver a correr sobre una base con datos.
+
+Grilla ficticia (decisión 27): conjuntos reales en escenarios inventados (`ficticio-…`), con `fuente = 'ficticia'`. Sirve para desarrollar pantallas mientras no haya grilla real. `pnpm db:grilla` entra por `docker exec` a la base local; no hay forma de apuntarlo al proyecto remoto, y `pnpm supabase db reset` la borra.
+
+Supabase remoto (São Paulo): `pnpm supabase login`, `pnpm supabase link --project-ref <ref>`, `pnpm supabase db push`. El seed no se aplica solo en remoto: correr `supabase/seeds/01_temporadas.sql` y después `supabase/seeds/02_research.sql` con el SQL editor o con `psql` (o `pnpm supabase db push --include-seed`, que corre los seeds de `config.toml`). `supabase/local/` nunca se corre en remoto.
 
 Al crear el proyecto remoto hay que activar a mano los inicios de sesión anónimos (Authentication → Sign In / Providers → Allow anonymous sign-ins): `config.toml` sólo vale para el Supabase local. Antes del lanzamiento, revisar también los límites de auth por IP (decisión 23).
 
@@ -87,4 +95,6 @@ Provisional: `uy.cuerda.app`. Para cambiarlo antes de publicar: `appId` en `app/
 - Nada de texto hardcodeado en la UI: todo por i18n (`src/locales/{es,en}.json`, mismas claves; hay un test que lo controla).
 - RLS en todas las tablas: lectura pública de lo publicado, escritura sólo service role o admin. Los usuarios anónimos tienen el rol `authenticated`: las policies de escritura exigen `es_admin()`, nunca sólo el rol. En el MVP todo lo que está en las tablas públicas está publicado (decisión 24).
 - Nunca subir keys al repo: usar `.env` y mantener `.env.example`.
+- `packages/shared/src/database.types.ts` y `supabase/seeds/02_research.sql` son generados: se regeneran con `pnpm gen:types` y `pnpm gen:seed`, nunca a mano.
+- Las funciones SQL reciben la noche lógica como parámetro (la app la calcula con `nocheLogica()`); nada de `current_date`, `now()::date` ni el `TimeZone` de la sesión en las migraciones.
 - Plan mode antes de cada paso grande; commit al terminar cada paso.
