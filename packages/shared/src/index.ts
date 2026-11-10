@@ -1,7 +1,11 @@
-import type { Tables } from './database.types'
+import type { Enums, Tables } from './database.types'
 
 export * from './dates'
 export * from './norm'
-export type { Database, Json, Tables, TablesInsert, TablesUpdate } from './database.types'
+export { Constants } from './database.types'
+export type { Database, Enums, Json, Tables, TablesInsert, TablesUpdate } from './database.types'
 
 export type Temporada = Tables<'temporadas'>
+export type CategoriaConjunto = Enums<'categoria_conjunto'>
+export type TipoEscenario = Enums<'tipo_escenario'>
+export type EstadoActuacion = Enums<'estado_actuacion'>

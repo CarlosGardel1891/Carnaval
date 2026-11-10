@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { Constants } from '@cuerda/shared'
 import en from './en.json'
 import es from './es.json'
 
@@ -13,5 +14,15 @@ function keys(tree: Tree, prefix = ''): string[] {
 describe('traducciones', () => {
   it('es y en tienen las mismas claves', () => {
     expect(keys(en).sort()).toEqual(keys(es).sort())
+  })
+
+  it('cada valor de los enums de la base que se muestra tiene su texto', () => {
+    const enums = Constants.public.Enums
+    const expected = [
+      ...enums.categoria_conjunto.map((v) => `category.${v}`),
+      ...enums.tipo_escenario.map((v) => `stageType.${v}`),
+      ...enums.estado_actuacion.map((v) => `status.${v}`),
+    ]
+    expect(keys(es)).toEqual(expect.arrayContaining(expected))
   })
 })

@@ -1,14 +1,16 @@
 import { useTranslation } from 'react-i18next'
 import type { Temporada } from '@cuerda/shared'
-import { formatIsoDate } from '../../lib/formatDate'
+import { formatIsoDate } from '../../lib/format'
+import { useLocale } from '../../lib/useLocale'
 
 interface SeasonCardProps {
   season: Temporada
 }
 
 export function SeasonCard({ season }: SeasonCardProps) {
-  const { t, i18n } = useTranslation()
-  const fmt = (d: string) => formatIsoDate(d, i18n.language)
+  const { t } = useTranslation()
+  const locale = useLocale()
+  const fmt = (d: string) => formatIsoDate(d, locale)
 
   return (
     <section className="bg-surface border-line rounded-2xl border p-4">

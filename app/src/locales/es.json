@@ -27,5 +27,27 @@
   },
   "stage": {
     "title": "Escenario"
+  },
+  "category": {
+    "murga": "Murga",
+    "parodistas": "Parodistas",
+    "humoristas": "Humoristas",
+    "revista": "Revista",
+    "comparsa": "Comparsa",
+    "samba": "Escuela de samba",
+    "otro": "Otro"
+  },
+  "stageType": {
+    "teatro_verano": "Teatro de Verano",
+    "privado": "Tablado privado",
+    "popular": "Escenario popular",
+    "movil": "Escenario móvil",
+    "gratuito": "Escenario gratuito",
+    "barrio_a_barrio": "Barrio a Barrio"
+  },
+  "status": {
+    "programada": "Programada",
+    "cambiada": "Cambió",
+    "suspendida": "Suspendida"
   }
 }

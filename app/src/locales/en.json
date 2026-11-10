@@ -27,5 +27,27 @@
   },
   "stage": {
     "title": "Stage"
+  },
+  "category": {
+    "murga": "Murga",
+    "parodistas": "Parodistas",
+    "humoristas": "Humoristas",
+    "revista": "Revista",
+    "comparsa": "Comparsa",
+    "samba": "Samba school",
+    "otro": "Other"
+  },
+  "stageType": {
+    "teatro_verano": "Teatro de Verano",
+    "privado": "Private stage",
+    "popular": "Community stage",
+    "movil": "Mobile stage",
+    "gratuito": "Free stage",
+    "barrio_a_barrio": "Barrio a Barrio"
+  },
+  "status": {
+    "programada": "Scheduled",
+    "cambiada": "Changed",
+    "suspendida": "Cancelled"
   }
 }
