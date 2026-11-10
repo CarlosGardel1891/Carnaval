@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { cleanup, screen, within } from '@testing-library/react'
+import { focusManager } from '@tanstack/react-query'
+import { act, cleanup, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import i18n from '../../i18n'
 import { fetchCurrentSeason, fetchNightActs } from '../../lib/api'
@@ -38,6 +39,7 @@ describe('pizarrón Hoy', () => {
   })
   afterEach(() => {
     cleanup()
+    focusManager.setFocused(undefined)
     vi.useRealTimers()
     vi.resetAllMocks()
     if (systemTz === undefined) delete process.env.TZ
@@ -122,6 +124,20 @@ describe('pizarrón Hoy', () => {
     renderApp('/')
     await screen.findByRole('region', { name: 'Tablado Centro' })
     expect(screen.getByText('Actualizado recién')).toBeInTheDocument()
+  })
+
+  it('al volver la app al frente refresca la grilla y la hora', async () => {
+    renderApp('/')
+    await screen.findByRole('region', { name: 'Tablado Centro' })
+    expect(within(rowOf('Cayó la Cabra')).queryByText('Ahora en escena')).not.toBeInTheDocument()
+
+    // Una hora en segundo plano: los timers no corrieron.
+    act(() => focusManager.setFocused(false))
+    vi.setSystemTime(new Date('2027-01-28T22:35:00-03:00'))
+    act(() => focusManager.setFocused(true))
+
+    expect(within(rowOf('Cayó la Cabra')).getByText('Ahora en escena')).toBeInTheDocument()
+    await waitFor(() => expect(fetchNightActs).toHaveBeenCalledTimes(2))
   })
 
   it('antes de la temporada dice cuándo arranca y muestra la temporada', async () => {

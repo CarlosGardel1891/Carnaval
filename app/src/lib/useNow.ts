@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { focusManager } from '@tanstack/react-query'
 
 /**
  * El instante actual, renovado cada `intervalMs` y al volver a la app (los timers se
@@ -11,10 +12,13 @@ export function useNow(intervalMs = 30_000): Date {
   useEffect(() => {
     const tick = () => setNow(new Date())
     const id = setInterval(tick, intervalMs)
-    document.addEventListener('visibilitychange', tick)
+    // El mismo «al frente» que usa la caché: ver `initLifecycle`.
+    const unsubscribe = focusManager.subscribe((focused) => {
+      if (focused) tick()
+    })
     return () => {
       clearInterval(id)
-      document.removeEventListener('visibilitychange', tick)
+      unsubscribe()
     }
   }, [intervalMs])
 

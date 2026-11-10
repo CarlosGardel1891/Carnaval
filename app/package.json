@@ -17,6 +17,7 @@
     "ios:open": "cap open ios"
   },
   "dependencies": {
+    "@capacitor/app": "^8.1.2",
     "@capacitor/core": "^8.5.3",
     "@cuerda/shared": "workspace:*",
     "@supabase/supabase-js": "^2.118.0",
