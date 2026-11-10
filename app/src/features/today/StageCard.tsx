@@ -1,9 +1,8 @@
 import { useId } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router'
-import { formatDistance } from '../../lib/format'
 import { joinParts, priceLabel } from '../../lib/labels'
-import { useLocale } from '../../lib/useLocale'
+import { useDistanceLabel } from '../location/useDistanceLabel'
 import { useStagePath } from '../stages/stagePath'
 import { ActRow } from './ActRow'
 import type { StageGroup } from './board'
@@ -16,7 +15,7 @@ interface StageCardProps {
 /** Un escenario del pizarrón: su encabezado (que lleva a la ficha) y lo que pasa esa noche. */
 export function StageCard({ group, onStage }: StageCardProps) {
   const { t } = useTranslation()
-  const locale = useLocale()
+  const distanceLabel = useDistanceLabel()
   const stagePath = useStagePath()
   const headingId = useId()
 
@@ -35,7 +34,7 @@ export function StageCard({ group, onStage }: StageCardProps) {
           </h2>
           {summary && <p className="text-soft">{summary}</p>}
           {group.distancia_m !== null && (
-            <p className="text-accent font-semibold">{formatDistance(group.distancia_m, locale)}</p>
+            <p className="text-accent font-semibold">{distanceLabel(group.distancia_m)}</p>
           )}
         </div>
         <svg

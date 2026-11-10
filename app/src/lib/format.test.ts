@@ -2,6 +2,7 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import {
   formatAgo,
   formatDistance,
+  formatRoughDistance,
   formatIsoDate,
   formatLocale,
   formatNight,
@@ -70,6 +71,16 @@ describe('formatDistance', () => {
     expect(plain(formatDistance(1234, 'es'))).toBe('1,2 km')
     expect(plain(formatDistance(1234, 'en'))).toBe('1.2 km')
     expect(plain(formatDistance(12_600, 'es'))).toBe('13 km')
+  })
+})
+
+describe('formatRoughDistance', () => {
+  it('va en kilómetros enteros y nunca baja de 1 km', () => {
+    expect(plain(formatRoughDistance(40, 'es'))).toBe('1 km')
+    expect(plain(formatRoughDistance(1499, 'es'))).toBe('1 km')
+    expect(plain(formatRoughDistance(1500, 'es'))).toBe('2 km')
+    expect(plain(formatRoughDistance(2500, 'en'))).toBe('3 km')
+    expect(plain(formatRoughDistance(12_600, 'es'))).toBe('13 km')
   })
 })
 

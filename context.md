@@ -175,14 +175,14 @@ LEEME.md           Cómo arrancar
 **`app`**
 
 - **Hoy** (`features/today/`): la grilla de la noche, por escenario o por hora, con filtros de gratuitos y categoría, «ahora en escena», las suspendidas y cambiadas marcadas, y «actualizado hace X». La noche sale de `nocheLogica()` o de `?noche=YYYY-MM-DD`; los filtros viven en la URL.
-- **Cerca mío** (`features/location/`): pide la ubicación aproximada sólo cuando se toca el filtro y ordena por distancia. La posición no se guarda.
+- **Cerca mío** (`features/location/`): pide la ubicación sólo cuando se toca el filtro (precisa o aproximada, elige el usuario) y ordena por distancia. Con la aproximada, las distancias van redondeadas al kilómetro y un aviso lo explica. La posición no se guarda.
 - **Mapa** (`features/map/`): los escenarios de la noche que tienen ubicación, con forma y color por tipo, y las paradas de los itinerantes. Sin key de MapTiler muestra los marcadores sobre un fondo liso y lo avisa. MapLibre va en un archivo aparte, que se carga la primera vez que se abre `/mapa`: «Hoy» arranca sin él.
 - **Ficha de escenario** (`features/stages/`): tipo, barrio, precio, dirección, «Cómo llegar» (abre la app de mapas del teléfono) y la grilla de la noche; en un itinerante, cada parada.
 - **Caché** (`lib/queryCache.ts`): las consultas se guardan 24 horas en el teléfono; sin red, la app abre con lo último que cargó y lo avisa.
 - **Ciclo de vida** (`lib/lifecycle.ts`): la grilla se refresca cada 5 minutos sólo con la app al frente y al volver a ella; el botón «atrás» de Android vuelve o minimiza.
 - Todo lo que habla con Supabase está en `lib/api.ts`. En el emulador de Android, el cliente reescribe `127.0.0.1` a `10.0.2.2` para llegar al Supabase local.
 - Todo el texto sale de `src/locales/es.json` y `en.json`; un test controla que tengan las mismas claves.
-- 127 tests.
+- 131 tests.
 
 **`admin`**
 
@@ -250,7 +250,7 @@ Datos cargados por el seed: 110 conjuntos (98 con fila 2027), 42 escenarios sin 
 
 ## 10. Reglas y decisiones que hay que respetar
 
-Las 41 decisiones tomadas están en `docs/DECISIONES.md`. Las que más condicionan el trabajo:
+Las 42 decisiones tomadas están en `docs/DECISIONES.md`. Las que más condicionan el trabajo:
 
 - **Zona horaria:** siempre `America/Montevideo`, nunca la del teléfono. Se usan las funciones de `@cuerda/shared`.
 - **Noche lógica:** antes de las 06:00 es la noche anterior. Vale para «hoy», para la temporada vigente y para el modo Llamadas.
@@ -267,7 +267,7 @@ Las 41 decisiones tomadas están en `docs/DECISIONES.md`. Las que más condicion
 - **Archivos generados:** `database.types.ts` y `supabase/seeds/02_research.sql` se regeneran (`pnpm gen:types`, `pnpm gen:seed`), nunca se editan a mano.
 - **Grilla ficticia y noche real de prueba:** sólo en el Supabase local; nunca llegan al proyecto remoto.
 - **«Ahora en escena»:** una actuación lo está desde su inicio hasta el inicio de la siguiente no suspendida de ese escenario, con un tope de 75 minutos, y sólo si la noche que se mira es la de hoy.
-- **Ubicación del usuario:** aproximada, sólo cuando la pide «cerca mío», en memoria y nunca guardada. El mapa no la pide.
+- **Ubicación del usuario:** sólo cuando la pide «cerca mío», en memoria y nunca guardada. Se piden la precisa y la aproximada y el usuario elige; con la aproximada las distancias se muestran redondeadas. El mapa no la pide.
 - **Caché en el teléfono:** 24 horas. Si cambia la forma de lo que devuelve una consulta, hay que subir `CACHE_VERSION`; una consulta que lleve la posición del usuario va con `meta: { persist: false }`.
 - **Coordenadas:** no se inventan. Un escenario sin ubicación aparece en la lista y en su ficha, y el mapa dice cuántos faltan.
 - **Forma de trabajo:** un paso numerado del plan es una tarea; se planifica antes de tocar código y se hace un commit al terminar. Un paso no está hecho hasta cumplir el «Listo cuando» de su fase.

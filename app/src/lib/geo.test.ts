@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { Capacitor } from '@capacitor/core'
 import { Geolocation } from '@capacitor/geolocation'
-import { currentPosition, hasLocationPermission, LocationError } from './geo'
+import { APPROXIMATE_FROM_M, currentPosition, hasLocationPermission, LocationError } from './geo'
 
 vi.mock('@capacitor/geolocation', () => ({
   Geolocation: {
@@ -16,9 +16,15 @@ const permission = (state: 'granted' | 'denied' | 'prompt', coarse = state) => (
   coarseLocation: coarse,
 })
 
-const position = { timestamp: 0, coords: { latitude: -34.9, longitude: -56.2 } } as Awaited<
-  ReturnType<typeof Geolocation.getCurrentPosition>
->
+const positionWithin = (accuracy: number) =>
+  ({ timestamp: 0, coords: { latitude: -34.9, longitude: -56.2, accuracy } }) as Awaited<
+    ReturnType<typeof Geolocation.getCurrentPosition>
+  >
+const position = positionWithin(12)
+
+const HERE = { lat: -34.9, lng: -56.2 }
+const highAccuracy = () =>
+  vi.mocked(Geolocation.getCurrentPosition).mock.lastCall?.[0]?.enableHighAccuracy
 
 const reasonOf = async (attempt: Promise<unknown>) => {
   const error = await attempt.then(
@@ -42,15 +48,38 @@ describe('ubicación', () => {
     vi.resetAllMocks()
   })
 
-  it('pide el permiso si falta y devuelve la posición', async () => {
-    await expect(currentPosition()).resolves.toEqual({ lat: -34.9, lng: -56.2 })
+  it('pide el permiso si falta, preciso y aproximado a la vez, y devuelve la posición', async () => {
+    await expect(currentPosition()).resolves.toEqual({ coords: HERE, approximate: false })
     expect(Geolocation.requestPermissions).toHaveBeenCalledTimes(1)
+    // Sin argumentos: el plugin pide los dos permisos y Android deja elegir.
+    expect(Geolocation.requestPermissions).toHaveBeenCalledWith()
+    // Con el permiso preciso se pide la mejor posición.
+    expect(highAccuracy()).toBe(true)
   })
 
-  it('si ya hay permiso no lo vuelve a pedir; alcanza con la ubicación aproximada', async () => {
+  it('si el usuario elige la aproximada, anda igual y la posición sale marcada', async () => {
+    vi.mocked(Geolocation.requestPermissions).mockResolvedValue(permission('denied', 'granted'))
+    await expect(currentPosition()).resolves.toEqual({ coords: HERE, approximate: true })
+    // Sin el permiso preciso no se pide alta precisión: el plugin volvería a preguntar.
+    expect(highAccuracy()).toBe(false)
+  })
+
+  it('si ya hay permiso no lo vuelve a pedir, sea preciso o aproximado', async () => {
     vi.mocked(Geolocation.checkPermissions).mockResolvedValue(permission('denied', 'granted'))
-    await expect(currentPosition()).resolves.toEqual({ lat: -34.9, lng: -56.2 })
+    await expect(currentPosition()).resolves.toEqual({ coords: HERE, approximate: true })
+    vi.mocked(Geolocation.checkPermissions).mockResolvedValue(permission('granted'))
+    await expect(currentPosition()).resolves.toEqual({ coords: HERE, approximate: false })
     expect(Geolocation.requestPermissions).not.toHaveBeenCalled()
+  })
+
+  it('con permiso preciso pero un margen grande (iOS sin «ubicación exacta»), es aproximada', async () => {
+    vi.mocked(Geolocation.checkPermissions).mockResolvedValue(permission('granted'))
+    vi.mocked(Geolocation.getCurrentPosition).mockResolvedValue(
+      positionWithin(APPROXIMATE_FROM_M + 1),
+    )
+    await expect(currentPosition()).resolves.toEqual({ coords: HERE, approximate: true })
+    vi.mocked(Geolocation.getCurrentPosition).mockResolvedValue(positionWithin(APPROXIMATE_FROM_M))
+    await expect(currentPosition()).resolves.toEqual({ coords: HERE, approximate: false })
   })
 
   it('permiso negado: `denied`, sin consultar la posición', async () => {
@@ -70,7 +99,7 @@ describe('ubicación', () => {
 
   it('en la web el permiso lo pide el navegador al consultar la posición', async () => {
     native.mockReturnValue(false)
-    await expect(currentPosition()).resolves.toEqual({ lat: -34.9, lng: -56.2 })
+    await expect(currentPosition()).resolves.toEqual({ coords: HERE, approximate: false })
     expect(Geolocation.checkPermissions).not.toHaveBeenCalled()
     expect(Geolocation.requestPermissions).not.toHaveBeenCalled()
 

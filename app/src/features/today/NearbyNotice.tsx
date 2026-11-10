@@ -4,13 +4,18 @@ import type { LocationStatus } from '../location/locationContext'
 
 interface NearbyNoticeProps {
   status: LocationStatus
+  /** Se está ordenando con una posición aproximada. */
+  approximate: boolean
   /** Escenarios que «cerca mío» deja afuera por no tener ubicación cargada. */
   hiddenStages: number
   onRetry: () => void
 }
 
-/** Lo que hay que decir sobre «cerca mío»: buscando, sin permiso, sin posición, o qué quedó afuera. */
-export function NearbyNotice({ status, hiddenStages, onRetry }: NearbyNoticeProps) {
+/**
+ * Lo que hay que decir sobre «cerca mío»: buscando, sin permiso, sin posición, que la
+ * posición es aproximada, o qué quedó afuera.
+ */
+export function NearbyNotice({ status, approximate, hiddenStages, onRetry }: NearbyNoticeProps) {
   const { t } = useTranslation()
 
   if (status === 'locating') {
@@ -37,8 +42,11 @@ export function NearbyNotice({ status, hiddenStages, onRetry }: NearbyNoticeProp
       </div>
     )
   }
-  if (hiddenStages > 0) {
-    return <p className="text-soft pb-3">{t('nearby.hidden', { count: hiddenStages })}</p>
-  }
-  return null
+  if (!approximate && hiddenStages === 0) return null
+  return (
+    <div className="text-soft space-y-2 pb-3">
+      {approximate && <p>{t('nearby.approximate')}</p>}
+      {hiddenStages > 0 && <p>{t('nearby.hidden', { count: hiddenStages })}</p>}
+    </div>
+  )
 }

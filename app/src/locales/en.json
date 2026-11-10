@@ -109,6 +109,9 @@
     "denied": "We don't have permission to use your location, so we can't sort by distance. If you want to use it, allow location for Cuerda in your phone's settings and tap “Near me” again.",
     "unavailable": "We couldn't get your location. Check that your phone's location is turned on.",
     "retry": "Try again",
+    "approximate": "Your location is approximate: distances are estimates and the order of nearby stages may be off. To improve it, turn on precise location for Cuerda in your phone's settings.",
+    "underDistance": "under {{distance}}",
+    "aboutDistance": "about {{distance}}",
     "hidden_one": "{{count}} stage with no location on file is not shown in “Near me”.",
     "hidden_other": "{{count}} stages with no location on file are not shown in “Near me”."
   }

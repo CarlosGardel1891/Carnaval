@@ -87,3 +87,15 @@ export function formatDistance(meters: number, locale: string): string {
     maximumFractionDigits: km < 10 ? 1 : 0,
   }).format(km)
 }
+
+/**
+ * Distancia desde una posición aproximada: en kilómetros enteros y nunca menos de 1 km
+ * (quien llama dice «menos de 1 km» o «aprox. 3 km»).
+ */
+export function formatRoughDistance(meters: number, locale: string): string {
+  return new Intl.NumberFormat(locale, {
+    style: 'unit',
+    unit: 'kilometer',
+    maximumFractionDigits: 0,
+  }).format(Math.max(1, Math.round(meters / 1000)))
+}

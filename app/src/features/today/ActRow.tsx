@@ -1,9 +1,10 @@
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router'
 import type { Act } from '../../lib/api'
-import { formatDistance, formatTime } from '../../lib/format'
+import { formatTime } from '../../lib/format'
 import { joinParts } from '../../lib/labels'
 import { useLocale } from '../../lib/useLocale'
+import { useDistanceLabel } from '../location/useDistanceLabel'
 import { useStagePath } from '../stages/stagePath'
 
 interface ActRowProps {
@@ -20,6 +21,7 @@ const badge = 'rounded-md px-2 py-0.5 font-semibold'
 export function ActRow({ act, onStage, showStage = false, showDistance = false }: ActRowProps) {
   const { t } = useTranslation()
   const locale = useLocale()
+  const distanceLabel = useDistanceLabel()
   const stagePath = useStagePath()
   const suspended = act.estado === 'suspendida'
 
@@ -28,7 +30,7 @@ export function ActRow({ act, onStage, showStage = false, showDistance = false }
     act.etapa_rueda && t(`round.${act.etapa_rueda}`),
     // La parada de un itinerante es de la actuación, no del escenario.
     act.itinerante === true && act.direccion,
-    showDistance && act.distancia_m !== null && formatDistance(act.distancia_m, locale),
+    showDistance && act.distancia_m !== null && distanceLabel(act.distancia_m),
   ])
 
   return (

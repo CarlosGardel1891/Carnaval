@@ -163,7 +163,10 @@ describe('mapa', () => {
 
   it('si ya había permiso, muestra la posición del usuario', async () => {
     vi.mocked(hasLocationPermission).mockResolvedValue(true)
-    vi.mocked(currentPosition).mockResolvedValue({ lat: -34.9, lng: -56.18 })
+    vi.mocked(currentPosition).mockResolvedValue({
+      coords: { lat: -34.9, lng: -56.18 },
+      approximate: false,
+    })
     renderApp('/mapa')
     expect(await screen.findByText('usuario -34.9,-56.18')).toBeInTheDocument()
   })

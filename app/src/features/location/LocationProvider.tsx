@@ -5,12 +5,13 @@ import { LocationContext, type LocationStatus, type UserLocation } from './locat
 
 interface State {
   coords: Coords | null
+  approximate: boolean
   status: LocationStatus
 }
 
 /** Guarda la posición del usuario para toda la app (pizarrón y mapa), sólo en memoria. */
 export function LocationProvider({ children }: { children: ReactNode }) {
-  const [state, setState] = useState<State>({ coords: null, status: 'idle' })
+  const [state, setState] = useState<State>({ coords: null, approximate: false, status: 'idle' })
   // Una sola búsqueda a la vez: dos toques seguidos esperan la misma.
   const pending = useRef<Promise<boolean> | null>(null)
 
@@ -18,12 +19,12 @@ export function LocationProvider({ children }: { children: ReactNode }) {
     pending.current ??= (async () => {
       setState((prev) => ({ ...prev, status: 'locating' }))
       try {
-        const coords = await currentPosition()
-        setState({ coords, status: 'ready' })
+        const { coords, approximate } = await currentPosition()
+        setState({ coords, approximate, status: 'ready' })
         return true
       } catch (error) {
         const reason = error instanceof LocationError ? error.reason : 'unavailable'
-        setState({ coords: null, status: reason })
+        setState({ coords: null, approximate: false, status: reason })
         return false
       } finally {
         pending.current = null

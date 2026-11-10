@@ -6,6 +6,8 @@ export type LocationStatus = 'idle' | 'locating' | 'ready' | 'denied' | 'unavail
 export interface UserLocation {
   /** La posición del usuario. Vive sólo en memoria: ni en la URL ni en disco. */
   coords: Coords | null
+  /** La posición es aproximada: las distancias se muestran redondeadas. */
+  approximate: boolean
   status: LocationStatus
   /** Pide el permiso si hace falta y busca la posición. Devuelve si la consiguió. */
   request: () => Promise<boolean>

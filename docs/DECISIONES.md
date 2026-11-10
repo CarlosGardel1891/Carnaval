@@ -70,7 +70,7 @@ Registro de decisiones del proyecto. Si algo de `docs/PLAN.md` choca con este ar
 33. **Botón «atrás» de Android:** vuelve en el historial; si no hay a dónde volver, minimiza la app (no la cierra).
 34. **«Cerca mío»:**
     - En la URL sólo va `cerca=1`. Las coordenadas quedan en memoria, redondeadas a 4 decimales (unos 11 metros), y nunca se guardan ni se mandan a otro lado que a la consulta.
-    - Alcanza con la ubicación aproximada: no se pide la precisa.
+    - Qué permiso se pide y qué pasa con la ubicación aproximada: decisión 42 (al principio se pedía sólo la aproximada).
     - Ordena por distancia a la parada más cercana de la noche. Los escenarios sin ubicación cargada no entran en la lista, y se avisa cuántos quedaron afuera.
     - Si la URL trae `cerca=1` y no hay permiso, el filtro se apaga sin pedirlo: el permiso sólo se pide cuando la persona toca el botón.
 35. **Mapa:**
@@ -100,3 +100,9 @@ Registro de decisiones del proyecto. Si algo de `docs/PLAN.md` choca con este ar
     - Es de la temporada 2026 sobre el catálogo 2027: sirve para probar las pantallas con una noche de tamaño real, no como dato histórico.
 40. **CI:** hasta el 2026-11-10 GitHub Actions no arranca ninguna corrida (`startup_failure`) por la facturación de la cuenta dueña del repo; no es un problema del workflow. Mientras tanto mandan los chequeos locales, que son los mismos que corre el CI.
 41. **Barras del sistema en Android, oscuras:** la app tiene un solo tema, oscuro, y la barra de estado y la de gestos lo siguen aunque el teléfono esté en modo claro. Los íconos claros salen de `StatusBar` (`@capacitor/status-bar`) y `SystemBars` en `app/capacitor.config.ts`, los dos con `style: 'DARK'`: si uno quedara en automático, pisaría al otro al rotar o cambiar el tema. El color de fondo no se puede fijar desde el plugin (desde Android 15 las barras son transparentes y `backgroundColor` no hace nada): sale de `android:windowBackground` en `styles.xml`, con el mismo color que `--color-ground`.
+42. **Ubicación precisa o aproximada, a elección del usuario** (reemplaza el punto de la decisión 34 que decía que no se pedía la precisa):
+    - Se piden los dos permisos a la vez y el usuario elige. La aproximada de Android cae en una grilla de unos 3 km²: con eso el orden entre tablados cercanos no es confiable.
+    - Con el permiso preciso se pide la mejor posición (`enableHighAccuracy`). Sin él no: en Android el plugin volvería a mostrar el diálogo de permisos en cada consulta.
+    - La posición es «aproximada» si el usuario dio sólo ese permiso o si el teléfono la informa con un margen de más de 1 km (`APPROXIMATE_FROM_M` en `app/src/lib/geo.ts`); esto último cubre iOS con «ubicación exacta» apagada y un navegador sin GPS.
+    - Con una posición aproximada «cerca mío» anda igual, pero las distancias van redondeadas al kilómetro («menos de 1 km», «aprox. 3 km») y un aviso dice que el orden entre escenarios cercanos puede no ser exacto y cómo activar la precisa. La app no vuelve a pedir el permiso por su cuenta.
+    - Todo lo que muestra una distancia pasa por `useDistanceLabel` (`app/src/features/location/`).

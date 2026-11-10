@@ -43,6 +43,7 @@ const nearbyChip = () => screen.getByRole('button', { name: 'Cerca mío' })
 const isOn = () => nearbyChip().getAttribute('aria-pressed') === 'true'
 
 const HIDDEN = '1 escenario sin ubicación cargada no aparece en «Cerca mío».'
+const APPROXIMATE = /^Tu ubicación es aproximada/
 
 describe('«cerca mío»', () => {
   beforeEach(async () => {
@@ -51,7 +52,7 @@ describe('«cerca mío»', () => {
     vi.mocked(fetchNightActs).mockImplementation(({ origin }) => Promise.resolve(nightFrom(origin)))
     vi.mocked(fetchCurrentSeason).mockResolvedValue(null)
     vi.mocked(hasLocationPermission).mockResolvedValue(false)
-    vi.mocked(currentPosition).mockResolvedValue(HERE)
+    vi.mocked(currentPosition).mockResolvedValue({ coords: HERE, approximate: false })
     await i18n.changeLanguage('es')
   })
   afterEach(() => {
@@ -95,12 +96,42 @@ describe('«cerca mío»', () => {
     // El escenario sin ubicación cargada queda afuera, y se avisa.
     expect(screen.queryByText('Zíngaros')).not.toBeInTheDocument()
     expect(screen.getByText(HIDDEN)).toBeInTheDocument()
+    expect(screen.queryByText(APPROXIMATE)).not.toBeInTheDocument()
 
     // A la base va la posición redondeada (~11 m); a la URL, sólo que está prendido.
     expect(fetchNightActs).toHaveBeenLastCalledWith(
       expect.objectContaining({ origin: { lat: -34.9058, lng: -56.1913 } }),
     )
     expect(router.state.location.search).toBe('?cerca=1')
+  })
+
+  it('con la ubicación aproximada ordena igual, redondea las distancias y lo avisa', async () => {
+    vi.mocked(currentPosition).mockResolvedValue({ coords: HERE, approximate: true })
+    renderApp('/')
+    await screen.findByRole('region', { name: 'Tablado Centro' })
+
+    await userEvent.click(nearbyChip())
+    await waitFor(() =>
+      expect(groupNames()).toEqual(['Escenario Móvil', 'Escenario Prado', 'Tablado Centro']),
+    )
+    const distanceOf = (name: string) =>
+      within(screen.getByRole('region', { name })).getByText(/km$/, { selector: 'p.text-accent' })
+        .textContent
+    // 300 m y 800 m no se distinguen con una posición que puede estar corrida más de 1 km.
+    expect(distanceOf('Escenario Móvil')).toMatch(/^menos de 1\skm$/)
+    expect(distanceOf('Escenario Prado')).toMatch(/^menos de 1\skm$/)
+    expect(distanceOf('Tablado Centro')).toMatch(/^aprox\. 3\skm$/)
+    const movil = screen.getByRole('region', { name: 'Escenario Móvil' })
+    expect(within(movil).getByText(/Esquina ficticia 1 · aprox\. 1\skm/)).toBeInTheDocument()
+    expect(within(movil).queryByText(/\d\sm$/)).not.toBeInTheDocument()
+
+    expect(screen.getByText(APPROXIMATE)).toBeInTheDocument()
+    expect(screen.getByText(HIDDEN)).toBeInTheDocument()
+
+    // Al apagar «cerca mío» el aviso se va.
+    await userEvent.click(nearbyChip())
+    await waitFor(() => expect(groupNames()).toHaveLength(4))
+    expect(screen.queryByText(APPROXIMATE)).not.toBeInTheDocument()
   })
 
   it('al apagarlo vuelve el orden por hora y los escenarios sin ubicación', async () => {

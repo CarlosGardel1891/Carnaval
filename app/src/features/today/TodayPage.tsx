@@ -30,7 +30,7 @@ export function TodayPage() {
   const locale = useLocale()
   const { noche, isTonight, now } = useNoche()
   const { filters, active, update, toggleCategory, clear } = useBoardFilters()
-  const { coords, status, request, restore, dismiss } = useUserLocation()
+  const { coords, approximate, status, request, restore, dismiss } = useUserLocation()
   // «Gratis» lo filtra la base; la categoría, la app. Con «cerca mío», la base además
   // devuelve la distancia a cada escenario.
   const origin = filters.nearby ? coords : null
@@ -136,6 +136,7 @@ export function TodayPage() {
               />
               <NearbyNotice
                 status={status}
+                approximate={byDistance && approximate}
                 hiddenStages={hiddenStages}
                 onRetry={() => void turnNearbyOn()}
               />
