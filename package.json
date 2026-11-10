@@ -15,6 +15,8 @@
     "typecheck": "pnpm -r typecheck",
     "test": "pnpm -r test",
     "test:db": "pnpm --filter @cuerda/db-tests test:db",
+    "gen:seed": "python scripts/gen_seed.py",
+    "db:grilla": "node scripts/db-grilla.mjs",
     "gen:types": "supabase gen types typescript --local --schema public > packages/shared/src/database.types.ts && prettier --write packages/shared/src/database.types.ts"
   },
   "type": "module",
