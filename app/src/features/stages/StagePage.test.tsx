@@ -233,6 +233,17 @@ describe('ficha de escenario', () => {
     ).toBeInTheDocument()
   })
 
+  it('si falla la actualización de la grilla, sigue mostrando lo anterior y lo avisa', async () => {
+    const { queryClient } = renderApp('/escenarios/ficticio-prado')
+    await screen.findByText('Cayó la Cabra')
+    vi.mocked(fetchNightActs).mockRejectedValue(new Error('sin red'))
+    await queryClient.refetchQueries({ queryKey: ['actuaciones'] })
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'No se pudo actualizar: estás viendo lo último que cargó.',
+    )
+    expect(rows()).toHaveLength(3)
+  })
+
   it('«Volver» vuelve a donde se estaba; entrando directo, va a Hoy', async () => {
     const { router } = renderApp('/')
     await userEvent.click(await screen.findByRole('link', { name: /Escenario Prado/ }))

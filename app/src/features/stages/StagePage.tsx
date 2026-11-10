@@ -148,6 +148,11 @@ export function StagePage() {
         <h2 id="grilla" className="text-xl font-bold first-letter:uppercase">
           {isTonight ? t('stage.tonight') : formatNight(noche, locale)}
         </h2>
+        {night.isError && night.data && !night.isFetching && (
+          <p role="alert" className="text-danger">
+            {t('today.refreshError')}
+          </p>
+        )}
         {night.isPending ? (
           <p className="text-soft">{t('today.loading')}</p>
         ) : night.isError && !night.data ? (

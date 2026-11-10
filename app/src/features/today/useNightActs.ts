@@ -36,6 +36,8 @@ export function nightActsQuery(noche: string, options: NightActsOptions = {}) {
     refetchInterval: REFRESH_MS,
     refetchIntervalInBackground: false,
     refetchOnWindowFocus: true,
+    // Con la posición del usuario en la clave, no se guarda en el teléfono.
+    meta: { persist: origin === null },
   })
 }
 

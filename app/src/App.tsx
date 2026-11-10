@@ -1,15 +1,17 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client'
 import { createBrowserRouter, RouterProvider } from 'react-router'
+import { cachePersistOptions, createAppQueryClient } from './lib/queryCache'
 import { routes } from './routes'
 
-const queryClient = new QueryClient()
+const queryClient = createAppQueryClient()
+const persistOptions = cachePersistOptions()
 
 const router = createBrowserRouter(routes)
 
 export function App() {
   return (
-    <QueryClientProvider client={queryClient}>
+    <PersistQueryClientProvider client={queryClient} persistOptions={persistOptions}>
       <RouterProvider router={router} />
-    </QueryClientProvider>
+    </PersistQueryClientProvider>
   )
 }

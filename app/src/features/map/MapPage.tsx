@@ -59,6 +59,9 @@ export function MapPage() {
 
   const loading = stages.isPending || acts.isPending
   const failed = (stages.isError && !stages.data) || (acts.isError && !acts.data)
+  // Falló la actualización, pero hay con qué armar el mapa: se avisa que es lo anterior.
+  const stale =
+    !failed && (stages.isError || acts.isError) && !stages.isFetching && !acts.isFetching
 
   return (
     <main className="flex h-full flex-col">
@@ -100,6 +103,11 @@ export function MapPage() {
               {t('today.retry')}
             </Button>
           </div>
+        )}
+        {stale && (
+          <p role="alert" className="text-danger">
+            {t('today.refreshError')}
+          </p>
         )}
         {!loading && !failed && markers.length === 0 && (
           <p className="text-soft">{t('map.empty')}</p>

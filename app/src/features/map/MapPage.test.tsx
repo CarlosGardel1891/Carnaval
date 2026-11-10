@@ -188,6 +188,17 @@ describe('mapa', () => {
     expect(screen.queryByRole('alert')).not.toBeInTheDocument()
   })
 
+  it('si falla la actualización, sigue mostrando lo anterior y lo avisa', async () => {
+    const { queryClient } = renderApp('/mapa')
+    await screen.findByRole('button', { name: /Tablado Centro/ })
+    vi.mocked(fetchNightActs).mockRejectedValue(new Error('sin red'))
+    await queryClient.refetchQueries({ queryKey: ['actuaciones'] })
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'No se pudo actualizar: estás viendo lo último que cargó.',
+    )
+    expect(screen.getByRole('button', { name: /Tablado Centro/ })).toBeInTheDocument()
+  })
+
   it('en inglés, los marcadores y los avisos están en inglés', async () => {
     await i18n.changeLanguage('en')
     renderApp('/mapa')
