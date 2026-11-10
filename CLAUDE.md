@@ -30,6 +30,13 @@ Requisitos: Node 24 (`.nvmrc`), `corepack enable` (pnpm fijado en `package.json`
 
 Android en Windows: `JAVA_HOME` tiene que apuntar a un JDK 21 (`C:\Program Files\Microsoft\jdk-21…` o, si es Temurin, `C:\Program Files\Eclipse Adoptium\jdk-21…`), no al JBR de Android Studio (Java 25, que Gradle 8.14 no soporta). `ANDROID_HOME` = `%LOCALAPPDATA%\Android\Sdk`. Los emuladores creados en la máquina se listan con `emulator -list-avds`.
 
+Los comandos de Android (`pnpm --filter app android…`) se corren desde una terminal de PowerShell con esas dos variables definidas; si `ANDROID_HOME` no está en el sistema, `$env:ANDROID_HOME = "$env:LOCALAPPDATA\Android\Sdk"` antes del comando. Probado el 2026-11-10 con `android:local`. Dos cosas a saber:
+
+- Con más de un destino (un emulador abierto cuenta, y cada AVD creado también), `cap run` pregunta cuál usar. Para que no pregunte: `pnpm --filter app android:local --target emulator-5554` (el id sale de `adb devices`).
+- Dentro de una sesión de Claude Code fallan con «"gradlew" no se reconoce como un comando interno o externo», en PowerShell y en Git Bash por igual: la sesión define `NoDefaultCurrentDirectoryInExePath=1` y `cmd` deja de buscar `gradlew.bat` en la carpeta actual. No es un problema del script. Ahí hay que sacar la variable para ese comando: `Remove-Item Env:NoDefaultCurrentDirectoryInExePath` (PowerShell) o `unset NoDefaultCurrentDirectoryInExePath` (Git Bash).
+
+Para probar «cerca mío» en el emulador, fijarle una posición (longitud y latitud, en ese orden): `adb emu geo fix -56.1645 -34.9011` es el centro de Montevideo.
+
 ```bash
 pnpm install                 # dependencias de todo el monorepo
 pnpm dev                     # app en http://localhost:5173
