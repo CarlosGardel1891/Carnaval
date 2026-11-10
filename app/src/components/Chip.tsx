@@ -15,7 +15,7 @@ export function Chip({ pressed, onClick, children, disabled = false }: ChipProps
       aria-pressed={pressed}
       disabled={disabled}
       onClick={onClick}
-      className={`min-h-12 shrink-0 rounded-full border px-4 font-semibold whitespace-nowrap ${
+      className={`min-h-12 shrink-0 rounded-full border px-4 font-semibold whitespace-nowrap disabled:opacity-60 ${
         pressed ? 'bg-accent text-accent-ink border-accent' : 'bg-surface text-ink border-line'
       }`}
     >

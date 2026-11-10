@@ -82,5 +82,14 @@
     "byTime": "Por hora",
     "noResults": "No hay actuaciones con estos filtros.",
     "clear": "Quitar filtros"
+  },
+  "nearby": {
+    "label": "Cerca mío",
+    "locating": "Buscando tu ubicación…",
+    "denied": "No tenemos permiso para usar tu ubicación, así que no podemos ordenar por cercanía. Si querés usarlo, permití la ubicación para Cuerda en los ajustes del teléfono y volvé a tocar «Cerca mío».",
+    "unavailable": "No pudimos obtener tu ubicación. Fijate que la ubicación del teléfono esté prendida.",
+    "retry": "Reintentar",
+    "hidden_one": "{{count}} escenario sin ubicación cargada no aparece en «Cerca mío».",
+    "hidden_other": "{{count}} escenarios sin ubicación cargada no aparecen en «Cerca mío»."
   }
 }

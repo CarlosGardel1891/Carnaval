@@ -53,7 +53,13 @@ export function StageCard({ group, onStage }: StageCardProps) {
       </Link>
       <ul className="divide-line border-line divide-y border-t px-4">
         {group.acts.map((act) => (
-          <ActRow key={act.actuacion_id} act={act} onStage={onStage.has(act.actuacion_id)} />
+          <ActRow
+            key={act.actuacion_id}
+            act={act}
+            onStage={onStage.has(act.actuacion_id)}
+            // Un itinerante tiene una parada por actuación: cada una con su distancia.
+            showDistance={group.itinerante}
+          />
         ))}
       </ul>
     </section>

@@ -1,4 +1,3 @@
-import type { ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import type { CategoriaConjunto } from '@cuerda/shared'
 import { Chip } from '../../components/Chip'
@@ -8,20 +7,22 @@ interface FilterBarProps {
   filters: BoardFilters
   /** Las categorías que se ofrecen: las que hay esa noche (y las ya elegidas). */
   categories: CategoriaConjunto[]
+  /** Mientras se busca la posición, «cerca mío» no se puede tocar. */
+  locating: boolean
+  onToggleNearby: () => void
   onToggleFree: () => void
   onToggleCategory: (category: CategoriaConjunto) => void
   onView: (view: BoardView) => void
-  /** Filtros que van antes que los demás (p. ej. «cerca mío»). */
-  children?: ReactNode
 }
 
 export function FilterBar({
   filters,
   categories,
+  locating,
+  onToggleNearby,
   onToggleFree,
   onToggleCategory,
   onView,
-  children,
 }: FilterBarProps) {
   const { t } = useTranslation()
 
@@ -32,7 +33,9 @@ export function FilterBar({
         aria-label={t('filters.label')}
         className="-mx-4 flex gap-2 overflow-x-auto px-4 py-1"
       >
-        {children}
+        <Chip pressed={filters.nearby} disabled={locating} onClick={onToggleNearby}>
+          {t('nearby.label')}
+        </Chip>
         <Chip pressed={filters.onlyFree} onClick={onToggleFree}>
           {t('filters.free')}
         </Chip>

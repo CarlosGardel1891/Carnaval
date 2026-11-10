@@ -4,8 +4,12 @@ import { Constants, type CategoriaConjunto } from '@cuerda/shared'
 
 export type BoardView = 'stage' | 'time'
 
-/** Los filtros del pizarrón. Viven en la URL: `?gratis=1&cat=murga,comparsa&vista=hora`. */
+/**
+ * Los filtros del pizarrón. Viven en la URL: `?cerca=1&gratis=1&cat=murga,comparsa&vista=hora`.
+ * De «cerca mío» va sólo que está prendido; la posición, nunca.
+ */
 export interface BoardFilters {
+  nearby: boolean
   onlyFree: boolean
   categories: CategoriaConjunto[]
   view: BoardView
@@ -16,6 +20,7 @@ const ALL_CATEGORIES = Constants.public.Enums.categoria_conjunto
 export function parseFilters(params: URLSearchParams): BoardFilters {
   const requested = (params.get('cat') ?? '').split(',')
   return {
+    nearby: params.get('cerca') === '1',
     onlyFree: params.get('gratis') === '1',
     // En el orden de la base y sin valores que no existan.
     categories: ALL_CATEGORIES.filter((category) => requested.includes(category)),
@@ -26,6 +31,8 @@ export function parseFilters(params: URLSearchParams): BoardFilters {
 /** Escribe los filtros sobre los parámetros que ya hay (`noche` y demás no se tocan). */
 export function writeFilters(params: URLSearchParams, filters: BoardFilters): URLSearchParams {
   const next = new URLSearchParams(params)
+  if (filters.nearby) next.set('cerca', '1')
+  else next.delete('cerca')
   if (filters.onlyFree) next.set('gratis', '1')
   else next.delete('gratis')
   if (filters.categories.length > 0) next.set('cat', filters.categories.join(','))
@@ -66,12 +73,15 @@ export function useBoardFilters() {
   )
 
   /** Saca los filtros; la vista (por escenario o por hora) no es un filtro y queda. */
-  const clear = useCallback(() => update({ onlyFree: false, categories: [] }), [update])
+  const clear = useCallback(
+    () => update({ nearby: false, onlyFree: false, categories: [] }),
+    [update],
+  )
 
   return {
     filters,
     /** Si hay algún filtro que pueda estar dejando cosas afuera. */
-    active: filters.onlyFree || filters.categories.length > 0,
+    active: filters.nearby || filters.onlyFree || filters.categories.length > 0,
     update,
     toggleCategory,
     clear,

@@ -113,6 +113,12 @@ export function filterByCategories(acts: Act[], categories: readonly CategoriaCo
   return acts.filter((a) => categories.includes(a.conjunto_categoria))
 }
 
+/** Sólo las actuaciones de los escenarios que esa noche tienen ubicación (para «cerca mío»). */
+export function onlyLocatedStages(acts: Act[]): Act[] {
+  const located = new Set(acts.filter(hasLocation).map((a) => a.escenario_id))
+  return acts.filter((a) => located.has(a.escenario_id))
+}
+
 /** Cuántos escenarios de la lista no tienen ubicación cargada. */
 export function countStagesWithoutLocation(acts: Act[]): number {
   return groupByStage(acts).filter((g) => !g.hasLocation).length

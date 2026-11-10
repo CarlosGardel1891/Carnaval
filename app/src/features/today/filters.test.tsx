@@ -65,7 +65,7 @@ describe('filtros del pizarrón', () => {
     const chips = within(screen.getByRole('group', { name: 'Filtros' }))
       .getAllByRole('button')
       .map((button) => button.textContent)
-    expect(chips).toEqual(['Gratis', 'Murga', 'Parodistas', 'Comparsa'])
+    expect(chips).toEqual(['Cerca mío', 'Gratis', 'Murga', 'Parodistas', 'Comparsa'])
   })
 
   it('la categoría se filtra en la app, sin volver a la base', async () => {
@@ -155,17 +155,24 @@ describe('filtros del pizarrón', () => {
 describe('filtros en la URL', () => {
   it('ignora lo que no entiende', () => {
     const filters = parseFilters(new URLSearchParams('gratis=si&cat=murga,inventada&vista=x'))
-    expect(filters).toEqual({ onlyFree: false, categories: ['murga'], view: 'stage' })
+    expect(filters).toEqual({
+      nearby: false,
+      onlyFree: false,
+      categories: ['murga'],
+      view: 'stage',
+    })
   })
 
   it('escribe sólo lo que no es el valor por defecto y respeta lo demás', () => {
     const params = writeFilters(new URLSearchParams('noche=2027-01-28&gratis=1'), {
+      nearby: true,
       onlyFree: false,
       categories: ['murga', 'comparsa'],
       view: 'time',
     })
     expect(params.get('noche')).toBe('2027-01-28')
     expect(params.has('gratis')).toBe(false)
+    expect(params.get('cerca')).toBe('1')
     expect(params.get('cat')).toBe('murga,comparsa')
     expect(params.get('vista')).toBe('hora')
   })

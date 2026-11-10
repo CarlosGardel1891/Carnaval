@@ -1,13 +1,21 @@
-import { useMemo } from 'react'
+import { useCallback, useEffect, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router'
 import { Constants } from '@cuerda/shared'
 import { Button } from '../../components/Button'
 import { formatNight } from '../../lib/format'
 import { useLocale } from '../../lib/useLocale'
-import { categoriesPresent, filterByCategories, onStageNow } from './board'
+import { useUserLocation } from '../location/locationContext'
+import {
+  categoriesPresent,
+  countStagesWithoutLocation,
+  filterByCategories,
+  onlyLocatedStages,
+  onStageNow,
+} from './board'
 import { EmptyNight } from './EmptyNight'
 import { FilterBar } from './FilterBar'
+import { NearbyNotice } from './NearbyNotice'
 import { NightBoard } from './NightBoard'
 import { UpdatedLine } from './UpdatedLine'
 import { useBoardFilters } from './useBoardFilters'
@@ -22,19 +30,56 @@ export function TodayPage() {
   const locale = useLocale()
   const { noche, isTonight, now } = useNoche()
   const { filters, active, update, toggleCategory, clear } = useBoardFilters()
-  // «Gratis» lo filtra la base; la categoría, la app.
-  const query = useNightActs(noche, { onlyFree: filters.onlyFree })
+  const { coords, status, request, restore, dismiss } = useUserLocation()
+  // «Gratis» lo filtra la base; la categoría, la app. Con «cerca mío», la base además
+  // devuelve la distancia a cada escenario.
+  const origin = filters.nearby ? coords : null
+  const query = useNightActs(noche, { onlyFree: filters.onlyFree, origin })
   const acts = query.data
+  // Mientras llega la consulta con distancias se sigue viendo el orden anterior.
+  const byDistance = origin !== null && !query.isPlaceholderData
+
+  // Abrir con `?cerca=1` vale sólo si ya había permiso: si no, se apaga sin preguntar.
+  // El permiso se pide únicamente cuando el usuario toca «Cerca mío».
+  useEffect(() => {
+    if (!filters.nearby || coords || status !== 'idle') return
+    let cancelled = false
+    void restore().then((hadPermission) => {
+      if (!hadPermission && !cancelled) update({ nearby: false })
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [filters.nearby, coords, status, restore, update])
+
+  const turnNearbyOn = useCallback(async () => {
+    if (await request()) update({ nearby: true })
+  }, [request, update])
+
+  const toggleNearby = useCallback(() => {
+    if (filters.nearby) {
+      update({ nearby: false })
+      dismiss()
+    } else {
+      void turnNearbyOn()
+    }
+  }, [filters.nearby, update, dismiss, turnNearbyOn])
 
   // «Ahora en escena» sólo vale para la noche en curso, y no depende de la categoría.
   const onStage = useMemo(
     () => (isTonight && acts ? onStageNow(acts, now) : NOBODY),
     [isTonight, acts, now],
   )
-  const visible = useMemo(
+  const matching = useMemo(
     () => (acts ? filterByCategories(acts, filters.categories) : []),
     [acts, filters.categories],
   )
+  // «Cerca mío» deja afuera los escenarios sin ubicación cargada, y lo avisa.
+  const visible = useMemo(
+    () => (byDistance ? onlyLocatedStages(matching) : matching),
+    [byDistance, matching],
+  )
+  const hiddenStages = byDistance ? countStagesWithoutLocation(matching) : 0
   // Las categorías de esa noche, más las elegidas (para poder sacarlas aunque no haya).
   const categories = useMemo(() => {
     const present = acts ? categoriesPresent(acts) : []
@@ -83,9 +128,16 @@ export function TodayPage() {
               <FilterBar
                 filters={filters}
                 categories={categories}
+                locating={status === 'locating'}
+                onToggleNearby={toggleNearby}
                 onToggleFree={() => update({ onlyFree: !filters.onlyFree })}
                 onToggleCategory={toggleCategory}
                 onView={(view) => update({ view })}
+              />
+              <NearbyNotice
+                status={status}
+                hiddenStages={hiddenStages}
+                onRetry={() => void turnNearbyOn()}
               />
               {visible.length === 0 ? (
                 <div className="space-y-3 py-2">
@@ -95,7 +147,12 @@ export function TodayPage() {
                   </Button>
                 </div>
               ) : (
-                <NightBoard acts={visible} onStage={onStage} view={filters.view} />
+                <NightBoard
+                  acts={visible}
+                  onStage={onStage}
+                  view={filters.view}
+                  byDistance={byDistance}
+                />
               )}
             </>
           )}
