@@ -3,6 +3,198 @@ export type Json = string | number | boolean | null | { [key: string]: Json | un
 export type Database = {
   public: {
     Tables: {
+      conjunto_nombres: {
+        Row: {
+          conjunto_id: number
+          nombre_norm: string
+        }
+        ComputedFields: never
+        Insert: {
+          conjunto_id: number
+          nombre_norm: string
+        }
+        Update: {
+          conjunto_id?: number
+          nombre_norm?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'conjunto_nombres_conjunto_id_fkey'
+            columns: ['conjunto_id']
+            isOneToOne: false
+            referencedRelation: 'conjuntos'
+            referencedColumns: ['id']
+          },
+        ]
+      }
+      conjunto_temporada: {
+        Row: {
+          conjunto_id: number
+          en_concurso: boolean | null
+          en_llamadas: boolean
+          temporada_id: number
+        }
+        ComputedFields: never
+        Insert: {
+          conjunto_id: number
+          en_concurso?: boolean | null
+          en_llamadas?: boolean
+          temporada_id: number
+        }
+        Update: {
+          conjunto_id?: number
+          en_concurso?: boolean | null
+          en_llamadas?: boolean
+          temporada_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'conjunto_temporada_conjunto_id_fkey'
+            columns: ['conjunto_id']
+            isOneToOne: false
+            referencedRelation: 'conjuntos'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'conjunto_temporada_temporada_id_fkey'
+            columns: ['temporada_id']
+            isOneToOne: false
+            referencedRelation: 'temporadas'
+            referencedColumns: ['id']
+          },
+        ]
+      }
+      conjuntos: {
+        Row: {
+          alias: string[]
+          alias_norm: string[] | null
+          barrio: string | null
+          bio: string | null
+          categoria: Database['public']['Enums']['categoria_conjunto']
+          facebook: string | null
+          foto_url: string | null
+          fuente_url: string[]
+          id: number
+          instagram: string | null
+          nombre: string
+          nombre_norm: string | null
+          slug: string
+          verificado: boolean
+        }
+        ComputedFields: never
+        Insert: {
+          alias?: string[]
+          alias_norm?: never
+          barrio?: string | null
+          bio?: string | null
+          categoria: Database['public']['Enums']['categoria_conjunto']
+          facebook?: string | null
+          foto_url?: string | null
+          fuente_url?: string[]
+          id?: never
+          instagram?: string | null
+          nombre: string
+          nombre_norm?: never
+          slug: string
+          verificado?: boolean
+        }
+        Update: {
+          alias?: string[]
+          alias_norm?: never
+          barrio?: string | null
+          bio?: string | null
+          categoria?: Database['public']['Enums']['categoria_conjunto']
+          facebook?: string | null
+          foto_url?: string | null
+          fuente_url?: string[]
+          id?: never
+          instagram?: string | null
+          nombre?: string
+          nombre_norm?: never
+          slug?: string
+          verificado?: boolean
+        }
+        Relationships: []
+      }
+      escenario_nombres: {
+        Row: {
+          escenario_id: number
+          nombre_norm: string
+        }
+        ComputedFields: never
+        Insert: {
+          escenario_id: number
+          nombre_norm: string
+        }
+        Update: {
+          escenario_id?: number
+          nombre_norm?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'escenario_nombres_escenario_id_fkey'
+            columns: ['escenario_id']
+            isOneToOne: false
+            referencedRelation: 'escenarios'
+            referencedColumns: ['id']
+          },
+        ]
+      }
+      escenarios: {
+        Row: {
+          activo: boolean
+          alias: string[]
+          alias_norm: string[] | null
+          barrio: string | null
+          direccion: string | null
+          fuente_url: string[]
+          gratis: boolean | null
+          id: number
+          itinerante: boolean | null
+          nombre: string
+          nombre_norm: string | null
+          precio_texto: string | null
+          slug: string
+          tipo: Database['public']['Enums']['tipo_escenario'] | null
+          ubicacion: unknown
+        }
+        ComputedFields: never
+        Insert: {
+          activo?: boolean
+          alias?: string[]
+          alias_norm?: never
+          barrio?: string | null
+          direccion?: string | null
+          fuente_url?: string[]
+          gratis?: boolean | null
+          id?: never
+          itinerante?: boolean | null
+          nombre: string
+          nombre_norm?: never
+          precio_texto?: string | null
+          slug: string
+          tipo?: Database['public']['Enums']['tipo_escenario'] | null
+          ubicacion?: unknown
+        }
+        Update: {
+          activo?: boolean
+          alias?: string[]
+          alias_norm?: never
+          barrio?: string | null
+          direccion?: string | null
+          fuente_url?: string[]
+          gratis?: boolean | null
+          id?: never
+          itinerante?: boolean | null
+          nombre?: string
+          nombre_norm?: never
+          precio_texto?: string | null
+          slug?: string
+          tipo?: Database['public']['Enums']['tipo_escenario'] | null
+          ubicacion?: unknown
+        }
+        Relationships: []
+      }
       temporadas: {
         Row: {
           anio: number
@@ -38,9 +230,13 @@ export type Database = {
     Functions: {
       es_admin: { Args: Record<PropertyKey, never>; Returns: boolean }
       norm: { Args: { t: string }; Returns: string }
+      norm_lista: { Args: { t: string[] }; Returns: string[] }
     }
     Enums: {
-      [_ in never]: never
+      categoria_conjunto:
+        'murga' | 'parodistas' | 'humoristas' | 'revista' | 'comparsa' | 'samba' | 'otro'
+      tipo_escenario:
+        'teatro_verano' | 'privado' | 'popular' | 'movil' | 'gratuito' | 'barrio_a_barrio'
     }
     CompositeTypes: {
       [_ in never]: never
@@ -151,6 +347,24 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      categoria_conjunto: [
+        'murga',
+        'parodistas',
+        'humoristas',
+        'revista',
+        'comparsa',
+        'samba',
+        'otro',
+      ],
+      tipo_escenario: [
+        'teatro_verano',
+        'privado',
+        'popular',
+        'movil',
+        'gratuito',
+        'barrio_a_barrio',
+      ],
+    },
   },
 } as const
