@@ -299,6 +299,33 @@ export type Database = {
           },
         ]
       }
+      favoritos: {
+        Row: {
+          conjunto_id: number
+          creado_en: string
+          usuario_id: string
+        }
+        ComputedFields: never
+        Insert: {
+          conjunto_id: number
+          creado_en?: string
+          usuario_id?: string
+        }
+        Update: {
+          conjunto_id?: number
+          creado_en?: string
+          usuario_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'favoritos_conjunto_id_fkey'
+            columns: ['conjunto_id']
+            isOneToOne: false
+            referencedRelation: 'conjuntos'
+            referencedColumns: ['id']
+          },
+        ]
+      }
       temporadas: {
         Row: {
           anio: number
