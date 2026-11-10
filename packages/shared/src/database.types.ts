@@ -299,6 +299,60 @@ export type Database = {
           },
         ]
       }
+      eventos: {
+        Row: {
+          estado: Database['public']['Enums']['estado_evento']
+          fecha_fin: string
+          fecha_inicio: string
+          fuente_url: string[]
+          id: number
+          info: string | null
+          lugar: string | null
+          nombre: string
+          recorrido: unknown
+          slug: string
+          temporada_id: number
+          tipo: Database['public']['Enums']['tipo_evento']
+        }
+        ComputedFields: never
+        Insert: {
+          estado: Database['public']['Enums']['estado_evento']
+          fecha_fin: string
+          fecha_inicio: string
+          fuente_url?: string[]
+          id?: never
+          info?: string | null
+          lugar?: string | null
+          nombre: string
+          recorrido?: unknown
+          slug: string
+          temporada_id: number
+          tipo: Database['public']['Enums']['tipo_evento']
+        }
+        Update: {
+          estado?: Database['public']['Enums']['estado_evento']
+          fecha_fin?: string
+          fecha_inicio?: string
+          fuente_url?: string[]
+          id?: never
+          info?: string | null
+          lugar?: string | null
+          nombre?: string
+          recorrido?: unknown
+          slug?: string
+          temporada_id?: number
+          tipo?: Database['public']['Enums']['tipo_evento']
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'eventos_temporada_id_fkey'
+            columns: ['temporada_id']
+            isOneToOne: false
+            referencedRelation: 'temporadas'
+            referencedColumns: ['id']
+          },
+        ]
+      }
       favoritos: {
         Row: {
           conjunto_id: number
@@ -322,6 +376,40 @@ export type Database = {
             columns: ['conjunto_id']
             isOneToOne: false
             referencedRelation: 'conjuntos'
+            referencedColumns: ['id']
+          },
+        ]
+      }
+      orden_desfile: {
+        Row: {
+          conjunto_id: number
+          evento_id: number
+          posicion: number
+        }
+        ComputedFields: never
+        Insert: {
+          conjunto_id: number
+          evento_id: number
+          posicion: number
+        }
+        Update: {
+          conjunto_id?: number
+          evento_id?: number
+          posicion?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'orden_desfile_conjunto_id_fkey'
+            columns: ['conjunto_id']
+            isOneToOne: false
+            referencedRelation: 'conjuntos'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'orden_desfile_evento_id_fkey'
+            columns: ['evento_id']
+            isOneToOne: false
+            referencedRelation: 'eventos'
             referencedColumns: ['id']
           },
         ]
@@ -419,9 +507,11 @@ export type Database = {
       categoria_conjunto:
         'murga' | 'parodistas' | 'humoristas' | 'revista' | 'comparsa' | 'samba' | 'otro'
       estado_actuacion: 'programada' | 'cambiada' | 'suspendida'
+      estado_evento: 'confirmado' | 'estimado'
       rueda_concurso: 'primera' | 'segunda' | 'liguilla'
       tipo_escenario:
         'teatro_verano' | 'privado' | 'popular' | 'movil' | 'gratuito' | 'barrio_a_barrio'
+      tipo_evento: 'inaugural' | 'samba' | 'llamadas' | 'corso' | 'admision' | 'concurso' | 'otro'
     }
     CompositeTypes: {
       [_ in never]: never
@@ -543,6 +633,7 @@ export const Constants = {
         'otro',
       ],
       estado_actuacion: ['programada', 'cambiada', 'suspendida'],
+      estado_evento: ['confirmado', 'estimado'],
       rueda_concurso: ['primera', 'segunda', 'liguilla'],
       tipo_escenario: [
         'teatro_verano',
@@ -552,6 +643,7 @@ export const Constants = {
         'gratuito',
         'barrio_a_barrio',
       ],
+      tipo_evento: ['inaugural', 'samba', 'llamadas', 'corso', 'admision', 'concurso', 'otro'],
     },
   },
 } as const

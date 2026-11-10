@@ -35,7 +35,8 @@ export function expectRechazo(res: { data: unknown; error: { code: string } | nu
 
 /**
  * Borra los datos de prueba. Los conjuntos y escenarios de los tests llevan nombres inventados
- * con el prefijo «zz», para no chocar con los del seed; las etapas, números de 90 para arriba.
+ * con el prefijo «zz», para no chocar con los del seed (los eventos también); las etapas,
+ * números de 90 para arriba.
  */
 export async function limpiar(): Promise<void> {
   await withSql(async (sql) => {
@@ -44,6 +45,11 @@ export async function limpiar(): Promise<void> {
         where conjunto_id in (select id from public.conjuntos where slug like 'zz-%')
            or escenario_id in (select id from public.escenarios where slug like 'zz-%')`,
     )
+    await sql.query(
+      `delete from public.orden_desfile
+        where conjunto_id in (select id from public.conjuntos where slug like 'zz-%')`,
+    )
+    await sql.query(`delete from public.eventos where slug like 'zz-%'`)
     await sql.query(`delete from public.conjuntos where slug like 'zz-%'`)
     await sql.query(`delete from public.escenarios where slug like 'zz-%'`)
     await sql.query(`delete from public.etapas_concurso where numero >= 90`)
