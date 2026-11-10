@@ -1,13 +1,16 @@
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router'
+import { Constants } from '@cuerda/shared'
 import { Button } from '../../components/Button'
 import { formatNight } from '../../lib/format'
 import { useLocale } from '../../lib/useLocale'
-import { NightBoard } from './NightBoard'
-import { onStageNow } from './board'
+import { categoriesPresent, filterByCategories, onStageNow } from './board'
 import { EmptyNight } from './EmptyNight'
+import { FilterBar } from './FilterBar'
+import { NightBoard } from './NightBoard'
 import { UpdatedLine } from './UpdatedLine'
+import { useBoardFilters } from './useBoardFilters'
 import { useNightActs } from './useNightActs'
 import { useNoche } from './useNoche'
 
@@ -18,14 +21,27 @@ export function TodayPage() {
   const { t } = useTranslation()
   const locale = useLocale()
   const { noche, isTonight, now } = useNoche()
-  const query = useNightActs(noche)
+  const { filters, active, update, toggleCategory, clear } = useBoardFilters()
+  // «Gratis» lo filtra la base; la categoría, la app.
+  const query = useNightActs(noche, { onlyFree: filters.onlyFree })
   const acts = query.data
 
-  // «Ahora en escena» sólo vale para la noche en curso.
+  // «Ahora en escena» sólo vale para la noche en curso, y no depende de la categoría.
   const onStage = useMemo(
     () => (isTonight && acts ? onStageNow(acts, now) : NOBODY),
     [isTonight, acts, now],
   )
+  const visible = useMemo(
+    () => (acts ? filterByCategories(acts, filters.categories) : []),
+    [acts, filters.categories],
+  )
+  // Las categorías de esa noche, más las elegidas (para poder sacarlas aunque no haya).
+  const categories = useMemo(() => {
+    const present = acts ? categoriesPresent(acts) : []
+    return Constants.public.Enums.categoria_conjunto.filter(
+      (c) => present.includes(c) || filters.categories.includes(c),
+    )
+  }, [acts, filters.categories])
 
   return (
     <main className="mx-auto max-w-2xl px-4 pb-6">
@@ -60,10 +76,28 @@ export function TodayPage() {
             failed={query.isError}
             onRefresh={() => void query.refetch()}
           />
-          {acts.length === 0 ? (
+          {acts.length === 0 && !active ? (
             <EmptyNight noche={noche} />
           ) : (
-            <NightBoard acts={acts} onStage={onStage} />
+            <>
+              <FilterBar
+                filters={filters}
+                categories={categories}
+                onToggleFree={() => update({ onlyFree: !filters.onlyFree })}
+                onToggleCategory={toggleCategory}
+                onView={(view) => update({ view })}
+              />
+              {visible.length === 0 ? (
+                <div className="space-y-3 py-2">
+                  <p className="text-lg">{t('filters.noResults')}</p>
+                  <Button variant="secondary" onClick={clear}>
+                    {t('filters.clear')}
+                  </Button>
+                </div>
+              ) : (
+                <NightBoard acts={visible} onStage={onStage} view={filters.view} />
+              )}
+            </>
           )}
         </>
       )}

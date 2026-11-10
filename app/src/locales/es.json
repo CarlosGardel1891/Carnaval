@@ -73,5 +73,14 @@
     "primera": "Primera rueda",
     "segunda": "Segunda rueda",
     "liguilla": "Liguilla"
+  },
+  "filters": {
+    "label": "Filtros",
+    "free": "Gratis",
+    "view": "Vista",
+    "byStage": "Por escenario",
+    "byTime": "Por hora",
+    "noResults": "No hay actuaciones con estos filtros.",
+    "clear": "Quitar filtros"
   }
 }

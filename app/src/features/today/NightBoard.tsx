@@ -3,8 +3,7 @@ import type { Act } from '../../lib/api'
 import { ActRow } from './ActRow'
 import { groupByStage, sortByDistance, sortByFirstStart } from './board'
 import { StageCard } from './StageCard'
-
-export type BoardView = 'stage' | 'time'
+import type { BoardView } from './useBoardFilters'
 
 interface NightBoardProps {
   acts: Act[]

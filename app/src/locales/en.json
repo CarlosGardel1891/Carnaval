@@ -73,5 +73,14 @@
     "primera": "First round",
     "segunda": "Second round",
     "liguilla": "Liguilla"
+  },
+  "filters": {
+    "label": "Filters",
+    "free": "Free",
+    "view": "View",
+    "byStage": "By stage",
+    "byTime": "By time",
+    "noResults": "No shows match these filters.",
+    "clear": "Clear filters"
   }
 }
