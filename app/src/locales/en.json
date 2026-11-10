@@ -48,7 +48,20 @@
   },
   "stage": {
     "title": "Stage",
-    "itinerant": "Itinerant"
+    "itinerant": "Itinerant",
+    "back": "Back",
+    "loading": "Loading the stage…",
+    "error": "We couldn't load the stage.",
+    "notFound": "We couldn't find that stage.",
+    "where": "Where it is",
+    "directions": "Get directions",
+    "noLocation": "We don't have its location yet to show you how to get there.",
+    "stopsTonight": "Where it is tonight",
+    "stops": "Where it is that night",
+    "itinerantHint": "This is a travelling stage: each show is in a different place.",
+    "tonight": "Tonight",
+    "noActsTonight": "No shows are listed at this stage for tonight.",
+    "noActs": "No shows are listed at this stage for that night."
   },
   "category": {
     "murga": "Murga",

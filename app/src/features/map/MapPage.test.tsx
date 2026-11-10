@@ -6,6 +6,7 @@ import {
   fetchCurrentSeason,
   fetchLocatedStages,
   fetchNightActs,
+  fetchStage,
   type LocatedStage,
 } from '../../lib/api'
 import { currentPosition, hasLocationPermission } from '../../lib/geo'
@@ -95,6 +96,7 @@ describe('mapa', () => {
     vi.mocked(fetchNightActs).mockResolvedValue(nightFixture())
     vi.mocked(fetchLocatedStages).mockResolvedValue(STAGES)
     vi.mocked(fetchCurrentSeason).mockResolvedValue(null)
+    vi.mocked(fetchStage).mockResolvedValue(null)
     vi.mocked(hasLocationPermission).mockResolvedValue(false)
     await i18n.changeLanguage('es')
   })

@@ -175,8 +175,9 @@ describe('«cerca mío»', () => {
     await screen.findByRole('region', { name: 'Tablado Centro' })
 
     await waitFor(() => expect(router.state.location.search).toBe('?cat=murga'))
+    // La URL cambia un instante antes de que se vuelva a dibujar el chip.
+    await waitFor(() => expect(isOn()).toBe(false))
     expect(currentPosition).not.toHaveBeenCalled()
-    expect(isOn()).toBe(false)
     expect(screen.queryByRole('alert')).not.toBeInTheDocument()
   })
 

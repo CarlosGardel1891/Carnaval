@@ -48,7 +48,20 @@
   },
   "stage": {
     "title": "Escenario",
-    "itinerant": "Itinerante"
+    "itinerant": "Itinerante",
+    "back": "Volver",
+    "loading": "Cargando el escenario…",
+    "error": "No pudimos cargar el escenario.",
+    "notFound": "No encontramos ese escenario.",
+    "where": "Dónde queda",
+    "directions": "Cómo llegar",
+    "noLocation": "Todavía no tenemos su ubicación para mostrarte cómo llegar.",
+    "stopsTonight": "Dónde está esta noche",
+    "stops": "Dónde está esa noche",
+    "itinerantHint": "Es un escenario itinerante: cada actuación es en un lugar distinto.",
+    "tonight": "Esta noche",
+    "noActsTonight": "No hay actuaciones cargadas en este escenario para esta noche.",
+    "noActs": "No hay actuaciones cargadas en este escenario para esa noche."
   },
   "category": {
     "murga": "Murga",

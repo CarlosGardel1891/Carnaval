@@ -1,4 +1,4 @@
-import type { Database, Temporada } from '@cuerda/shared'
+import type { Database, Tables, Temporada } from '@cuerda/shared'
 import { supabase } from './supabase'
 
 /**
@@ -33,6 +33,20 @@ export type Act = Nullable<
 export type LocatedStage = Nullable<
   Functions['escenarios_cercanos']['Returns'][number],
   'tipo' | 'barrio' | 'direccion' | 'gratis' | 'precio_texto'
+>
+
+/** Lo que la ficha muestra de un escenario. La ubicación no viene acá (ver `fetchLocatedStages`). */
+export type Stage = Pick<
+  Tables<'escenarios'>,
+  | 'id'
+  | 'slug'
+  | 'nombre'
+  | 'tipo'
+  | 'barrio'
+  | 'direccion'
+  | 'gratis'
+  | 'precio_texto'
+  | 'itinerante'
 >
 
 export interface Coords {
@@ -90,6 +104,17 @@ export async function fetchLocatedStages(noche: string): Promise<LocatedStage[]>
     p_radio_m: WHOLE_CITY_M,
     p_noche: noche,
   })
+  if (error) throw error
+  return data
+}
+
+/** Un escenario por su slug, o null si no existe. */
+export async function fetchStage(slug: string): Promise<Stage | null> {
+  const { data, error } = await supabase
+    .from('escenarios')
+    .select('id, slug, nombre, tipo, barrio, direccion, gratis, precio_texto, itinerante')
+    .eq('slug', slug)
+    .maybeSingle()
   if (error) throw error
   return data
 }
