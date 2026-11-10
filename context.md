@@ -96,8 +96,8 @@ El análisis completo está en `docs/competencia-carnaval-app.md`.
 | --- | --- | --- |
 | 0 · Investigación y validación | 23 oct – 2 nov | **Terminada** |
 | 1 · Setup técnico | 3 – 5 nov | **Código terminado** (2026-10-23); faltan dos verificaciones manuales |
-| 2 · Modelo de datos | 6 – 9 nov | **Sin empezar. Es lo que sigue y ya va atrasada** |
-| 3 · Hoy y escenarios | 10 – 23 nov | Sin empezar |
+| 2 · Modelo de datos | 6 – 9 nov | **Terminada** (2026-11-10, un día tarde) |
+| 3 · Hoy y escenarios | 10 – 23 nov | **Es lo que sigue** |
 | 4 · Conjuntos, Seguir y push | 24 – 30 nov | Sin empezar |
 | 5 · Calendario y Concurso | 1 – 7 dic | Sin empezar |
 | 6 · Modo Llamadas | 8 – 13 dic | Sin empezar |
@@ -105,13 +105,14 @@ El análisis completo está en `docs/competencia-carnaval-app.md`.
 | 8 · QA, beta y publicación | 14 dic – 20 ene | Sin empezar |
 | 9 · Operación en temporada | 21 ene – 7 mar | — |
 
-En una frase: **está la base técnica y están los datos semilla, pero la app todavía no hace nada útil.** Hoy muestra un mapa de Montevideo y una tarjeta con las fechas de la temporada, leídas de la única tabla que existe.
+En una frase: **la base de datos está completa, con sus permisos, sus funciones de consulta y los datos semilla cargados, pero la app todavía no la usa.** La app sigue mostrando un mapa de Montevideo y una tarjeta con las fechas de la temporada.
 
 Lo que falta confirmar de la Fase 1:
 
 - La app corriendo en el simulador de iOS (hace falta una Mac).
 - El proyecto remoto de Supabase, en São Paulo, con las migraciones aplicadas.
 - El build de Android en la máquina de desarrollo actual, que tiene JDK 17 y necesita el 21.
+- El CI en GitHub: hasta el 2026-11-10 ninguna corrida de las ramas de trabajo llegó a arrancar (`startup_failure`). Mientras tanto mandan los chequeos locales.
 
 ## 6. Tecnología
 
@@ -119,12 +120,12 @@ Lo que falta confirmar de la Fase 1:
 | --- | --- |
 | App | React 19, TypeScript estricto, Vite 8, Tailwind 4, React Router, TanStack Query |
 | Empaquetado nativo | Capacitor 8 (Android: SDK mínimo 24; iOS: 15.0) |
-| Backend | Supabase: Postgres 17 con PostGIS y unaccent, auth anónima, Edge Functions, Realtime |
+| Backend | Supabase: Postgres 17 con PostGIS, auth anónima (ya habilitada), Edge Functions, Realtime |
 | Mapas | MapLibre GL con tiles de MapTiler |
 | Idiomas | react-i18next, español e inglés |
 | Tests | Vitest y Testing Library |
 | Repo | Monorepo con pnpm workspaces (pnpm vía corepack), Node 24 |
-| CI | GitHub Actions: lint, formato, typecheck, tests, build y validación de los datos semilla |
+| CI | GitHub Actions: lint, formato, typecheck, tests, build y validación de los datos semilla; un segundo job levanta Supabase y corre los tests de la base |
 
 Identificador provisional de la app: `uy.cuerda.app`. Se cambia cuando esté el nombre final; los pasos están en `CLAUDE.md`.
 
@@ -134,10 +135,12 @@ Identificador provisional de la app: `uy.cuerda.app`. Se cambia cuando esté el 
 app/               App móvil (Vite + Capacitor). android/ e ios/ son los proyectos nativos
 admin/             Panel web de carga de datos (hoy, sólo un login de adorno)
 packages/shared/   @cuerda/shared: tipos de la base, fechas y normalización de nombres
-supabase/          config.toml, migraciones y seed local
+packages/db-tests/ Tests de integración de la base contra el Supabase local (pnpm test:db)
+supabase/          config.toml, migraciones, seeds/ y local/ (grilla ficticia)
+scripts/           Generadores del seed y de norm, y el cargador de la grilla ficticia
 research/          Datos semilla de la Fase 0, informe y validador
 docs/              PLAN.md, DECISIONES.md y análisis de competencia
-prompts/           Prompts para Claude Code (hoy, sólo el de la Fase 1)
+prompts/           Prompts para Claude Code, uno por fase
 CLAUDE.md          Stack, comandos y reglas; lo lee Claude Code en cada sesión
 LEEME.md           Cómo arrancar
 ```
@@ -149,16 +152,23 @@ LEEME.md           Cómo arrancar
 - `nocheLogica()`: devuelve la fecha de la «noche» en hora de Montevideo, con corte a las 06:00.
 - `calendarDateInMontevideo()`: la fecha calendario en Montevideo.
 - `modoLlamadasActivo()`: dice si la app debe estar en modo Llamadas según las fechas de la temporada.
-- `norm()`: normaliza nombres (minúsculas, sin tildes, espacios simples) para comparar conjuntos y escenarios. Tiene que dar exactamente lo mismo que la función `norm` de `research/validate.py`; está comprobado contra los 358 nombres, alias y direcciones reales.
+- `norm()`: normaliza nombres (minúsculas, sin tildes, espacios simples) para comparar conjuntos y escenarios. Vive en tres lugares (TypeScript, la `norm` de `research/validate.py` y `public.norm` en SQL) y los tres tienen que dar exactamente lo mismo; está comprobado contra un fixture de 420 casos con los nombres, alias y direcciones reales.
 - `database.types.ts`: tipos generados desde la base. No se edita a mano.
 
 **`supabase`**
 
-- Dos migraciones: extensiones (PostGIS y unaccent) y la tabla `temporadas`.
-- `temporadas` tiene `anio`, `fecha_inicio`, `fecha_fin`, `modo_llamadas_desde` y `modo_llamadas_hasta`, con controles de coherencia en la base.
-- Permisos: cualquiera puede leer; nadie puede escribir desde la app. Verificado contra la API local.
-- El seed carga la temporada 2027: del 2027-01-21 al 2027-03-07, con Llamadas el 5 y 6 de febrero.
+- Once migraciones: las 10 tablas del MVP, más dos tablas de claves de nombres (`conjunto_nombres` y `escenario_nombres`) que usan el matching y la búsqueda.
+- Permisos (RLS) en todas las tablas: cualquiera lee; sólo escribe un admin (`es_admin()`, que mira `app_metadata`) o el service role. `favoritos` y `dispositivos_push` son sólo de su dueño.
+- Auth anónima habilitada en el entorno local. En el proyecto remoto hay que activarla a mano.
+- Funciones de consulta: `actuaciones_de_la_noche`, `escenarios_cercanos`, `proximas_de_conjunto`, `buscar_por_nombre` y `registrar_dispositivo_push`. Las que dependen de la fecha reciben la noche como parámetro; ninguna usa la fecha del servidor.
+- `public.norm` en SQL, réplica de la de TypeScript y Python, comprobada contra 420 casos.
+- Seeds: `01_temporadas.sql` (temporada 2027: del 2027-01-21 al 2027-03-07, Llamadas el 5 y 6 de febrero) y `02_research.sql`, que se genera desde los CSV con `pnpm gen:seed`.
+- Grilla ficticia (`pnpm db:grilla`): tres noches de conjuntos reales en cuatro escenarios inventados, para desarrollar pantallas. Sólo se carga en el Supabase local.
 - El entorno local usa puertos 553xx para convivir con otros proyectos Supabase.
+
+**`packages/db-tests`**
+
+- 138 tests contra el Supabase local: permisos tabla por tabla con usuarios anónimos, admin y falso admin; funciones; invariantes del esquema; seed contra los CSV; grilla ficticia.
 
 **`app`**
 
@@ -171,7 +181,7 @@ LEEME.md           Cómo arrancar
 
 - Una pantalla de login que sólo muestra un aviso. No se conecta a nada todavía. 1 test.
 
-**Lo que no existe aún:** 9 de las 10 tablas del MVP, las funciones de consulta, las Edge Functions, la auth anónima (está deshabilitada en `supabase/config.toml`), cualquier pantalla real y el panel de carga.
+**Lo que no existe aún:** cualquier pantalla real, la sesión anónima en la app, las Edge Functions, el panel de carga, la grilla real y las coordenadas de los escenarios.
 
 ## 8. Datos semilla (`research/`)
 
@@ -190,44 +200,50 @@ Datos firmes: las **46 comparsas** clasificadas a las Llamadas 2027 (23 por noch
 
 Huecos que hay que conocer:
 
-- **Ningún escenario tiene coordenadas**, sólo dirección en texto, y 5 de los 31 fijos ni siquiera dirección. Sin eso no hay mapa ni filtro «cerca mío». Es el bloqueo más concreto para la Fase 3.
-- **34 conjuntos** tienen pendiente si entran al Concurso; se resuelve el 17/11. Después de esa fecha tienen que quedar 39 en concurso.
+- **Ningún escenario real tiene coordenadas**, sólo dirección en texto, y 5 de los 31 fijos ni siquiera dirección. Hasta que se carguen, los reales aparecen en la lista y en su ficha, pero no en el mapa ni en «cerca mío»; el mapa se desarrolla con los escenarios ficticios.
+- **34 conjuntos** tienen pendiente si entran al Concurso; se resuelve el 17/11. Después de esa fecha tienen que quedar 39 en concurso. Los 34 ya tienen su fila 2027 en la base, con `en_concurso` nulo.
+- **12 conjuntos** están en el catálogo sin participación 2027: 4 del Concurso 2026 sin evidencia de 2027 y 8 fuera de concurso sin verificar.
 - 68 conjuntos sin Instagram y 74 sin barrio.
 - 8 conjuntos fuera de concurso sin verificar, y 4 de ellos sin categoría conocida.
 - El calendario no trae recorridos y 11 de sus 19 eventos son de pretemporada.
-- Las columnas de los CSV no coinciden una a una con las tablas planificadas; el mapeo hay que definirlo al escribir la importación.
 
-Regla: **no editar `research/` a mano sin correr después `python research/validate.py`.**
+Regla: **no editar `research/` a mano sin correr después `python research/validate.py`.** Si cambia un CSV, también hay que regenerar el seed (`pnpm gen:seed`) y el fixture de `norm` (`python scripts/gen_norm_cases.py`).
 
-## 9. Modelo de datos que viene (Fase 2)
+## 9. Modelo de datos (Fase 2, hecho)
 
 La tabla central es **`actuaciones`**: cada fila es «tal conjunto, en tal escenario, a tal hora». De ahí salen el pizarrón, el mapa, las fichas y las push.
 
 | Tabla | Para qué |
 | --- | --- |
-| `temporadas` | Fechas de la temporada y del modo Llamadas (ya existe) |
-| `conjuntos` | Nombre, alias, categoría, barrio, redes, foto |
-| `conjunto_temporada` | Si el conjunto está en el Concurso y en las Llamadas ese año |
+| `temporadas` | Fechas de la temporada y del modo Llamadas |
+| `conjuntos` | Nombre, alias, categoría, barrio, redes, foto. Es el catálogo: estar acá no dice nada sobre 2027 |
+| `conjunto_temporada` | Si el conjunto está en el Concurso y en las Llamadas ese año. `en_concurso` nulo quiere decir pendiente |
 | `escenarios` | Nombre, alias, tipo, dirección, ubicación, precio, si es gratis o itinerante |
-| `actuaciones` | Conjunto + escenario + hora, noche lógica, estado (programada, cambiada, suspendida) y fuente |
+| `actuaciones` | Conjunto + escenario + hora, noche lógica (columna generada), estado (programada, cambiada, suspendida) y fuente |
 | `etapas_concurso` | Rueda, número y fecha de cada etapa |
-| `eventos` | Desfiles, corsos y demás, con recorrido |
+| `eventos` | Desfiles, corsos y demás, con recorrido. Cada noche de Llamadas es un evento propio |
 | `orden_desfile` | Posición de cada comparsa en un evento |
 | `favoritos` | Conjuntos que sigue cada usuario |
 | `dispositivos_push` | Token, plataforma e idioma de cada teléfono |
+| `conjunto_nombres`, `escenario_nombres` | Claves normalizadas de nombres y alias, para matching y búsqueda |
 
-Funciones de consulta previstas: `actuaciones_de_la_noche`, `proximas_de_conjunto`, `escenarios_cercanos` y `buscar_por_nombre`.
+Funciones que usa la app:
 
-Permisos: lectura pública de lo publicado, escritura sólo para el rol admin, y `favoritos` y `dispositivos_push` sólo para su dueño.
+| Función | Qué devuelve |
+| --- | --- |
+| `actuaciones_de_la_noche(noche, lat, lng, solo_gratis, solo_favoritos)` | La grilla de una noche, con conjunto, escenario, dirección y punto de esa noche, distancia si se le pasa un origen, y si el conjunto es favorito |
+| `escenarios_cercanos(lat, lng, radio_m, noche)` | Escenarios con ubicación dentro del radio: los fijos, y los itinerantes por sus actuaciones de esa noche |
+| `proximas_de_conjunto(conjunto_id, noche)` | Lo que le queda a un conjunto desde esa noche |
+| `buscar_por_nombre(texto)` | Conjuntos y escenarios cuyo nombre o alias normalizado coincide exacto |
+| `registrar_dispositivo_push(token, plataforma, idioma)` | Da de alta o reasigna el token al usuario de la sesión |
 
-Dos decisiones a cerrar antes de escribir esta fase:
+Permisos: lectura pública (en el MVP, todo lo que está en las tablas públicas está publicado), escritura sólo para el admin, y `favoritos` y `dispositivos_push` sólo para su dueño. Los usuarios anónimos tienen el rol `authenticated`, así que ninguna policy de escritura se apoya sólo en el rol.
 
-- Cómo se normalizan los nombres en SQL para que dé lo mismo que `norm` en TypeScript y en Python.
-- Habilitar la auth anónima, que hoy está apagada.
+Datos cargados por el seed: 110 conjuntos (98 con fila 2027), 42 escenarios sin coordenadas y 19 eventos. No hay grilla real todavía: `actuaciones` sólo tiene datos si se carga la grilla ficticia.
 
 ## 10. Reglas y decisiones que hay que respetar
 
-Las 21 decisiones tomadas están en `docs/DECISIONES.md`. Las que más condicionan el trabajo:
+Las 28 decisiones tomadas están en `docs/DECISIONES.md`. Las que más condicionan el trabajo:
 
 - **Zona horaria:** siempre `America/Montevideo`, nunca la del teléfono. Se usan las funciones de `@cuerda/shared`.
 - **Noche lógica:** antes de las 06:00 es la noche anterior. Vale para «hoy», para la temporada vigente y para el modo Llamadas.
@@ -240,6 +256,9 @@ Las 21 decisiones tomadas están en `docs/DECISIONES.md`. Las que más condicion
 - **Idioma del código:** tablas y columnas en español con snake_case; código en inglés; commits en español.
 - **Textos:** nada escrito directo en la interfaz; todo pasa por i18n en los dos idiomas.
 - **Seguridad:** RLS en todas las tablas y ninguna key en el repo (`.env` local, `.env.example` al día).
+- **Noche como parámetro:** las funciones SQL reciben la noche lógica; la calcula la app con `nocheLogica()`. Nada de `current_date` en la base.
+- **Archivos generados:** `database.types.ts` y `supabase/seeds/02_research.sql` se regeneran (`pnpm gen:types`, `pnpm gen:seed`), nunca se editan a mano.
+- **Grilla ficticia:** sólo en el Supabase local; nunca llega al proyecto remoto.
 - **Forma de trabajo:** un paso numerado del plan es una tarea; se planifica antes de tocar código y se hace un commit al terminar. Un paso no está hecho hasta cumplir el «Listo cuando» de su fase.
 
 ## 11. Cómo correrlo
@@ -268,9 +287,12 @@ python research/validate.py
 Base de datos:
 
 ```bash
-pnpm supabase db reset                # recrea la base: migraciones + seed
+pnpm supabase db reset                # recrea la base: migraciones + seeds
 pnpm supabase migration new <nombre>  # migración nueva
 pnpm gen:types                        # regenera los tipos de @cuerda/shared
+pnpm gen:seed                         # regenera el seed desde research/
+pnpm db:grilla hoy                    # carga la grilla ficticia desde la noche de hoy
+pnpm test:db                          # tests de la base (necesita pnpm supabase start)
 ```
 
 Nativo: `pnpm --filter app android` (o `android:local` para usar el Supabase local) y, en Mac, `pnpm --filter app ios`. El resto de los comandos y los detalles de Windows están en `CLAUDE.md`.
@@ -284,7 +306,8 @@ Nativo: `pnpm --filter app android` (o `android:local` para usar el Supabase loc
 | Rechazo o demora en App Store | Lanzamiento tarde | Beta desde el 14 de diciembre; política de privacidad lista |
 | Cambios de último momento (lluvia) | Gente que va y no hay función | Botón «suspender noche» con push; «actualizado hace X» |
 | Carnaval App copia el diferencial | Se achica la ventaja | Datos completos, mapa y hora estimada en Llamadas |
-| Atraso actual | La Fase 2 debía terminar el 9/11 y no empezó | Arrancarla ya; evaluar el recorte si se sigue corriendo |
+| Atraso | La Fase 2 cerró el 10/11, un día tarde; la Fase 3 arranca en fecha | Evaluar el recorte si alguna fase se corre |
+| CI que no arranca | Los errores se ven tarde | Chequeos locales completos antes de cada commit, hasta que se resuelva |
 
 ## 13. Pendientes que no son código
 
@@ -293,7 +316,7 @@ Nativo: `pnpm --filter app android` (o `android:local` para usar el Supabase loc
 - **Conjuntos y comparsas:** mensaje directo por Instagram (borrador 8.3).
 - **Instagram de la app:** cuenta profesional vinculada a una Página de Facebook.
 - **Supabase remoto** (São Paulo) y **key de MapTiler**, si todavía no están creados.
-- **17/11:** cargar el resultado de la Prueba de Admisión en `research/conjuntos.csv` y correr `python research/validate.py --post-prueba`.
+- **17/11:** cargar el resultado de la Prueba de Admisión en `research/conjuntos.csv`, correr `python research/validate.py --post-prueba` y regenerar el seed con `pnpm gen:seed --post-prueba`.
 - **Coordenadas de los escenarios** y las cinco direcciones que faltan.
 - **Decisiones abiertas:** nombre final de la app y monetización en la primera temporada (gratis sin anuncios, o un sponsor).
 

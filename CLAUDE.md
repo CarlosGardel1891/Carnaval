@@ -7,7 +7,7 @@ App móvil del Carnaval de Montevideo con foco en las Llamadas y el candombe: qu
 - `docs/PLAN.md` — el plan por fases (qué hacer y cuándo).
 - `docs/DECISIONES.md` — decisiones tomadas; mandan sobre el plan.
 - `research/CAMBIOS.md` — estado de los datos semilla y pendientes.
-- `prompts/` — prompts preparados por fase (por ahora sólo el de la Fase 1).
+- `prompts/` — el prompt de cada fase, tal como se usó.
 
 ## Stack
 
