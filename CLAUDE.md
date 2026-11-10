@@ -84,6 +84,8 @@ En el emulador Android, la app reescribe `127.0.0.1`/`localhost` a `10.0.2.2` pa
 
 Copiar `app/.env.example` a `app/.env`: `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` (publishable key) y `VITE_MAPTILER_KEY`. Nunca subir `.env` al repo; mantener `.env.example` al día.
 
+La key de MapTiler queda dentro de la app, así que hay que restringirla por origen en MapTiler Cloud (Account → API keys → Allowed HTTP origins). Los orígenes de la app son: `http://localhost:5173` (desarrollo), `https://localhost` (Android) y `capacitor://localhost` (iOS). Sin key, el mapa muestra los marcadores sobre un fondo liso y avisa que falta.
+
 ## Bundle ID
 
 Provisional: `uy.cuerda.app`. Para cambiarlo antes de publicar: `appId` en `app/capacitor.config.ts`, `namespace` y `applicationId` en `app/android/app/build.gradle` (y el paquete Java de `MainActivity`), `PRODUCT_BUNDLE_IDENTIFIER` en Xcode; después `pnpm --filter app cap:sync`.

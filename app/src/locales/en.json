@@ -4,9 +4,16 @@
     "tagline": "Montevideo's carnival, night by night"
   },
   "map": {
-    "label": "Map of Montevideo",
-    "missingKey": "The MapTiler key (VITE_MAPTILER_KEY) is missing, so the map can't be shown.",
-    "title": "Stage map"
+    "label": "Map of stages",
+    "missingKey": "The MapTiler key (VITE_MAPTILER_KEY) is missing: stages are shown, but streets are not.",
+    "title": "Map",
+    "you": "Your location",
+    "legend": "Legend",
+    "loading": "Loading stages…",
+    "error": "We couldn't load the stages.",
+    "empty": "No stages have a location on file yet.",
+    "notOnMap_one": "{{count}} of tonight's stages is not on the map: it has no location on file yet.",
+    "notOnMap_other": "{{count}} of tonight's stages are not on the map: they have no location on file yet."
   },
   "season": {
     "title": "Carnival {{year}}",

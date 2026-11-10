@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import i18n from '../i18n'
-import { fetchCurrentSeason, fetchNightActs } from '../lib/api'
+import { fetchCurrentSeason, fetchLocatedStages, fetchNightActs } from '../lib/api'
 import { renderApp } from '../test-utils'
 
 vi.mock('../lib/api')
@@ -12,6 +12,7 @@ describe('navegación', () => {
   beforeEach(async () => {
     vi.mocked(fetchCurrentSeason).mockResolvedValue(null)
     vi.mocked(fetchNightActs).mockResolvedValue([])
+    vi.mocked(fetchLocatedStages).mockResolvedValue([])
     await i18n.changeLanguage('es')
   })
   afterEach(cleanup)

@@ -29,6 +29,12 @@ export type Act = Nullable<
   | 'distancia_m'
 >
 
+/** Un escenario con ubicación: su punto fijo o, si es itinerante, una parada de la noche. */
+export type LocatedStage = Nullable<
+  Functions['escenarios_cercanos']['Returns'][number],
+  'tipo' | 'barrio' | 'direccion' | 'gratis' | 'precio_texto'
+>
+
 export interface Coords {
   lat: number
   lng: number
@@ -63,6 +69,26 @@ export async function fetchNightActs({
     p_noche: noche,
     p_solo_gratis: onlyFree,
     ...(origin ? { p_lat: origin.lat, p_lng: origin.lng } : {}),
+  })
+  if (error) throw error
+  return data
+}
+
+/** Centro de Montevideo: desde acá se mide para traer «todos» los escenarios con ubicación. */
+export const MONTEVIDEO_CENTER: Coords = { lat: -34.9058, lng: -56.1913 }
+const WHOLE_CITY_M = 100_000
+
+/**
+ * Los escenarios activos con ubicación. `escenarios_cercanos` devuelve una fila por
+ * escenario: de un itinerante sólo trae una parada, así que sus paradas de la noche se
+ * sacan de las actuaciones (ver `mapMarkers`).
+ */
+export async function fetchLocatedStages(noche: string): Promise<LocatedStage[]> {
+  const { data, error } = await supabase.rpc('escenarios_cercanos', {
+    p_lat: MONTEVIDEO_CENTER.lat,
+    p_lng: MONTEVIDEO_CENTER.lng,
+    p_radio_m: WHOLE_CITY_M,
+    p_noche: noche,
   })
   if (error) throw error
   return data

@@ -4,9 +4,16 @@
     "tagline": "El carnaval de Montevideo, noche a noche"
   },
   "map": {
-    "label": "Mapa de Montevideo",
-    "missingKey": "Falta la key de MapTiler (VITE_MAPTILER_KEY) para mostrar el mapa.",
-    "title": "Mapa de escenarios"
+    "label": "Mapa de escenarios",
+    "missingKey": "Falta la key de MapTiler (VITE_MAPTILER_KEY): se ven los escenarios, pero no las calles.",
+    "title": "Mapa",
+    "you": "Tu ubicación",
+    "legend": "Referencias",
+    "loading": "Cargando los escenarios…",
+    "error": "No pudimos cargar los escenarios.",
+    "empty": "Todavía no hay escenarios con ubicación cargada.",
+    "notOnMap_one": "{{count}} escenario de esta noche no está en el mapa: todavía no tiene ubicación cargada.",
+    "notOnMap_other": "{{count}} escenarios de esta noche no están en el mapa: todavía no tienen ubicación cargada."
   },
   "season": {
     "title": "Carnaval {{year}}",
