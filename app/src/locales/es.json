@@ -23,10 +23,25 @@
     "map": "Mapa"
   },
   "today": {
-    "title": "Hoy"
+    "title": "Hoy",
+    "otherNight": "Otra noche",
+    "backToTonight": "Volver a hoy",
+    "updated": "Actualizado {{ago}}",
+    "updatedNow": "Actualizado recién",
+    "updating": "Actualizando…",
+    "refresh": "Actualizar",
+    "loading": "Cargando la grilla…",
+    "error": "No pudimos cargar la grilla.",
+    "retry": "Reintentar",
+    "refreshError": "No se pudo actualizar: estás viendo lo último que cargó.",
+    "emptyNight": "Todavía no hay actuaciones cargadas para esta noche.",
+    "beforeSeason": "El Carnaval {{year}} arranca el {{date}}.",
+    "offSeason": "Esta noche no hay actuaciones.",
+    "onStage": "Ahora en escena"
   },
   "stage": {
-    "title": "Escenario"
+    "title": "Escenario",
+    "itinerant": "Itinerante"
   },
   "category": {
     "murga": "Murga",
@@ -49,5 +64,14 @@
     "programada": "Programada",
     "cambiada": "Cambió",
     "suspendida": "Suspendida"
+  },
+  "price": {
+    "free": "Gratis",
+    "paid": "Con entrada"
+  },
+  "round": {
+    "primera": "Primera rueda",
+    "segunda": "Segunda rueda",
+    "liguilla": "Liguilla"
   }
 }

@@ -23,10 +23,25 @@
     "map": "Map"
   },
   "today": {
-    "title": "Today"
+    "title": "Today",
+    "otherNight": "Another night",
+    "backToTonight": "Back to today",
+    "updated": "Updated {{ago}}",
+    "updatedNow": "Updated just now",
+    "updating": "Updating…",
+    "refresh": "Refresh",
+    "loading": "Loading the lineup…",
+    "error": "We couldn't load the lineup.",
+    "retry": "Try again",
+    "refreshError": "Couldn't refresh: you're seeing the last lineup that loaded.",
+    "emptyNight": "There are no shows listed for this night yet.",
+    "beforeSeason": "Carnival {{year}} starts on {{date}}.",
+    "offSeason": "There are no shows tonight.",
+    "onStage": "On stage now"
   },
   "stage": {
-    "title": "Stage"
+    "title": "Stage",
+    "itinerant": "Itinerant"
   },
   "category": {
     "murga": "Murga",
@@ -49,5 +64,14 @@
     "programada": "Scheduled",
     "cambiada": "Changed",
     "suspendida": "Cancelled"
+  },
+  "price": {
+    "free": "Free",
+    "paid": "Ticketed"
+  },
+  "round": {
+    "primera": "First round",
+    "segunda": "Second round",
+    "liguilla": "Liguilla"
   }
 }

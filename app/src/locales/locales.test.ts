@@ -22,6 +22,7 @@ describe('traducciones', () => {
       ...enums.categoria_conjunto.map((v) => `category.${v}`),
       ...enums.tipo_escenario.map((v) => `stageType.${v}`),
       ...enums.estado_actuacion.map((v) => `status.${v}`),
+      ...enums.rueda_concurso.map((v) => `round.${v}`),
     ]
     expect(keys(es)).toEqual(expect.arrayContaining(expected))
   })
