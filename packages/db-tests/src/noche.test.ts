@@ -1,5 +1,5 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
-import { anonClient, ctx, serviceClient, userClient, type Db } from './clients'
+import { anonClient, ctx, serviceClient, userClient, withSql, type Db } from './clients'
 import { limpiar, ok } from './helpers'
 
 // Una noche lejos de cualquier temporada cargada, y coordenadas de prueba en el Centro.
@@ -259,8 +259,32 @@ describe('actuaciones_de_la_noche', () => {
 
 describe('mis_favoritos', () => {
   it('devuelve sólo los de quien llama, y nada sin sesión', async () => {
+    // A sigue a zz-tres (beforeAll) y B a zz-dos (test anterior): ninguno ve el del otro.
     expect(ok(await a().rpc('mis_favoritos'))).toEqual([ids['zz-tres']])
+    expect(ok(await b().rpc('mis_favoritos'))).toEqual([ids['zz-dos']])
     expect(ok(await anonClient().rpc('mis_favoritos'))).toEqual([])
+  })
+
+  it('no recibe parámetros: no hay forma de pedir los favoritos de otro usuario', async () => {
+    const firmas = await withSql(async (sql) => {
+      const { rows } = await sql.query<{ pronargs: number; def: string }>(
+        `select p.pronargs, pg_get_functiondef(p.oid) as def
+         from pg_proc p join pg_namespace n on n.oid = p.pronamespace
+         where n.nspname = 'public' and p.proname = 'mis_favoritos'`,
+      )
+      return rows
+    })
+    expect(firmas).toHaveLength(1) // una sola firma, sin sobrecargas
+    expect(firmas[0]!.pronargs).toBe(0)
+    expect(firmas[0]!.def).toContain('usuario_id = (select auth.uid())')
+
+    // Y por la API: pasarle el id de otro no devuelve nada, falla.
+    const idDeA = ctx().anonimoA.id
+    for (const args of [{ p_usuario_id: idDeA }, { usuario_id: idDeA }]) {
+      const { data, error } = await b().rpc('mis_favoritos', args as never)
+      expect(data).toBeNull()
+      expect(error?.code).toBe('PGRST202') // PostgREST: no existe una función con esa firma
+    }
   })
 })
 
