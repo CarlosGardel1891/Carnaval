@@ -7,3 +7,4 @@ dist/
 android/
 ios/
 supabase/.temp/
+packages/db-tests/fixtures/

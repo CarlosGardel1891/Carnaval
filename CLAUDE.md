@@ -20,6 +20,7 @@ React 19 + TypeScript (strict) + Vite + Capacitor 8 + Tailwind 4, Supabase (Post
 - `supabase/` — `config.toml`, `migrations/`, `seed.sql` (sólo local) y, más adelante, Edge Functions.
 - `packages/shared/` (`@cuerda/shared`) — tipos de la base (`database.types.ts`, generado), fechas (`nocheLogica`, `modoLlamadasActivo`, `calendarDateInMontevideo`) y `norm` para matching de nombres.
 - `packages/db-tests/` (`@cuerda/db-tests`) — tests de integración de la base (RLS, funciones, invariantes del esquema) contra el Supabase local. Corren con `pnpm test:db`, aparte de `pnpm test`.
+- `scripts/` — generadores: `gen-norm-marks.mjs` (migración de `public.norm`) y `gen_norm_cases.py` (fixture de casos de `norm`). `norm` vive en tres lugares (TypeScript, Python y SQL) y tienen que dar lo mismo (decisión 22).
 - `research/` — datos semilla de la Fase 0. **No editar a mano sin correr `python research/validate.py` después.**
 - `docs/`, `prompts/` — plan, decisiones y prompts.
 

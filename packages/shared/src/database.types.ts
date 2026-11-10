@@ -37,6 +37,7 @@ export type Database = {
     }
     Functions: {
       es_admin: { Args: Record<PropertyKey, never>; Returns: boolean }
+      norm: { Args: { t: string }; Returns: string }
     }
     Enums: {
       [_ in never]: never
