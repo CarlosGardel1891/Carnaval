@@ -359,7 +359,59 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      actuaciones_de_la_noche: {
+        Args: {
+          p_lat?: number
+          p_lng?: number
+          p_noche: string
+          p_solo_favoritos?: boolean
+          p_solo_gratis?: boolean
+        }
+        Returns: {
+          actuacion_id: number
+          conjunto_categoria: Database['public']['Enums']['categoria_conjunto']
+          conjunto_foto_url: string
+          conjunto_id: number
+          conjunto_nombre: string
+          conjunto_slug: string
+          direccion: string
+          distancia_m: number
+          es_favorito: boolean
+          escenario_barrio: string
+          escenario_id: number
+          escenario_nombre: string
+          escenario_slug: string
+          escenario_tipo: Database['public']['Enums']['tipo_escenario']
+          estado: Database['public']['Enums']['estado_actuacion']
+          etapa_numero: number
+          etapa_rueda: Database['public']['Enums']['rueda_concurso']
+          gratis: boolean
+          inicio: string
+          itinerante: boolean
+          lat: number
+          lng: number
+          precio_texto: string
+        }[]
+      }
       es_admin: { Args: Record<PropertyKey, never>; Returns: boolean }
+      escenarios_cercanos: {
+        Args: { p_lat: number; p_lng: number; p_noche: string; p_radio_m: number }
+        Returns: {
+          barrio: string
+          direccion: string
+          distancia_m: number
+          escenario_id: number
+          gratis: boolean
+          itinerante: boolean
+          lat: number
+          lng: number
+          nombre: string
+          precio_texto: string
+          slug: string
+          tipo: Database['public']['Enums']['tipo_escenario']
+        }[]
+      }
+      mis_favoritos: { Args: Record<PropertyKey, never>; Returns: number[] }
       norm: { Args: { t: string }; Returns: string }
       norm_lista: { Args: { t: string[] }; Returns: string[] }
     }
