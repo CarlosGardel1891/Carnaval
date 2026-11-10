@@ -142,6 +142,8 @@ Cada fase termina con algo usable en el simulador y sus tests en verde; los dato
 
 Listo cuando: con datos de una noche real de 2026 (ej. sábado 28 de febrero de 2026, cartelera de El Observador), la pantalla Hoy muestra lo mismo que la cartelera publicada.
 
+Estado al 2026-11-10: los cinco puntos están hechos. La noche del 28/02/2026 se carga en el Supabase local con `pnpm db:noche-real` y se ve en `/?noche=2026-02-28`: entran 79 de las 82 líneas de la cartelera. Las tres que faltan son las de «ESCENARIOS MÓVILES», un título que todavía no es alias de ningún escenario en `research/escenarios.csv`. Los escenarios reales no tienen coordenadas, así que aparecen en la lista y en su ficha, pero no en el mapa ni en «cerca mío».
+
 ### Fase 4 · Conjuntos, Seguir y push (24 – 30 nov)
 
 1. Lista de conjuntos por categoría, con buscador.

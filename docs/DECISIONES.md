@@ -56,3 +56,45 @@ Registro de decisiones del proyecto. Si algo de `docs/PLAN.md` choca con este ar
     - `dispositivos_push`: el `token` es la clave primaria. `registrar_dispositivo_push()` sólo la puede ejecutar el rol `authenticated`.
     - `mis_favoritos()`: función security definer que devuelve sólo los conjuntos que sigue el usuario de la sesión. La usan las funciones de lectura para el filtro «mis conjuntos», así andan también sin sesión y sin abrir la RLS de `favoritos`.
     - Para el importador (Fase 7): en un `insert` en lote por la API, si las filas no traen las mismas columnas, las que faltan quedan en nulo en vez de tomar el valor por defecto. Hay que mandarlo con `defaultToNull: false`.
+
+## 2026-11-10 · Tomadas en la Fase 3 (Hoy y escenarios)
+
+29. **Qué queda para la Fase 4:** el filtro «mis conjuntos» y la sesión anónima. En la Fase 3 la app lee todo con la key pública, sin sesión.
+30. **«Ahora en escena»:** una actuación está en escena desde su inicio hasta el inicio de la siguiente actuación no suspendida de ese escenario, con un tope de 75 minutos. Una suspendida nunca está en escena. Sólo se marca cuando la noche que se mira es la de hoy.
+31. **Pizarrón «Hoy»:**
+    - La noche sale de `nocheLogica()` y se le pasa a la base; se puede mirar otra con `?noche=YYYY-MM-DD`.
+    - Los filtros (gratis, categoría, vista por escenario o por hora) viven en la URL y cambian con `replace`, para que «atrás» no los deshaga de a uno. Las pestañas de abajo también navegan con `replace`.
+    - Por escenario, primero el que arranca antes y, a igual hora, por nombre. Las suspendidas y las cambiadas no se esconden: se muestran marcadas.
+    - Siempre dice hace cuánto se actualizó. Si una actualización falla, sigue mostrando lo anterior y lo avisa; el mapa y la ficha de escenario hacen lo mismo.
+32. **Refresco:** la grilla se vuelve a pedir cada 5 minutos, sólo con la app al frente. «Al frente» sale de `appStateChange` de `@capacitor/app`, conectado al `focusManager` de TanStack Query. Al volver a la app se refresca sólo lo que tiene más de 1 minuto.
+33. **Botón «atrás» de Android:** vuelve en el historial; si no hay a dónde volver, minimiza la app (no la cierra).
+34. **«Cerca mío»:**
+    - En la URL sólo va `cerca=1`. Las coordenadas quedan en memoria, redondeadas a 4 decimales (unos 11 metros), y nunca se guardan ni se mandan a otro lado que a la consulta.
+    - Alcanza con la ubicación aproximada: no se pide la precisa.
+    - Ordena por distancia a la parada más cercana de la noche. Los escenarios sin ubicación cargada no entran en la lista, y se avisa cuántos quedaron afuera.
+    - Si la URL trae `cerca=1` y no hay permiso, el filtro se apaga sin pedirlo: el permiso sólo se pide cuando la persona toca el botón.
+35. **Mapa:**
+    - Los escenarios fijos salen de `escenarios_cercanos`, con centro en Montevideo (-34.9058, -56.1913) y 100 km de radio; las paradas de los itinerantes, de las actuaciones de la noche.
+    - Cada tipo de escenario tiene forma y color propios, con leyenda: el color solo no alcanza.
+    - El mapa nunca pide la ubicación.
+    - Estilo `streets-v2-dark` de MapTiler. Sin key, muestra los marcadores sobre un fondo liso y avisa que falta.
+    - Cuenta cuántos escenarios de la noche no están en el mapa por no tener ubicación.
+36. **Ficha de escenario:**
+    - Se busca por `slug`, sin filtrar por `activo`: un enlace viejo tiene que seguir andando. Si esa consulta falla, la ficha se arma con lo que trae la grilla de la noche.
+    - La grilla de la ficha usa la misma consulta que el pizarrón sin filtros, así no hay un pedido más.
+    - «Cómo llegar» abre el mapa del teléfono: `geo:` en Android, Apple Maps en iOS y Google Maps en el navegador. Sin ubicación cargada no hay enlace, y se dice.
+    - Un itinerante lista cada parada de la noche con su enlace.
+    - «Volver» vuelve a donde se estaba; entrando directo, va a Hoy.
+37. **Caché guardada en el teléfono:**
+    - Las consultas se guardan con `@capacitor/preferences` (clave `cuerda-cache`) y valen 24 horas: pasado un día, la grilla vieja confunde más de lo que ayuda.
+    - `CACHE_VERSION` se sube cuando cambia la forma de lo que devuelven las consultas; al abrir, la app descarta lo que guardó otra versión.
+    - Las consultas que llevan la posición del usuario no se guardan nunca.
+    - Lo último que cargó se conserva aunque la actualización siguiente haya fallado.
+    - `networkMode: 'always'`: sin red, la consulta falla y se avisa, en vez de quedar en pausa. `navigator.onLine` no es confiable dentro de un WebView.
+38. **Permiso de ubicación en iOS:** `NSLocationWhenInUseUsageDescription` va en `Info.plist` con un solo texto, en español. Localizarlo (`InfoPlist.strings`) queda pendiente hasta tener una Mac: `project.pbxproj` no se edita a mano.
+39. **Noche real del 28/02/2026, sólo local:** `supabase/local/noche_real_2026-02-28.sql` tiene la cartelera de El Observador del sábado 28/02/2026 tal como salió publicada, y se carga con `pnpm db:noche-real`. Reglas:
+    - Las mismas barreras que la grilla ficticia (decisión 27): parámetro de sesión obligatorio, `docker exec` a la base local y marca propia (`fuente = 'cartelera-2026-02-28'`, con la nota en `fuente_url`). `pnpm db:noche-real --quitar` la borra.
+    - Cada línea se resuelve por `norm` contra los nombres y alias del seed (decisión 5). Lo que no coincide no se carga y se lista al terminar: el fixture no corrige la cartelera ni agrega alias por su cuenta.
+    - No crea escenarios ni conjuntos y no inventa coordenadas. Los itinerantes llevan sólo la dirección que publicó la cartelera.
+    - Es de la temporada 2026 sobre el catálogo 2027: sirve para probar las pantallas con una noche de tamaño real, no como dato histórico.
+40. **CI:** hasta el 2026-11-10 GitHub Actions no arranca ninguna corrida (`startup_failure`) por la facturación de la cuenta dueña del repo; no es un problema del workflow. Mientras tanto mandan los chequeos locales, que son los mismos que corre el CI.

@@ -1,6 +1,6 @@
 # Cuerda · contexto completo del proyecto
 
-Documento para poner al día a alguien que llega de cero. Estado al **2026-11-10**. Repo: <https://github.com/Emiliano-Vanzini/Carnaval>, rama de trabajo `develop`.
+Documento para poner al día a alguien que llega de cero. Estado al **2026-11-10**. Repo: <https://github.com/Emiliano-Vanzini/Carnaval>, rama de trabajo `hoy-escenarios` (Fase 3); `develop` tiene hasta la Fase 2.
 
 Si algo de acá choca con los documentos del repo, mandan ellos, en este orden: `docs/DECISIONES.md`, `docs/PLAN.md`, `CLAUDE.md`.
 
@@ -97,29 +97,30 @@ El análisis completo está en `docs/competencia-carnaval-app.md`.
 | 0 · Investigación y validación | 23 oct – 2 nov | **Terminada** |
 | 1 · Setup técnico | 3 – 5 nov | **Código terminado** (2026-10-23); faltan dos verificaciones manuales |
 | 2 · Modelo de datos | 6 – 9 nov | **Terminada** (2026-11-10, un día tarde) |
-| 3 · Hoy y escenarios | 10 – 23 nov | **Es lo que sigue** |
-| 4 · Conjuntos, Seguir y push | 24 – 30 nov | Sin empezar |
+| 3 · Hoy y escenarios | 10 – 23 nov | **Código terminado** (2026-11-10) en `hoy-escenarios`; falta pasarla a `develop` |
+| 4 · Conjuntos, Seguir y push | 24 – 30 nov | **Es lo que sigue** |
 | 5 · Calendario y Concurso | 1 – 7 dic | Sin empezar |
 | 6 · Modo Llamadas | 8 – 13 dic | Sin empezar |
 | 7 · Datos y panel admin | 1 dic – 10 ene (en paralelo) | Sin empezar |
 | 8 · QA, beta y publicación | 14 dic – 20 ene | Sin empezar |
 | 9 · Operación en temporada | 21 ene – 7 mar | — |
 
-En una frase: **la base de datos está completa, con sus permisos, sus funciones de consulta y los datos semilla cargados, pero la app todavía no la usa.** La app sigue mostrando un mapa de Montevideo y una tarjeta con las fechas de la temporada.
+En una frase: **la app ya muestra la noche: pizarrón «Hoy», mapa y ficha de escenario, con «cerca mío» y lo último que cargó guardado en el teléfono.** Lo hace sobre datos de prueba (la grilla ficticia o la cartelera real del 28/02/2026): todavía no hay grilla real, los escenarios reales no tienen coordenadas y no existe nada de conjuntos, Seguir ni push.
 
 Lo que falta confirmar de la Fase 1:
 
 - La app corriendo en el simulador de iOS (hace falta una Mac).
 - El proyecto remoto de Supabase, en São Paulo, con las migraciones aplicadas.
-- El build de Android en la máquina de desarrollo actual, que tiene JDK 17 y necesita el 21.
-- El CI en GitHub: hasta el 2026-11-10 ninguna corrida de las ramas de trabajo llegó a arrancar (`startup_failure`). Mientras tanto mandan los chequeos locales.
+- El CI en GitHub: ninguna corrida llega a arrancar (`startup_failure`) por un problema de facturación de la cuenta dueña del repo (decisión 40). Mientras tanto mandan los chequeos locales.
+
+Android quedó confirmado el 2026-11-10: con JDK 21 (Temurin) el build de debug compila y la app corrió en el emulador contra el Supabase local (Hoy, ficha, mapa, «Cómo llegar» y el botón «atrás»). Lo único que no se pudo probar ahí es «cerca mío» con una posición: el emulador no entregó ninguna y la app mostró su aviso de error.
 
 ## 6. Tecnología
 
 | Capa | Con qué |
 | --- | --- |
 | App | React 19, TypeScript estricto, Vite 8, Tailwind 4, React Router, TanStack Query |
-| Empaquetado nativo | Capacitor 8 (Android: SDK mínimo 24; iOS: 15.0) |
+| Empaquetado nativo | Capacitor 8 (Android: SDK mínimo 24; iOS: 15.0), con los plugins App, Geolocation y Preferences |
 | Backend | Supabase: Postgres 17 con PostGIS, auth anónima (ya habilitada), Edge Functions, Realtime |
 | Mapas | MapLibre GL con tiles de MapTiler |
 | Idiomas | react-i18next, español e inglés |
@@ -136,8 +137,8 @@ app/               App móvil (Vite + Capacitor). android/ e ios/ son los proyec
 admin/             Panel web de carga de datos (hoy, sólo un login de adorno)
 packages/shared/   @cuerda/shared: tipos de la base, fechas y normalización de nombres
 packages/db-tests/ Tests de integración de la base contra el Supabase local (pnpm test:db)
-supabase/          config.toml, migraciones, seeds/ y local/ (grilla ficticia)
-scripts/           Generadores del seed y de norm, y el cargador de la grilla ficticia
+supabase/          config.toml, migraciones, seeds/ y local/ (grilla ficticia y noche real de prueba)
+scripts/           Generadores del seed y de norm, y el cargador de los datos de prueba
 research/          Datos semilla de la Fase 0, informe y validador
 docs/              PLAN.md, DECISIONES.md y análisis de competencia
 prompts/           Prompts para Claude Code, uno por fase
@@ -164,24 +165,30 @@ LEEME.md           Cómo arrancar
 - `public.norm` en SQL, réplica de la de TypeScript y Python, comprobada contra 420 casos.
 - Seeds: `01_temporadas.sql` (temporada 2027: del 2027-01-21 al 2027-03-07, Llamadas el 5 y 6 de febrero) y `02_research.sql`, que se genera desde los CSV con `pnpm gen:seed`.
 - Grilla ficticia (`pnpm db:grilla`): tres noches de conjuntos reales en cuatro escenarios inventados, para desarrollar pantallas. Sólo se carga en el Supabase local.
+- Noche real (`pnpm db:noche-real`): la cartelera publicada del sábado 28/02/2026, para probar con una noche de tamaño real. Entran 79 de sus 82 líneas, en 17 escenarios; las otras tres son de «ESCENARIOS MÓVILES», un nombre que no coincide con ningún alias. También es sólo local, y sus escenarios no tienen coordenadas.
 - El entorno local usa puertos 553xx para convivir con otros proyectos Supabase.
 
 **`packages/db-tests`**
 
-- 138 tests contra el Supabase local: permisos tabla por tabla con usuarios anónimos, admin y falso admin; funciones; invariantes del esquema; seed contra los CSV; grilla ficticia.
+- 145 tests contra el Supabase local: permisos tabla por tabla con usuarios anónimos, admin y falso admin; funciones; invariantes del esquema; seed contra los CSV; grilla ficticia y noche real.
 
 **`app`**
 
-- Una sola pantalla: encabezado, mapa de Montevideo y una tarjeta con la temporada vigente o próxima.
-- Cliente de Supabase que, en el emulador de Android, reescribe `127.0.0.1` a `10.0.2.2` para llegar al Supabase local.
+- **Hoy** (`features/today/`): la grilla de la noche, por escenario o por hora, con filtros de gratuitos y categoría, «ahora en escena», las suspendidas y cambiadas marcadas, y «actualizado hace X». La noche sale de `nocheLogica()` o de `?noche=YYYY-MM-DD`; los filtros viven en la URL.
+- **Cerca mío** (`features/location/`): pide la ubicación aproximada sólo cuando se toca el filtro y ordena por distancia. La posición no se guarda.
+- **Mapa** (`features/map/`): los escenarios de la noche que tienen ubicación, con forma y color por tipo, y las paradas de los itinerantes. Sin key de MapTiler muestra los marcadores sobre un fondo liso y lo avisa.
+- **Ficha de escenario** (`features/stages/`): tipo, barrio, precio, dirección, «Cómo llegar» (abre la app de mapas del teléfono) y la grilla de la noche; en un itinerante, cada parada.
+- **Caché** (`lib/queryCache.ts`): las consultas se guardan 24 horas en el teléfono; sin red, la app abre con lo último que cargó y lo avisa.
+- **Ciclo de vida** (`lib/lifecycle.ts`): la grilla se refresca cada 5 minutos sólo con la app al frente y al volver a ella; el botón «atrás» de Android vuelve o minimiza.
+- Todo lo que habla con Supabase está en `lib/api.ts`. En el emulador de Android, el cliente reescribe `127.0.0.1` a `10.0.2.2` para llegar al Supabase local.
 - Todo el texto sale de `src/locales/es.json` y `en.json`; un test controla que tengan las mismas claves.
-- 6 tests.
+- 126 tests.
 
 **`admin`**
 
 - Una pantalla de login que sólo muestra un aviso. No se conecta a nada todavía. 1 test.
 
-**Lo que no existe aún:** cualquier pantalla real, la sesión anónima en la app, las Edge Functions, el panel de carga, la grilla real y las coordenadas de los escenarios.
+**Lo que no existe aún:** las fichas de conjuntos, «Seguir» y el filtro «mis conjuntos», la sesión anónima en la app, las push, el calendario, el modo Llamadas, las Edge Functions, el panel de carga, la grilla real y las coordenadas de los escenarios.
 
 ## 8. Datos semilla (`research/`)
 
@@ -239,11 +246,11 @@ Funciones que usa la app:
 
 Permisos: lectura pública (en el MVP, todo lo que está en las tablas públicas está publicado), escritura sólo para el admin, y `favoritos` y `dispositivos_push` sólo para su dueño. Los usuarios anónimos tienen el rol `authenticated`, así que ninguna policy de escritura se apoya sólo en el rol.
 
-Datos cargados por el seed: 110 conjuntos (98 con fila 2027), 42 escenarios sin coordenadas y 19 eventos. No hay grilla real todavía: `actuaciones` sólo tiene datos si se carga la grilla ficticia.
+Datos cargados por el seed: 110 conjuntos (98 con fila 2027), 42 escenarios sin coordenadas y 19 eventos. No hay grilla real todavía: `actuaciones` sólo tiene datos si se carga la grilla ficticia o la noche real de prueba.
 
 ## 10. Reglas y decisiones que hay que respetar
 
-Las 28 decisiones tomadas están en `docs/DECISIONES.md`. Las que más condicionan el trabajo:
+Las 40 decisiones tomadas están en `docs/DECISIONES.md`. Las que más condicionan el trabajo:
 
 - **Zona horaria:** siempre `America/Montevideo`, nunca la del teléfono. Se usan las funciones de `@cuerda/shared`.
 - **Noche lógica:** antes de las 06:00 es la noche anterior. Vale para «hoy», para la temporada vigente y para el modo Llamadas.
@@ -258,7 +265,11 @@ Las 28 decisiones tomadas están en `docs/DECISIONES.md`. Las que más condicion
 - **Seguridad:** RLS en todas las tablas y ninguna key en el repo (`.env` local, `.env.example` al día).
 - **Noche como parámetro:** las funciones SQL reciben la noche lógica; la calcula la app con `nocheLogica()`. Nada de `current_date` en la base.
 - **Archivos generados:** `database.types.ts` y `supabase/seeds/02_research.sql` se regeneran (`pnpm gen:types`, `pnpm gen:seed`), nunca se editan a mano.
-- **Grilla ficticia:** sólo en el Supabase local; nunca llega al proyecto remoto.
+- **Grilla ficticia y noche real de prueba:** sólo en el Supabase local; nunca llegan al proyecto remoto.
+- **«Ahora en escena»:** una actuación lo está desde su inicio hasta el inicio de la siguiente no suspendida de ese escenario, con un tope de 75 minutos, y sólo si la noche que se mira es la de hoy.
+- **Ubicación del usuario:** aproximada, sólo cuando la pide «cerca mío», en memoria y nunca guardada. El mapa no la pide.
+- **Caché en el teléfono:** 24 horas. Si cambia la forma de lo que devuelve una consulta, hay que subir `CACHE_VERSION`; una consulta que lleve la posición del usuario va con `meta: { persist: false }`.
+- **Coordenadas:** no se inventan. Un escenario sin ubicación aparece en la lista y en su ficha, y el mapa dice cuántos faltan.
 - **Forma de trabajo:** un paso numerado del plan es una tarea; se planifica antes de tocar código y se hace un commit al terminar. Un paso no está hecho hasta cumplir el «Listo cuando» de su fase.
 
 ## 11. Cómo correrlo
@@ -292,6 +303,7 @@ pnpm supabase migration new <nombre>  # migración nueva
 pnpm gen:types                        # regenera los tipos de @cuerda/shared
 pnpm gen:seed                         # regenera el seed desde research/
 pnpm db:grilla hoy                    # carga la grilla ficticia desde la noche de hoy
+pnpm db:noche-real                    # carga la noche real del 2026-02-28 (verla con /?noche=2026-02-28)
 pnpm test:db                          # tests de la base (necesita pnpm supabase start)
 ```
 
@@ -306,8 +318,8 @@ Nativo: `pnpm --filter app android` (o `android:local` para usar el Supabase loc
 | Rechazo o demora en App Store | Lanzamiento tarde | Beta desde el 14 de diciembre; política de privacidad lista |
 | Cambios de último momento (lluvia) | Gente que va y no hay función | Botón «suspender noche» con push; «actualizado hace X» |
 | Carnaval App copia el diferencial | Se achica la ventaja | Datos completos, mapa y hora estimada en Llamadas |
-| Atraso | La Fase 2 cerró el 10/11, un día tarde; la Fase 3 arranca en fecha | Evaluar el recorte si alguna fase se corre |
-| CI que no arranca | Los errores se ven tarde | Chequeos locales completos antes de cada commit, hasta que se resuelva |
+| Atraso | La Fase 2 cerró el 10/11, un día tarde; el código de la Fase 3 quedó listo ese mismo día, antes de su cierre (23/11) | Evaluar el recorte si alguna fase se corre |
+| CI que no arranca | GitHub no inicia las corridas por la facturación de la cuenta dueña del repo; los errores se ven tarde | Chequeos locales completos antes de cada commit, hasta que se resuelva |
 
 ## 13. Pendientes que no son código
 
@@ -315,7 +327,11 @@ Nativo: `pnpm --filter app android` (o `android:local` para usar el Supabase loc
 - **AUDECA:** pedir el orden de desfile y contenido de Llamadas (borrador 8.2).
 - **Conjuntos y comparsas:** mensaje directo por Instagram (borrador 8.3).
 - **Instagram de la app:** cuenta profesional vinculada a una Página de Facebook.
-- **Supabase remoto** (São Paulo) y **key de MapTiler**, si todavía no están creados.
+- **Supabase remoto** (São Paulo), si todavía no está creado.
+- **Key de MapTiler:** ponerla en `app/.env` y restringirla por origen en MapTiler Cloud (los orígenes están en `CLAUDE.md`). Con una key real todavía no se probó el mapa.
+- **GitHub Actions:** quien administra la cuenta dueña del repo tiene que resolver el pago fallido o subir el límite de gasto (Settings → Billing & plans) para que el CI arranque.
+- **Alias «ESCENARIOS MÓVILES»:** decidir si se agrega a `research/escenarios.csv` y para cuál de los dos móviles de la IM; con él, la noche real de prueba carga sus 82 líneas.
+- **iOS:** probar en una Mac y localizar el texto del permiso de ubicación.
 - **17/11:** cargar el resultado de la Prueba de Admisión en `research/conjuntos.csv`, correr `python research/validate.py --post-prueba` y regenerar el seed con `pnpm gen:seed --post-prueba`.
 - **Coordenadas de los escenarios** y las cinco direcciones que faltan.
 - **Decisiones abiertas:** nombre final de la app y monetización en la primera temporada (gratis sin anuncios, o un sponsor).
