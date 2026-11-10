@@ -481,6 +481,15 @@ export type Database = {
           precio_texto: string
         }[]
       }
+      buscar_por_nombre: {
+        Args: { p_texto: string }
+        Returns: {
+          id: number
+          nombre: string
+          slug: string
+          tipo: string
+        }[]
+      }
       es_admin: { Args: Record<PropertyKey, never>; Returns: boolean }
       escenarios_cercanos: {
         Args: { p_lat: number; p_lng: number; p_noche: string; p_radio_m: number }
@@ -502,6 +511,28 @@ export type Database = {
       mis_favoritos: { Args: Record<PropertyKey, never>; Returns: number[] }
       norm: { Args: { t: string }; Returns: string }
       norm_lista: { Args: { t: string[] }; Returns: string[] }
+      proximas_de_conjunto: {
+        Args: { p_conjunto_id: number; p_noche: string }
+        Returns: {
+          actuacion_id: number
+          direccion: string
+          escenario_barrio: string
+          escenario_id: number
+          escenario_nombre: string
+          escenario_slug: string
+          escenario_tipo: Database['public']['Enums']['tipo_escenario']
+          estado: Database['public']['Enums']['estado_actuacion']
+          etapa_numero: number
+          etapa_rueda: Database['public']['Enums']['rueda_concurso']
+          gratis: boolean
+          inicio: string
+          itinerante: boolean
+          lat: number
+          lng: number
+          noche: string
+          precio_texto: string
+        }[]
+      }
     }
     Enums: {
       categoria_conjunto:
