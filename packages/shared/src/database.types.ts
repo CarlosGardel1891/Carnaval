@@ -187,6 +187,34 @@ export type Database = {
         }
         Relationships: []
       }
+      dispositivos_push: {
+        Row: {
+          actualizado_en: string
+          creado_en: string
+          idioma: Database['public']['Enums']['idioma_app']
+          plataforma: Database['public']['Enums']['plataforma_push']
+          token: string
+          usuario_id: string
+        }
+        ComputedFields: never
+        Insert: {
+          actualizado_en?: string
+          creado_en?: string
+          idioma: Database['public']['Enums']['idioma_app']
+          plataforma: Database['public']['Enums']['plataforma_push']
+          token: string
+          usuario_id: string
+        }
+        Update: {
+          actualizado_en?: string
+          creado_en?: string
+          idioma?: Database['public']['Enums']['idioma_app']
+          plataforma?: Database['public']['Enums']['plataforma_push']
+          token?: string
+          usuario_id?: string
+        }
+        Relationships: []
+      }
       escenario_nombres: {
         Row: {
           escenario_id: number
@@ -533,12 +561,22 @@ export type Database = {
           precio_texto: string
         }[]
       }
+      registrar_dispositivo_push: {
+        Args: {
+          p_idioma: Database['public']['Enums']['idioma_app']
+          p_plataforma: Database['public']['Enums']['plataforma_push']
+          p_token: string
+        }
+        Returns: undefined
+      }
     }
     Enums: {
       categoria_conjunto:
         'murga' | 'parodistas' | 'humoristas' | 'revista' | 'comparsa' | 'samba' | 'otro'
       estado_actuacion: 'programada' | 'cambiada' | 'suspendida'
       estado_evento: 'confirmado' | 'estimado'
+      idioma_app: 'es' | 'en'
+      plataforma_push: 'ios' | 'android'
       rueda_concurso: 'primera' | 'segunda' | 'liguilla'
       tipo_escenario:
         'teatro_verano' | 'privado' | 'popular' | 'movil' | 'gratuito' | 'barrio_a_barrio'
@@ -665,6 +703,8 @@ export const Constants = {
       ],
       estado_actuacion: ['programada', 'cambiada', 'suspendida'],
       estado_evento: ['confirmado', 'estimado'],
+      idioma_app: ['es', 'en'],
+      plataforma_push: ['ios', 'android'],
       rueda_concurso: ['primera', 'segunda', 'liguilla'],
       tipo_escenario: [
         'teatro_verano',

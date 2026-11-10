@@ -53,5 +53,6 @@ export async function limpiar(): Promise<void> {
     await sql.query(`delete from public.conjuntos where slug like 'zz-%'`)
     await sql.query(`delete from public.escenarios where slug like 'zz-%'`)
     await sql.query(`delete from public.etapas_concurso where numero >= 90`)
+    await sql.query(`delete from public.dispositivos_push where token like 'zz-%'`)
   })
 }
