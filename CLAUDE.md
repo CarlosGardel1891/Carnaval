@@ -55,6 +55,8 @@ Studio local: http://127.0.0.1:55323. API: http://127.0.0.1:55321.
 
 Supabase remoto (São Paulo): `pnpm supabase login`, `pnpm supabase link --project-ref <ref>`, `pnpm supabase db push`. El seed no se aplica solo en remoto: cargar los datos con el SQL editor o un script con service role.
 
+Al crear el proyecto remoto hay que activar a mano los inicios de sesión anónimos (Authentication → Sign In / Providers → Allow anonymous sign-ins): `config.toml` sólo vale para el Supabase local. Antes del lanzamiento, revisar también los límites de auth por IP (decisión 23).
+
 Nativo (desde `app/`, o con `pnpm --filter app <script>`):
 
 ```bash
@@ -80,6 +82,6 @@ Provisional: `uy.cuerda.app`. Para cambiarlo antes de publicar: `appId` en `app/
 - Zona horaria siempre `America/Montevideo`, nunca la del dispositivo: usar las funciones de `@cuerda/shared`. Una actuación antes de las 06:00 es de la noche anterior.
 - Tablas y columnas en español snake_case; código en inglés; commits en español.
 - Nada de texto hardcodeado en la UI: todo por i18n (`src/locales/{es,en}.json`, mismas claves; hay un test que lo controla).
-- RLS en todas las tablas: lectura pública de lo publicado, escritura sólo service role o admin.
+- RLS en todas las tablas: lectura pública de lo publicado, escritura sólo service role o admin. Los usuarios anónimos tienen el rol `authenticated`: las policies de escritura exigen `es_admin()`, nunca sólo el rol. En el MVP todo lo que está en las tablas públicas está publicado (decisión 24).
 - Nunca subir keys al repo: usar `.env` y mantener `.env.example`.
 - Plan mode antes de cada paso grande; commit al terminar cada paso.

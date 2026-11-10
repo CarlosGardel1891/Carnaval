@@ -90,36 +90,41 @@ Prompt listo: `prompts/fase-1-setup.md`.
 
 ## Fase 2 · Modelo de datos en Supabase (6 – 9 nov)
 
+> Actualizada el 2026-11-10 con lo aprobado al arrancar la fase (decisiones 22 a 25 de `docs/DECISIONES.md`).
+
 La tabla central es `actuaciones`: cada fila es «tal conjunto, en tal escenario, a tal hora», y de ahí salen el pizarrón, el mapa, las fichas y las push.
 
 | Tabla | Campos clave | Versión |
 | --- | --- | --- |
 | `temporadas` | anio, fecha_inicio, fecha_fin, modo_llamadas_desde, modo_llamadas_hasta | MVP |
-| `conjuntos` | slug, nombre, alias[], categoria (murga, parodistas, humoristas, revista, comparsa, samba, otro), barrio, bio, instagram, facebook, foto_url, verificado, fuente_url[] | MVP |
+| `conjuntos` | slug, nombre, alias[], categoria (murga, parodistas, humoristas, revista, comparsa, samba, otro), barrio, bio, instagram, facebook, foto_url, verificado, fuente_url[], nombre_norm y alias_norm (generadas con `norm`) | MVP |
+| `conjunto_nombres` | nombre_norm (clave primaria), conjunto_id. La mantiene un trigger; garantiza que un nombre o alias normalizado apunte a un solo conjunto | MVP |
 | `conjunto_temporada` | conjunto_id, temporada_id, en_concurso (nullable = pendiente), en_llamadas | MVP |
-| `escenarios` | slug, nombre, alias[], tipo (teatro_verano, privado, popular, movil, gratuito, barrio_a_barrio; nullable), direccion, barrio, ubicacion (PostGIS Point), precio_texto, gratis (nullable), activo, itinerante (nullable), fuente_url[] | MVP |
-| `actuaciones` | escenario_id, conjunto_id, inicio, noche (fecha lógica), estado (programada, cambiada, suspendida), etapa_id, direccion_texto, ubicacion (para itinerantes), fuente, fuente_url | MVP |
+| `escenarios` | slug, nombre, alias[], tipo (teatro_verano, privado, popular, movil, gratuito, barrio_a_barrio; nullable), direccion, barrio, ubicacion (PostGIS Point), precio_texto, gratis (nullable), activo, itinerante (nullable), fuente_url[], nombre_norm y alias_norm (generadas con `norm`) | MVP |
+| `escenario_nombres` | nombre_norm (clave primaria), escenario_id. Igual que `conjunto_nombres` | MVP |
+| `actuaciones` | escenario_id, conjunto_id, inicio, noche (fecha lógica, generada en la base), estado (programada, cambiada, suspendida), etapa_id, direccion_texto, ubicacion (para itinerantes), fuente, fuente_url. Clave natural para reimportar: (escenario_id, conjunto_id, noche) | MVP |
 | `etapas_concurso` | temporada_id, rueda (primera, segunda, liguilla), numero, fecha | MVP |
-| `eventos` | temporada_id, slug, tipo (inaugural, samba, llamadas, corso, admision, concurso, otro), nombre, inicio, fin, estado (confirmado, estimado), recorrido (PostGIS LineString), info | MVP |
-| `orden_desfile` | evento_id, conjunto_id, posicion | MVP |
-| `favoritos` | user_id, conjunto_id | MVP |
-| `dispositivos_push` | user_id, token, plataforma, idioma | MVP |
+| `eventos` | temporada_id, slug, tipo (inaugural, samba, llamadas, corso, admision, concurso, otro), nombre, fecha_inicio, fecha_fin (fechas puras), lugar, estado (confirmado, estimado), recorrido (PostGIS LineString), info, fuente_url[]. Cada noche de las Llamadas es un evento propio | MVP |
+| `orden_desfile` | evento_id, conjunto_id, posicion (un orden por evento, o sea por noche) | MVP |
+| `favoritos` | usuario_id, conjunto_id | MVP |
+| `dispositivos_push` | usuario_id, token (único), plataforma, idioma | MVP |
 | `reportes` | user_id, evento_id, conjunto_id, ubicacion, creado | v2 |
 | `borradores_ingesta` | fuente_url, texto, datos_extraidos (jsonb), estado | v2 |
 | `salidas` | conjunto_id, inicio, recurrencia, punto_partida, recorrido, estado | v3 |
 
-**Reglas de acceso (RLS):** lectura pública de todo lo publicado; escritura sólo para el rol admin; `favoritos` y `dispositivos_push` sólo para su dueño.
+**Reglas de acceso (RLS):** lectura pública de todo lo publicado; escritura sólo para el admin; `favoritos` y `dispositivos_push` sólo para su dueño. En el MVP todo lo que está en las tablas públicas está publicado (decisión 24). El admin es un usuario con el claim `app_metadata.rol = 'admin'`, que lee la función `es_admin()` (decisión 23).
 
-**Usuarios:** auth anónima de Supabase, para que nadie tenga que registrarse para seguir conjuntos.
+**Usuarios:** auth anónima de Supabase, para que nadie tenga que registrarse para seguir conjuntos. Los usuarios anónimos tienen el rol `authenticated`, así que ese rol solo no habilita ninguna escritura sobre datos públicos.
 
-**Funciones SQL (RPC):**
+**Funciones SQL (RPC):** todas reciben la noche lógica como parámetro (la app la calcula con `nocheLogica()`); ninguna usa el reloj de la base.
 
 - `actuaciones_de_la_noche(noche, lat, lng, solo_gratis, solo_favoritos)` — alimenta la pantalla Hoy.
-- `proximas_de_conjunto(conjunto_id)` — para la ficha.
-- `escenarios_cercanos(lat, lng, radio_m)` — para el mapa.
+- `proximas_de_conjunto(conjunto_id, noche)` — para la ficha.
+- `escenarios_cercanos(lat, lng, radio_m, noche)` — para el mapa; los itinerantes se ubican por sus actuaciones de esa noche.
 - `buscar_por_nombre(texto)` — matching exacto normalizado contra nombre + alias (ver DECISIONES.md).
+- `registrar_dispositivo_push(token, plataforma, idioma)` — alta o reasignación del token al usuario actual.
 
-**Seed:** desde los CSV de `research/` (validados con `research/validate.py`).
+**Seed:** desde los CSV de `research/` (validados con `research/validate.py`), con un script que genera el SQL. La grilla ficticia para desarrollo y tests va aparte y sólo se carga en el Supabase local.
 
 ## Fases 3 a 6 · Funcionalidades del MVP (10 nov – 13 dic)
 
