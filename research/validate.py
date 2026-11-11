@@ -33,6 +33,13 @@ COLUMNAS = {
     "calendario_2027.csv": ["slug", "evento", "tipo", "fecha_inicio", "fecha_fin", "lugar", "estado", "fuente_url"],
 }
 
+# El fixture del Concurso Oficial: una fila por conjunto y noche. No es un catálogo como los
+# otros tres (no tiene slug ni nombre): se valida aparte, con chequeo_fixture.
+FIXTURE = "fixture_2027.csv"
+FIXTURE_COLUMNAS = ["rueda", "numero", "fecha", "hora", "conjunto", "fuente_url"]
+RUEDAS = ["primera", "segunda", "liguilla"]
+HORA_RE = re.compile(r"^([01]\d|2[0-3]):[0-5]\d$")
+
 BOOL = {"true", "false"}
 # columna -> (valores válidos, ¿se permite vacío?, ¿vacío es sólo advertencia?)
 ENUMS = {
@@ -81,8 +88,9 @@ def norm(s):
     return re.sub(r"\s+", " ", s).strip()
 
 
-def leer(archivo):
-    ruta = AQUI / archivo
+def leer(archivo, columnas=None, ruta=None):
+    ruta = ruta or AQUI / archivo
+    columnas = columnas or COLUMNAS[archivo]
     if not ruta.exists():
         err(archivo, "-", "no existe")
         return None
@@ -97,8 +105,8 @@ def leer(archivo):
     if b"\r\n" in crudo:
         aviso(archivo, "-", "fin de línea CRLF (se recomienda LF)")
     df = pd.read_csv(ruta, dtype=str, keep_default_na=False, na_filter=False, encoding="utf-8-sig")
-    if list(df.columns) != COLUMNAS[archivo]:
-        err(archivo, "-", f"columnas {list(df.columns)} != esperadas {COLUMNAS[archivo]}")
+    if list(df.columns) != columnas:
+        err(archivo, "-", f"columnas {list(df.columns)} != esperadas {columnas}")
         return None
     return df
 
@@ -235,6 +243,60 @@ def chequeo_calendario(df):
             aviso(a, fila_id(df, i), "tipo=llamadas fuera de febrero (¿dispararía el modo Llamadas antes de tiempo?)")
 
 
+def chequeo_fixture(df, conjuntos):
+    """El fixture del Concurso: cada fila es un conjunto en una noche (etapa) del Teatro de Verano.
+
+    `hora` es la hora de Montevideo. Una hora antes de las 06:00 es de la madrugada siguiente
+    y sigue perteneciendo a la noche de `fecha` (la noche lógica).
+    """
+    a = FIXTURE
+    slugs = set(conjuntos["slug"]) if conjuntos is not None else None
+    en_concurso = (
+        dict(zip(conjuntos["slug"], conjuntos["en_concurso"])) if conjuntos is not None else {}
+    )
+    fecha_de_etapa, etapa_de_fecha, vistos = {}, {}, set()
+    for i, row in df.iterrows():
+        fila = f"fila {i + 2} ({row['rueda']} {row['numero']}, {row['conjunto']})"
+        if row["rueda"] not in RUEDAS:
+            err(a, fila, f"rueda {row['rueda']!r} no es una de {RUEDAS}")
+        if not (row["numero"].isdigit() and int(row["numero"]) > 0):
+            err(a, fila, f"numero no es un entero positivo: {row['numero']!r}")
+        fecha_ok = False
+        if not FECHA_RE.match(row["fecha"]):
+            err(a, fila, f"fecha no es AAAA-MM-DD: {row['fecha']!r}")
+        else:
+            try:
+                date.fromisoformat(row["fecha"])
+                fecha_ok = True
+            except ValueError:
+                err(a, fila, f"fecha no es una fecha válida: {row['fecha']!r}")
+        if not HORA_RE.match(row["hora"]):
+            err(a, fila, f"hora no es HH:MM (24 horas): {row['hora']!r}")
+        elif "06:00" <= row["hora"] < "12:00":
+            aviso(a, fila, f"hora {row['hora']}: ¿una actuación del Concurso a la mañana?")
+        if row["conjunto"] == "":
+            err(a, fila, "falta el conjunto")
+        elif slugs is not None and row["conjunto"] not in slugs:
+            err(a, fila, f"el conjunto {row['conjunto']!r} no es un slug de conjuntos.csv")
+        elif en_concurso.get(row["conjunto"]) != "true":
+            aviso(a, fila, f"{row['conjunto']} no figura con en_concurso = true en conjuntos.csv")
+        if row["fuente_url"] and not URL_RE.match(row["fuente_url"]):
+            err(a, fila, f"fuente_url no es una URL: {row['fuente_url']!r}")
+
+        etapa = (row["rueda"], row["numero"])
+        if fecha_ok:
+            anterior = fecha_de_etapa.setdefault(etapa, row["fecha"])
+            if anterior != row["fecha"]:
+                err(a, fila, f"la etapa {etapa[0]} {etapa[1]} tiene dos fechas: {anterior} y {row['fecha']}")
+            otra = etapa_de_fecha.setdefault(row["fecha"], etapa)
+            if otra != etapa:
+                err(a, fila, f"el {row['fecha']} ya es de la etapa {otra[0]} {otra[1]}")
+        clave = (etapa, row["conjunto"])
+        if clave in vistos:
+            err(a, fila, "el conjunto está dos veces en la misma etapa")
+        vistos.add(clave)
+
+
 def resumen(dfs):
     print("=" * 60)
     print("RESUMEN")
@@ -256,6 +318,13 @@ def resumen(dfs):
     if k is not None:
         print(f"calendario_2027.csv: {len(k)} eventos", dict(Counter(k["estado"])))
         print("  tipo:", dict(Counter(k["tipo"])))
+    f = dfs.get(FIXTURE)
+    if f is not None:
+        if len(f) == 0:
+            print(f"{FIXTURE}: sin filas (el fixture del Concurso todavía no se publicó)")
+        else:
+            noches = Counter(r for r, _ in set(zip(f["rueda"], f["numero"])))
+            print(f"{FIXTURE}: {len(f)} actuaciones;", "noches por rueda:", dict(noches))
     print("=" * 60)
 
 
@@ -264,6 +333,8 @@ def main():
     ap.add_argument("--post-prueba", action="store_true",
                     help="exigir en_concurso completo y 39 conjuntos en el Concurso 2027")
     ap.add_argument("-q", "--quiet", action="store_true", help="no listar advertencias, sólo contarlas")
+    ap.add_argument("--fixture", metavar="ARCHIVO", type=Path,
+                    help=f"validar ese archivo como fixture del Concurso, en vez de research/{FIXTURE}")
     args = ap.parse_args()
 
     dfs = {}
@@ -280,6 +351,10 @@ def main():
         chequeo_escenarios(dfs["escenarios.csv"])
     if "calendario_2027.csv" in dfs:
         chequeo_calendario(dfs["calendario_2027.csv"])
+    fixture = leer(FIXTURE, FIXTURE_COLUMNAS, args.fixture)
+    if fixture is not None:
+        dfs[FIXTURE] = fixture
+        chequeo_fixture(fixture, dfs.get("conjuntos.csv"))
 
     resumen(dfs)
     if avisos:

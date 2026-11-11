@@ -375,4 +375,8 @@ on conflict (slug) do update set
   estado = excluded.estado,
   fuente_url = excluded.fuente_url;
 
+-- ---------------------------------------------------------------- fixture del Concurso (0)
+
+-- research/fixture_2027.csv todavía no tiene filas: el fixture 2027 no se publicó.
+
 commit;

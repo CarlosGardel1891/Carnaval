@@ -10,10 +10,16 @@ Participación en la temporada (`conjunto_temporada`): sólo para las filas resp
 una lista oficial de esa temporada (`temporada_lista` igual al año). Las demás quedan en el
 catálogo de conjuntos, sin participación.
 
+El fixture del Concurso Oficial sale de research/fixture_{año}.csv. Mientras no se publique,
+el archivo tiene sólo el encabezado y el seed no carga ninguna etapa.
+
 Uso:
     python scripts/gen_seed.py                 valida y escribe el seed
     python scripts/gen_seed.py --post-prueba   igual, validando con --post-prueba
     python scripts/gen_seed.py --check         falla si el seed no está al día
+    python scripts/gen_seed.py --solo-fixture ARCHIVO
+                                               imprime sólo el SQL del fixture de ese archivo,
+                                               sin validar ni escribir nada (para probarlo)
 
 Sólo usa la biblioteca estándar (research/validate.py necesita pandas).
 """
@@ -29,6 +35,10 @@ SEED = RAIZ / "supabase" / "seeds" / "02_research.sql"
 
 TEMPORADA = 2027
 CALENDARIO = f"calendario_{TEMPORADA}.csv"
+FIXTURE = f"fixture_{TEMPORADA}.csv"
+# El escenario del Concurso y la marca de lo que sale del fixture publicado.
+TEATRO_DE_VERANO = "teatro-de-verano-ramon-collazo"
+FUENTE_FIXTURE = f"research/{FIXTURE}"
 
 
 def validar(post_prueba):
@@ -40,7 +50,8 @@ def validar(post_prueba):
 
 
 def leer(archivo):
-    with open(RESEARCH / archivo, encoding="utf-8-sig", newline="") as fh:
+    with open(Path(archivo) if Path(archivo).is_absolute() else RESEARCH / archivo,
+              encoding="utf-8-sig", newline="") as fh:
         return list(csv.DictReader(fh))
 
 
@@ -227,10 +238,92 @@ on conflict (slug) do update set
 """
 
 
+def sql_fixture(fixture):
+    """El fixture del Concurso: las etapas (una por noche) y sus actuaciones en el Teatro de Verano.
+
+    Igual que el resto del seed, inserta o actualiza y no borra: si una fila sale del CSV, la
+    actuación queda en la base y hay que quitarla a mano. Una actuación que ya estaba y no
+    cambió no se toca, así volver a correr el seed no encola avisos de cambio.
+    """
+    titulo = f"-- ---------------------------------------------------------------- fixture del Concurso ({len(fixture)})\n"
+    if not fixture:
+        return titulo + f"""
+-- research/{FIXTURE} todavía no tiene filas: el fixture {TEMPORADA} no se publicó.
+"""
+    etapas = sorted({(f["rueda"], int(f["numero"]), f["fecha"]) for f in fixture},
+                    key=lambda e: (["primera", "segunda", "liguilla"].index(e[0]), e[1]))
+    fuente_de_etapa = {}
+    for f in fixture:
+        fuente_de_etapa.setdefault((f["rueda"], int(f["numero"])), f["fuente_url"])
+    valores_etapas = filas(
+        (texto(rueda), str(numero), texto(fecha) + "::date", texto(fuente_de_etapa[(rueda, numero)]))
+        for rueda, numero, fecha in etapas
+    )
+    valores_actuaciones = filas(
+        (
+            texto(f["rueda"]),
+            str(int(f["numero"])),
+            texto(f["fecha"]) + "::date",
+            texto(f["hora"]) + "::time",
+            texto(f["conjunto"]),
+            texto(f["fuente_url"]),
+        )
+        for f in fixture
+    )
+    return titulo + f"""
+do $$
+begin
+  if exists (select 1 from public.etapas_concurso where fuente = 'fixture-ficticio') then
+    raise exception 'Hay un fixture ficticio cargado: quitarlo antes con `pnpm db:fixture --quitar`.';
+  end if;
+end
+$$;
+
+insert into public.etapas_concurso (temporada_id, rueda, numero, fecha, fuente, fuente_url)
+select t.id, v.rueda::public.rueda_concurso, v.numero, v.fecha, {texto(FUENTE_FIXTURE)}, v.fuente_url
+from (values
+{valores_etapas}
+) as v (rueda, numero, fecha, fuente_url)
+join public.temporadas t on t.anio = {TEMPORADA}
+on conflict (temporada_id, rueda, numero) do update set
+  fecha = excluded.fecha,
+  fuente = excluded.fuente,
+  fuente_url = excluded.fuente_url;
+
+-- La hora es la de Montevideo. Antes de las 06:00 es la madrugada siguiente, que sigue
+-- siendo la noche de la etapa.
+insert into public.actuaciones as a (escenario_id, conjunto_id, etapa_id, inicio, fuente, fuente_url)
+select
+  es.id,
+  c.id,
+  e.id,
+  (v.fecha + v.hora + case when v.hora < time '06:00' then interval '1 day' else interval '0' end)
+    at time zone 'America/Montevideo',
+  {texto(FUENTE_FIXTURE)},
+  v.fuente_url
+from (values
+{valores_actuaciones}
+) as v (rueda, numero, fecha, hora, conjunto, fuente_url)
+join public.temporadas t on t.anio = {TEMPORADA}
+join public.etapas_concurso e
+  on e.temporada_id = t.id and e.rueda = v.rueda::public.rueda_concurso and e.numero = v.numero
+join public.conjuntos c on c.slug = v.conjunto
+join public.escenarios es on es.slug = {texto(TEATRO_DE_VERANO)}
+on conflict on constraint actuaciones_clave_natural do update set
+  etapa_id = excluded.etapa_id,
+  inicio = excluded.inicio,
+  fuente = excluded.fuente,
+  fuente_url = excluded.fuente_url
+where (a.etapa_id, a.inicio, a.fuente, a.fuente_url)
+  is distinct from (excluded.etapa_id, excluded.inicio, excluded.fuente, excluded.fuente_url);
+"""
+
+
 def generar():
     conjuntos = leer("conjuntos.csv")
     escenarios = leer("escenarios.csv")
     eventos = leer(CALENDARIO)
+    fixture = leer(FIXTURE)
     temporada, con_lista, sin_lista = sql_conjunto_temporada(conjuntos)
     cabecera = f"""-- Generado por scripts/gen_seed.py a partir de research/*.csv. No editar a mano:
 -- cambiar los CSV, correr `python research/validate.py` y regenerar con `pnpm gen:seed`.
@@ -254,11 +347,13 @@ $$;
         temporada,
         sql_escenarios(escenarios),
         sql_eventos(eventos),
+        sql_fixture(fixture),
         "commit;\n",
     ]
     resumen = (
         f"{len(conjuntos)} conjuntos ({con_lista} con participación {TEMPORADA}, "
-        f"{sin_lista} sin lista {TEMPORADA}), {len(escenarios)} escenarios, {len(eventos)} eventos"
+        f"{sin_lista} sin lista {TEMPORADA}), {len(escenarios)} escenarios, {len(eventos)} eventos, "
+        f"{len(fixture)} actuaciones del fixture del Concurso"
     )
     return "\n".join(partes), resumen
 
@@ -268,7 +363,14 @@ def main():
     ap.add_argument("--post-prueba", action="store_true",
                     help="validar con --post-prueba (después del resultado de la Prueba de Admisión)")
     ap.add_argument("--check", action="store_true", help="no escribir: fallar si el seed no está al día")
+    ap.add_argument("--solo-fixture", metavar="ARCHIVO", type=Path,
+                    help="imprimir sólo el SQL del fixture de ese archivo, sin validar ni escribir")
     args = ap.parse_args()
+
+    if args.solo_fixture:
+        sys.stdout.reconfigure(encoding="utf-8", newline="\n")
+        print(sql_fixture(leer(args.solo_fixture.resolve())))
+        return
 
     validar(args.post_prueba)
     sql, resumen = generar()
