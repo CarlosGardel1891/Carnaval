@@ -3,6 +3,7 @@ import { Outlet } from 'react-router'
 import { useSessionSync } from '../features/follow/useFollow'
 import { usePushSync } from '../features/push/usePush'
 import { useOpenInLlamadas } from '../features/llamadas/useOpenInLlamadas'
+import { usePrefetchLlamadas } from '../features/llamadas/useLlamadas'
 import { LocationProvider } from '../features/location/LocationProvider'
 import { formatNight, formatTime } from '../lib/format'
 import { isClockSimulated } from '../lib/clock'
@@ -35,6 +36,7 @@ export function AppLayout() {
   useSessionSync()
   usePushSync()
   useOpenInLlamadas()
+  usePrefetchLlamadas()
   return (
     <div className="flex h-dvh flex-col">
       <SimulatedClock />

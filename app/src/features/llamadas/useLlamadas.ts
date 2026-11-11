@@ -1,27 +1,29 @@
-import { queryOptions, useQuery } from '@tanstack/react-query'
+import { useEffect } from 'react'
+import { queryOptions, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useSearchParams } from 'react-router'
 import { nocheLogica } from '@cuerda/shared'
 import {
   fetchCurrentSeason,
+  fetchGroups,
   fetchParadeEvents,
   fetchParadeOrder,
   fetchParadeRoute,
   fetchStreetClosures,
   type ParadeEvent,
 } from '../../lib/api'
+import { LONG_CACHE_MAX_AGE_MS, LONG_LIVED_KEY } from '../../lib/queryCache'
 import { useNow } from '../../lib/useNow'
 import { REFRESH_MS } from '../today/useNightActs'
 import { pickNight } from './parade'
 
 /**
- * Las consultas del modo Llamadas. Todas llevan claves que no cambian con el día y se guardan
- * una semana en el teléfono (decisión 65): en el desfile la red se satura, y lo último que se
- * bajó tiene que seguir ahí aunque la app se haya abierto por última vez hace días.
+ * Las consultas del modo Llamadas. Todas llevan `llamadas` adelante en la clave, que no cambia
+ * con el día: así se guardan una semana en el teléfono (decisión 65, `lib/queryCache.ts`). En
+ * el desfile la red se satura, y lo último que se bajó tiene que seguir ahí aunque la app se
+ * haya abierto por última vez hace días.
  */
-
-/** Cuánto vale en el teléfono lo del modo Llamadas. */
-export const LLAMADAS_CACHE_MS = 7 * 24 * 60 * 60_000
-const offline = { persistMs: LLAMADAS_CACHE_MS }
+const KEY = LONG_LIVED_KEY
+const offline = { gcTime: LONG_CACHE_MAX_AGE_MS }
 
 /**
  * La temporada de las Llamadas. Es la misma que la vigente, pero con una clave fija: la de
@@ -29,46 +31,93 @@ const offline = { persistMs: LLAMADAS_CACHE_MS }
  */
 export const llamadasSeasonQuery = (today: string) =>
   queryOptions({
-    queryKey: ['llamadas', 'temporada'],
+    queryKey: [KEY, 'temporada'],
     queryFn: () => fetchCurrentSeason(today),
     staleTime: 60 * 60_000,
-    meta: offline,
+    ...offline,
   })
 
 /** Las noches del desfile. Traen el horario y el atraso: se refrescan como la grilla. */
 export const paradeEventsQuery = (seasonId: number) =>
   queryOptions({
-    queryKey: ['llamadas', 'eventos', seasonId],
+    queryKey: [KEY, 'eventos', seasonId],
     queryFn: () => fetchParadeEvents(seasonId),
     staleTime: 60_000,
     refetchInterval: REFRESH_MS,
     refetchIntervalInBackground: false,
-    meta: offline,
+    ...offline,
   })
 
 export const paradeOrderQuery = (eventId: number) =>
   queryOptions({
-    queryKey: ['llamadas', 'orden', eventId],
+    queryKey: [KEY, 'orden', eventId],
     queryFn: () => fetchParadeOrder(eventId),
     staleTime: 5 * 60_000,
-    meta: offline,
+    ...offline,
   })
 
 export const paradeRouteQuery = (eventId: number) =>
   queryOptions({
-    queryKey: ['llamadas', 'recorrido', eventId],
+    queryKey: [KEY, 'recorrido', eventId],
     queryFn: () => fetchParadeRoute(eventId),
     staleTime: 60 * 60_000,
-    meta: offline,
+    ...offline,
   })
 
 export const streetClosuresQuery = (eventId: number) =>
   queryOptions({
-    queryKey: ['llamadas', 'cortes', eventId],
+    queryKey: [KEY, 'cortes', eventId],
     queryFn: () => fetchStreetClosures(eventId),
     staleTime: 15 * 60_000,
-    meta: offline,
+    ...offline,
   })
+
+/**
+ * El catálogo de conjuntos, para listar las clasificadas mientras no esté el orden. Es el mismo
+ * de `useGroups`, con clave propia para que dure lo mismo que el resto del modo.
+ */
+export const llamadasGroupsQuery = () =>
+  queryOptions({
+    queryKey: [KEY, 'conjuntos'],
+    queryFn: fetchGroups,
+    staleTime: 60 * 60_000,
+    ...offline,
+  })
+
+/**
+ * Baja todo el modo Llamadas antes de que haga falta (decisión 65): desde que empieza la
+ * temporada y hasta la última noche del desfile, al abrir la app se piden las noches y, de cada
+ * una, el orden, el recorrido y los cortes, aunque no se entre a la pestaña. Lo que ya está
+ * fresco no se vuelve a pedir, y si no hay red no pasa nada: queda lo guardado.
+ *
+ * Se monta una sola vez, en el marco de la app.
+ */
+export function usePrefetchLlamadas(): void {
+  const today = nocheLogica(useNow())
+  const queryClient = useQueryClient()
+  const season = useQuery(llamadasSeasonQuery(today)).data
+  const seasonId = season?.id
+  const until = season?.modo_llamadas_hasta
+  const wanted =
+    seasonId !== undefined && !!until && today >= season!.fecha_inicio && today <= until
+
+  useEffect(() => {
+    if (!wanted) return
+    void queryClient
+      .fetchQuery(paradeEventsQuery(seasonId))
+      .then((nights) =>
+        Promise.all([
+          queryClient.prefetchQuery(llamadasGroupsQuery()),
+          ...(nights ?? []).flatMap((night) => [
+            queryClient.prefetchQuery(paradeOrderQuery(night.id)),
+            queryClient.prefetchQuery(paradeRouteQuery(night.id)),
+            queryClient.prefetchQuery(streetClosuresQuery(night.id)),
+          ]),
+        ]),
+      )
+      .catch(() => undefined)
+  }, [wanted, seasonId, today, queryClient])
+}
 
 export interface Llamadas {
   /** La noche lógica de ahora, en Montevideo. */

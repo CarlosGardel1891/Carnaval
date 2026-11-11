@@ -5,18 +5,17 @@ import { Link } from 'react-router'
 import { Button } from '../../components/Button'
 import { useFollowed } from '../follow/useFollow'
 import { groupPath } from '../groups/groupPath'
-import { useGroups } from '../groups/useGroups'
 import { EstimatedTime, EstimateNote } from './Estimate'
 import { useLlamadasNight } from './llamadasContext'
 import { departures, SAMPLE_ORDER_SOURCE } from './parade'
-import { paradeOrderQuery } from './useLlamadas'
+import { llamadasGroupsQuery, paradeOrderQuery } from './useLlamadas'
 
 const badge = 'rounded-md border px-2 py-0.5 text-sm font-semibold'
 
 /** Las comparsas clasificadas a las Llamadas, mientras no esté el orden. */
 function Qualified({ seasonId }: { seasonId: number }) {
   const { t } = useTranslation()
-  const groups = useGroups()
+  const groups = useQuery(llamadasGroupsQuery())
   const { ids: followed } = useFollowed()
   const qualified = useMemo(
     () =>

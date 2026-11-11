@@ -10,6 +10,7 @@ import {
   CACHE_KEY,
   CACHE_MAX_AGE_MS,
   CACHE_VERSION,
+  LONG_CACHE_MAX_AGE_MS,
   cachePersistOptions,
   createAppQueryClient,
 } from './queryCache'
@@ -119,9 +120,38 @@ describe('caché guardada en el teléfono', () => {
     expect(keys(await restore())).toEqual([['temporada', 'actual']])
   })
 
-  it('pasado un día sin abrir la app, descarta lo guardado', async () => {
+  it('pasado un día sin abrir la app, la grilla guardada no vuelve', async () => {
     await save(await clientWithNight())
     vi.setSystemTime(START.getTime() + CACHE_MAX_AGE_MS + 60_000)
+
+    expect(keys(await restore())).toEqual([])
+  })
+
+  it('lo del modo Llamadas dura una semana: vuelve a los tres días, y la grilla no', async () => {
+    const queryClient = await clientWithNight()
+    await queryClient.fetchQuery({
+      queryKey: ['llamadas', 'orden', 7],
+      queryFn: () => Promise.resolve([{ posicion: 1 }]),
+    })
+    await save(queryClient)
+    vi.setSystemTime(START.getTime() + 3 * CACHE_MAX_AGE_MS)
+
+    const restored = await restore()
+    expect(keys(restored)).toEqual([['llamadas', 'orden', 7]])
+    expect(restored.getQueryState(['llamadas', 'orden', 7])?.dataUpdatedAt).toBe(START.getTime())
+    // Y se sigue guardando, aunque tenga más de un día.
+    await save(restored)
+    expect(keys(await restore())).toEqual([['llamadas', 'orden', 7]])
+  })
+
+  it('pasada una semana sin abrir la app, descarta todo lo guardado', async () => {
+    const queryClient = await clientWithNight()
+    await queryClient.fetchQuery({
+      queryKey: ['llamadas', 'orden', 7],
+      queryFn: () => Promise.resolve([{ posicion: 1 }]),
+    })
+    await save(queryClient)
+    vi.setSystemTime(START.getTime() + LONG_CACHE_MAX_AGE_MS + 60_000)
 
     expect(keys(await restore())).toEqual([])
     expect(await stored()).toBeNull()

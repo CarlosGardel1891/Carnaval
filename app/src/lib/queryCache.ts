@@ -1,10 +1,28 @@
 import { createAsyncStoragePersister } from '@tanstack/query-async-storage-persister'
-import { QueryClient, type Query } from '@tanstack/react-query'
-import type { PersistQueryClientOptions } from '@tanstack/react-query-persist-client'
+import { QueryClient, type Query, type QueryKey } from '@tanstack/react-query'
+import type {
+  PersistedClient,
+  Persister,
+  PersistQueryClientOptions,
+} from '@tanstack/react-query-persist-client'
 import { preferencesStorage } from './preferencesStorage'
 
 /** Cuánto vale lo guardado: pasado un día, la grilla vieja confunde más de lo que ayuda. */
 export const CACHE_MAX_AGE_MS = 24 * 60 * 60_000
+
+/**
+ * Lo del modo Llamadas vale una semana (decisión 65): en el desfile la red se satura, y un
+ * orden de hace tres días, con su «actualizado hace…», sirve más que una pantalla vacía.
+ */
+export const LONG_CACHE_MAX_AGE_MS = 7 * CACHE_MAX_AGE_MS
+
+/** Las consultas que duran una semana: las que tienen esto primero en la clave. */
+export const LONG_LIVED_KEY = 'llamadas'
+
+/** Cuánto vale en el teléfono una consulta, según su clave. */
+export function cacheMaxAge(queryKey: QueryKey): number {
+  return queryKey[0] === LONG_LIVED_KEY ? LONG_CACHE_MAX_AGE_MS : CACHE_MAX_AGE_MS
+}
 
 /**
  * Versión de lo guardado. Subirla cuando cambie la forma de lo que devuelven las
@@ -17,14 +35,33 @@ export const CACHE_KEY = 'cuerda-cache'
 
 /**
  * Una consulta se guarda si tiene datos (aunque el último intento haya fallado: sin
- * red, lo último que cargó es justo lo que hay que conservar), si no tiene más de un
- * día y si no pidió quedar afuera con `meta: { persist: false }`, como las que llevan
- * la posición del usuario.
+ * red, lo último que cargó es justo lo que hay que conservar), si no pasó su plazo (un
+ * día; una semana lo del modo Llamadas) y si no pidió quedar afuera con
+ * `meta: { persist: false }`, como las que llevan la posición del usuario.
  */
 export function shouldPersistQuery(query: Query, now = Date.now()): boolean {
   if (query.meta?.persist === false) return false
   if (query.state.data === undefined) return false
-  return now - query.state.dataUpdatedAt < CACHE_MAX_AGE_MS
+  return now - query.state.dataUpdatedAt < cacheMaxAge(query.queryKey)
+}
+
+/**
+ * Al abrir, lo guardado vuelve consulta por consulta: cada una, sólo si no pasó su plazo.
+ * (El `maxAge` del persistidor mira cuándo se guardó todo junto, y es el plazo largo.)
+ */
+function dropExpired(persister: Persister): Persister {
+  return {
+    ...persister,
+    restoreClient: async () => {
+      const saved: PersistedClient | undefined = await persister.restoreClient()
+      if (!saved) return saved
+      const now = Date.now()
+      const queries = saved.clientState.queries.filter(
+        (query) => now - query.state.dataUpdatedAt < cacheMaxAge(query.queryKey),
+      )
+      return { ...saved, clientState: { ...saved.clientState, queries } }
+    },
+  }
 }
 
 /**
@@ -53,8 +90,8 @@ export function cachePersistOptions(
     storage: preferencesStorage,
   })
   return {
-    persister,
-    maxAge: CACHE_MAX_AGE_MS,
+    persister: dropExpired(persister),
+    maxAge: LONG_CACHE_MAX_AGE_MS,
     buster: CACHE_VERSION,
     dehydrateOptions: { shouldDehydrateQuery: (query) => shouldPersistQuery(query) },
   }
