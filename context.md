@@ -79,7 +79,7 @@ Dónde se diferencia:
 
 Lo que **no** se hace, por decisión: pencas, reseñas y comentarios, ni una versión web para el público. El historial de resultados, que antes estaba en esta lista, ahora entra (después del carnaval).
 
-El análisis completo está en `docs/competencia-carnaval-app.md`; es anterior a la decisión 53 y todavía dice que el historial no se hace.
+El análisis completo está en `docs/competencia-carnaval-app.md`.
 
 ## 4. Alcance por versión
 
