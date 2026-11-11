@@ -1,0 +1,238 @@
+import { MONTEVIDEO_TZ, minutesOfDayInMontevideo } from './dates'
+import { noticeTexts, type NoticeLanguage, type NoticeTexts } from './noticeTexts'
+
+/**
+ * Los avisos push, sin mandarlos: a partir de las filas que devuelve la base (quién recibe
+ * qué) arma una notificación por dispositivo, con su texto en el idioma del dispositivo y
+ * la pantalla que abre al tocarla. No depende de Firebase ni de la red: lo usan las Edge
+ * Functions y se prueba solo. Las horas van siempre en la zona de Montevideo.
+ */
+
+/** Una notificación lista para mandar a un dispositivo. */
+export interface Notice {
+  token: string
+  language: NoticeLanguage
+  title: string
+  body: string
+  /** Ruta de la app que se abre al tocarla. */
+  route: string
+  /** Ids de `avisos_enviados` que cubre: se cierran cuando el envío sale bien. */
+  noticeIds: number[]
+}
+
+/** Una fila de `tomar_avisos_del_dia`. */
+export interface DailyRow {
+  aviso_id: number
+  token: string
+  idioma: NoticeLanguage
+  conjunto_id: number
+  conjunto_slug: string
+  conjunto_nombre: string
+  actuacion_id: number
+  noche: string
+  inicio: string
+  escenario_nombre: string
+}
+
+/** Una fila de `tomar_avisos_de_cambios`. */
+export interface ChangeRow extends DailyRow {
+  estado: 'programada' | 'cambiada' | 'suspendida'
+  estado_anterior: 'programada' | 'cambiada' | 'suspendida'
+  inicio_anterior: string
+}
+
+/** Cuántos renglones entran en el cuerpo de un aviso agrupado antes del «y N más». */
+const MAX_LINES = 4
+
+/** El aviso del día sale entre las 12:00 y las 19:00 de Montevideo (decisión 47). */
+const DAILY_FROM_MIN = 12 * 60
+/** Con un margen, para que la pasada de las 19:00 en punto entre aunque arranque tarde. */
+const DAILY_UNTIL_MIN = 19 * 60 + 15
+
+export function isDailyNoticeWindow(instant: Date = new Date()): boolean {
+  const minutes = minutesOfDayInMontevideo(instant)
+  return minutes >= DAILY_FROM_MIN && minutes < DAILY_UNTIL_MIN
+}
+
+function fill(template: string, values: Record<string, string | number>): string {
+  return template.replace(/\{\{(\w+)\}\}/g, (_match, key: string) => String(values[key] ?? ''))
+}
+
+/** `Intl` separa «10:50» de «PM» con un espacio angosto que algunos teléfonos no muestran. */
+const plainSpaces = (text: string) => text.replace(/[  ]/g, ' ')
+
+function formatTime(instant: string, texts: NoticeTexts): string {
+  return plainSpaces(
+    new Intl.DateTimeFormat(texts.locale, {
+      minute: '2-digit',
+      timeZone: MONTEVIDEO_TZ,
+      // En español, reloj de 24 horas como en las carteleras («22:50»); en inglés, «10:50 PM».
+      ...(texts.locale.startsWith('en')
+        ? { hour: 'numeric', hour12: true }
+        : { hour: '2-digit', hourCycle: 'h23' }),
+    }).format(new Date(instant)),
+  )
+}
+
+/** «hoy», o «el sábado 30 de enero» si la noche no es la de hoy. */
+function formatWhen(noche: string, tonight: string, texts: NoticeTexts): string {
+  if (noche === tonight) return texts.tonight
+  // Una fecha pura: se formatea en UTC para que ninguna zona le corra el día.
+  const date = new Date(`${noche}T00:00:00Z`)
+  const part = (options: Intl.DateTimeFormatOptions) =>
+    plainSpaces(new Intl.DateTimeFormat(texts.locale, { ...options, timeZone: 'UTC' }).format(date))
+  return fill(texts.otherNight, {
+    weekday: part({ weekday: 'long' }),
+    date: part({ day: 'numeric', month: 'long' }),
+  })
+}
+
+/** Junta los renglones de un aviso agrupado, con «y N más» si no entran todos. */
+function joinLines(lines: string[], texts: NoticeTexts): string {
+  if (lines.length <= MAX_LINES) return lines.join('\n')
+  const shown = lines.slice(0, MAX_LINES - 1)
+  const count = lines.length - shown.length
+  return [...shown, fill(count === 1 ? texts.more_one : texts.more_other, { count })].join('\n')
+}
+
+/** Agrupa conservando el orden en que aparece cada clave. */
+function groupBy<T, K>(items: T[], keyOf: (item: T) => K): Map<K, T[]> {
+  const groups = new Map<K, T[]>()
+  for (const item of items) {
+    const key = keyOf(item)
+    const group = groups.get(key)
+    if (group) group.push(item)
+    else groups.set(key, [item])
+  }
+  return groups
+}
+
+const byStart = <T extends DailyRow>(rows: T[]): T[] =>
+  [...rows].sort(
+    (a, b) =>
+      new Date(a.inicio).getTime() - new Date(b.inicio).getTime() ||
+      a.actuacion_id - b.actuacion_id,
+  )
+
+const uniqueIds = (rows: DailyRow[]): number[] => [...new Set(rows.map((row) => row.aviso_id))]
+
+const groupRoute = (slug: string) => `/conjuntos/${encodeURIComponent(slug)}`
+const mineRoute = (noche: string) => `/?noche=${noche}&mios=1`
+
+/**
+ * «Tu conjunto actúa hoy»: una notificación por dispositivo.
+ *
+ * - Un conjunto en un escenario: hora y lugar.
+ * - Un conjunto en varios escenarios esa noche: una sola, con todas sus horas.
+ * - Varios conjuntos: un resumen, un renglón por conjunto.
+ */
+export function buildDailyNotices(rows: DailyRow[]): Notice[] {
+  return [...groupBy(rows, (row) => row.token)].map(([token, deviceRows]) => {
+    const language = deviceRows[0]!.idioma
+    const texts: NoticeTexts = noticeTexts[language]
+    const groups = [...groupBy(byStart(deviceRows), (row) => row.conjunto_id).values()]
+    const slots = (acts: DailyRow[]) =>
+      acts
+        .map((act) =>
+          fill(texts.slot, { time: formatTime(act.inicio, texts), stage: act.escenario_nombre }),
+        )
+        .join(texts.slotSeparator)
+    const base = { token, language, noticeIds: uniqueIds(deviceRows) }
+
+    if (groups.length === 1) {
+      const acts = groups[0]!
+      const first = acts[0]!
+      return {
+        ...base,
+        title: fill(texts.dailyOneTitle, { group: first.conjunto_nombre }),
+        body:
+          acts.length === 1
+            ? fill(texts.dailyOneBody, {
+                time: formatTime(first.inicio, texts),
+                stage: first.escenario_nombre,
+              })
+            : slots(acts),
+        route: groupRoute(first.conjunto_slug),
+      }
+    }
+
+    return {
+      ...base,
+      title: fill(texts.dailyManyTitle, { count: groups.length }),
+      body: joinLines(
+        groups.map((acts) =>
+          fill(texts.groupLine, { group: acts[0]!.conjunto_nombre, detail: slots(acts) }),
+        ),
+        texts,
+      ),
+      route: mineRoute(deviceRows[0]!.noche),
+    }
+  })
+}
+
+type ChangeKind = 'suspended' | 'resumed' | 'changed'
+
+function kindOf(row: ChangeRow): ChangeKind {
+  if (row.estado === 'suspendida') return 'suspended'
+  return row.estado_anterior === 'suspendida' ? 'resumed' : 'changed'
+}
+
+/**
+ * Cambios y suspensiones: una notificación por dispositivo con todo lo suyo, no una por
+ * actuación. `tonight` es la noche lógica de ahora: los avisos de otra noche dicen el día.
+ */
+export function buildChangeNotices(rows: ChangeRow[], tonight: string): Notice[] {
+  return [...groupBy(rows, (row) => row.token)].map(([token, deviceRows]) => {
+    const language = deviceRows[0]!.idioma
+    const texts: NoticeTexts = noticeTexts[language]
+    const changes = byStart(deviceRows)
+    const values = (row: ChangeRow) => ({
+      group: row.conjunto_nombre,
+      when: formatWhen(row.noche, tonight, texts),
+      time: formatTime(row.inicio, texts),
+      stage: row.escenario_nombre,
+      before: formatTime(row.inicio_anterior, texts),
+    })
+    const base = { token, language, noticeIds: uniqueIds(deviceRows) }
+    const sameGroup = changes.every((row) => row.conjunto_id === changes[0]!.conjunto_id)
+    const sameNight = changes.every((row) => row.noche === changes[0]!.noche)
+    const route = sameGroup
+      ? groupRoute(changes[0]!.conjunto_slug)
+      : mineRoute(sameNight ? changes[0]!.noche : tonight)
+
+    if (changes.length === 1) {
+      const row = changes[0]!
+      const kind = kindOf(row)
+      // «Antes, a las…» sólo si lo que cambió fue la hora.
+      const timeMoved =
+        kind === 'changed' &&
+        new Date(row.inicio).getTime() !== new Date(row.inicio_anterior).getTime()
+      const body =
+        kind === 'suspended'
+          ? texts.suspendedBody
+          : kind === 'resumed'
+            ? texts.resumedBody
+            : timeMoved
+              ? texts.changedBodyWas
+              : texts.changedBody
+      return {
+        ...base,
+        title: fill(texts[`${kind}Title`], values(row)),
+        body: fill(body, values(row)),
+        route,
+      }
+    }
+
+    return {
+      ...base,
+      title: texts.changesTitle,
+      body: joinLines(
+        changes.map((row) =>
+          fill(kindOf(row) === 'suspended' ? texts.suspendedLine : texts.changedLine, values(row)),
+        ),
+        texts,
+      ),
+      route,
+    }
+  })
+}

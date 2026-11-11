@@ -9,6 +9,7 @@ const formatter = new Intl.DateTimeFormat('en-CA', {
   month: '2-digit',
   day: '2-digit',
   hour: '2-digit',
+  minute: '2-digit',
   hourCycle: 'h23',
 })
 
@@ -17,6 +18,7 @@ interface MontevideoParts {
   month: number
   day: number
   hour: number
+  minute: number
 }
 
 function partsInMontevideo(instant: Date): MontevideoParts {
@@ -32,6 +34,7 @@ function partsInMontevideo(instant: Date): MontevideoParts {
     month: parts.month ?? NaN,
     day: parts.day ?? NaN,
     hour: parts.hour ?? NaN,
+    minute: parts.minute ?? NaN,
   }
 }
 
@@ -53,6 +56,12 @@ export function calendarDateInMontevideo(instant: Date = new Date()): string {
 export function nocheLogica(instant: Date = new Date()): string {
   const { year, month, day, hour } = partsInMontevideo(instant)
   return toIsoDate(year, month, hour < NIGHT_CUTOFF_HOUR ? day - 1 : day)
+}
+
+/** Minutos transcurridos desde las 00:00 de Montevideo (las 12:30 son 750). */
+export function minutesOfDayInMontevideo(instant: Date = new Date()): number {
+  const { hour, minute } = partsInMontevideo(instant)
+  return hour * 60 + minute
 }
 
 export interface LlamadasWindow {
