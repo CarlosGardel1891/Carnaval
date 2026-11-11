@@ -64,6 +64,28 @@ export function minutesOfDayInMontevideo(instant: Date = new Date()): number {
   return hour * 60 + minute
 }
 
+/**
+ * El instante que corresponde a una fecha (`YYYY-MM-DD`) y una hora (`HH:MM` o `HH:MM:SS`)
+ * de Montevideo. Es la vuelta de `calendarDateInMontevideo`: sin offset fijo, lo resuelve
+ * con la misma tabla de zonas que usa `Intl`.
+ */
+export function instantInMontevideo(date: string, time: string): Date {
+  const d = /^(\d{4})-(\d{2})-(\d{2})$/.exec(date)
+  const t = /^([01]\d|2[0-3]):([0-5]\d)(?::([0-5]\d))?$/.exec(time)
+  if (!d || !t) throw new RangeError(`Fecha u hora inválida: ${date} ${time}`)
+  const wall = Date.UTC(Number(d[1]), Number(d[2]) - 1, Number(d[3]), Number(t[1]), Number(t[2]))
+  // Lo que marca el reloj de Montevideo en un instante, leído como si fuera UTC.
+  const wallAt = (instant: number): number => {
+    const p = partsInMontevideo(new Date(instant))
+    return Date.UTC(p.year, p.month - 1, p.day, p.hour, p.minute)
+  }
+  // Primera aproximación con el offset de ese momento; la segunda pasada corrige si el
+  // offset cambia entre una y otra (un cambio de hora).
+  let instant = wall - (wallAt(wall) - wall)
+  instant = wall - (wallAt(instant) - instant)
+  return new Date(instant + Number(t[3] ?? 0) * 1000)
+}
+
 export interface LlamadasWindow {
   modo_llamadas_desde: string | null
   modo_llamadas_hasta: string | null
