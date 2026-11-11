@@ -27,7 +27,21 @@
   "nav": {
     "label": "Main navigation",
     "today": "Today",
-    "map": "Map"
+    "map": "Map",
+    "groups": "Groups"
+  },
+  "groups": {
+    "title": "Groups",
+    "search": "Search for a group",
+    "loading": "Loading groups…",
+    "error": "We couldn't load the groups.",
+    "empty": "No groups have been added for this season yet.",
+    "noResults": "No groups match that search.",
+    "count_one": "{{count}} group",
+    "count_other": "{{count}} groups",
+    "inContest": "In the contest",
+    "pendingAdmission": "Awaiting the Admission Trial",
+    "inLlamadas": "In the Llamadas"
   },
   "today": {
     "title": "Today",

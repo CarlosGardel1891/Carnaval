@@ -108,6 +108,41 @@ export async function fetchLocatedStages(noche: string): Promise<LocatedStage[]>
   return data
 }
 
+/** La participación de un conjunto en una temporada. `en_concurso` nulo es «pendiente». */
+export type GroupSeason = Pick<
+  Tables<'conjunto_temporada'>,
+  'temporada_id' | 'en_concurso' | 'en_llamadas'
+>
+
+/** Un conjunto del catálogo, con lo que hace falta para listarlo y buscarlo. */
+export interface Group {
+  id: number
+  slug: string
+  nombre: string
+  categoria: Tables<'conjuntos'>['categoria']
+  barrio: string | null
+  foto_url: string | null
+  /** Nombre y alias pasados por `norm` en la base: contra esto se busca. */
+  claves: string[]
+  temporadas: GroupSeason[]
+}
+
+/** Todo el catálogo de conjuntos, por nombre, con su participación por temporada. */
+export async function fetchGroups(): Promise<Group[]> {
+  const { data, error } = await supabase
+    .from('conjuntos')
+    .select(
+      'id, slug, nombre, categoria, barrio, foto_url, nombre_norm, alias_norm, conjunto_temporada(temporada_id, en_concurso, en_llamadas)',
+    )
+    .order('nombre_norm')
+  if (error) throw error
+  return data.map(({ nombre_norm, alias_norm, conjunto_temporada, ...group }) => ({
+    ...group,
+    claves: [nombre_norm, ...(alias_norm ?? [])].filter((key): key is string => Boolean(key)),
+    temporadas: conjunto_temporada,
+  }))
+}
+
 /** Un escenario por su slug, o null si no existe. */
 export async function fetchStage(slug: string): Promise<Stage | null> {
   const { data, error } = await supabase

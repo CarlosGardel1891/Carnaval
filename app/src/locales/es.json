@@ -27,7 +27,21 @@
   "nav": {
     "label": "Navegación principal",
     "today": "Hoy",
-    "map": "Mapa"
+    "map": "Mapa",
+    "groups": "Conjuntos"
+  },
+  "groups": {
+    "title": "Conjuntos",
+    "search": "Buscar un conjunto",
+    "loading": "Cargando los conjuntos…",
+    "error": "No pudimos cargar los conjuntos.",
+    "empty": "Todavía no hay conjuntos cargados para esta temporada.",
+    "noResults": "No encontramos conjuntos con esa búsqueda.",
+    "count_one": "{{count}} conjunto",
+    "count_other": "{{count}} conjuntos",
+    "inContest": "En concurso",
+    "pendingAdmission": "Pendiente de la Prueba de Admisión",
+    "inLlamadas": "En las Llamadas"
   },
   "today": {
     "title": "Hoy",
