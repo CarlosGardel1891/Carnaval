@@ -6,7 +6,7 @@ Si algo de acá choca con los documentos del repo, mandan ellos, en este orden: 
 
 ## 1. Qué es
 
-**Cuerda** (nombre de trabajo, todavía no definitivo) es una app móvil para iOS y Android sobre el Carnaval de Montevideo. Responde una pregunta: **«¿qué hay hoy de carnaval, dónde y a qué hora?»**. Su sello son las **Llamadas**, el desfile de comparsas de candombe, para el que tiene un modo especial.
+**Cuerda** (nombre de trabajo, todavía no definitivo) es una app sólo para iPhone y Android, sin versión web para el público, sobre el carnaval en Uruguay. Se lanza con Montevideo y el área metropolitana; el interior se suma después del lanzamiento. Responde una pregunta: **«¿qué hay hoy de carnaval, dónde y a qué hora?»**. Su sello son las **Llamadas**, el desfile de comparsas de candombe, para el que tiene un modo especial.
 
 Lo que va a ofrecer en su primera versión:
 
@@ -65,7 +65,7 @@ Quien no conozca el carnaval uruguayo necesita estos términos para leer el cód
 
 Existe una app activa, **Carnaval App** (un desarrollador solo, más de 5.000 descargas en Android), centrada en el Concurso Oficial, las pencas y los comentarios. Tiene programación de tablados y, desde 2024, la programación de las Llamadas.
 
-Cuerda no compite en ese terreno. La definición es: **Carnaval App es la app del Concurso; Cuerda es la app para salir a ver carnaval esta noche, y la de las Llamadas.**
+Cuerda no compite en lo social (pencas, comentarios), pero sí cubre el Concurso completo como información: el fixture del Teatro de Verano desde el lanzamiento, los resultados durante el carnaval y el historial después (decisión 53). La definición es: **Cuerda es la app con toda la información del carnaval: qué hay esta noche, el Concurso y las Llamadas. La comunidad queda para Carnaval App.**
 
 Dónde se diferencia:
 
@@ -75,18 +75,20 @@ Dónde se diferencia:
 4. Inglés y glosario para el turista.
 5. Sin registro y sin anuncios en la primera temporada.
 6. Uso todo el año con las salidas de tambores (versión 3).
+7. Alcance nacional: el interior se suma después del lanzamiento.
 
-Lo que **no** se hace, por decisión: pencas, reseñas, comentarios e historial de resultados.
+Lo que **no** se hace, por decisión: pencas, reseñas y comentarios, ni una versión web para el público. El historial de resultados, que antes estaba en esta lista, ahora entra (después del carnaval).
 
-El análisis completo está en `docs/competencia-carnaval-app.md`.
+El análisis completo está en `docs/competencia-carnaval-app.md`; es anterior a la decisión 53 y todavía dice que el historial no se hace.
 
 ## 4. Alcance por versión
 
 | Versión | Qué incluye | Cuándo |
 | --- | --- | --- |
-| **MVP** | Pizarrón Hoy, mapa y fichas de escenarios, fichas de conjuntos con Seguir, push, calendario, modo Llamadas, panel admin con importación de la grilla, español e inglés | Antes del 2027-01-21 |
-| **v2** | «¿Por dónde va el desfile?» con reportes de la gente, resultados del Concurso, ingesta asistida desde Instagram con aprobación manual | Durante el carnaval |
-| **v3** | Mapa de salidas de tambores, ubicación en vivo de la comparsa, cuentas verificadas de conjuntos, portugués | Desde marzo de 2027 |
+| **MVP** | Pizarrón Hoy, mapa y fichas de escenarios, fichas de conjuntos con Seguir, push, calendario, fixture del Concurso en el Teatro de Verano, modo Llamadas, panel admin interno con importación de la grilla, español e inglés. Montevideo y área metropolitana | Antes del 2027-01-21 |
+| **v2** | «¿Por dónde va el desfile?» con reportes de la gente, resultados del Concurso de la temporada, ingesta asistida desde Instagram con aprobación manual | Durante el carnaval |
+| **v3** | Mapa de salidas de tambores, historial de resultados del Concurso, ubicación en vivo de la comparsa, cuentas verificadas de conjuntos, portugués | Desde marzo de 2027 |
+| **A definir** | El carnaval del interior del país | Después del lanzamiento |
 
 **Recorte de emergencia** si no da el tiempo: Hoy + Conjuntos + Modo Llamadas, con el calendario como lista estática.
 
@@ -193,7 +195,7 @@ LEEME.md           Cómo arrancar
 
 **`admin`**
 
-- Una pantalla de login que sólo muestra un aviso. No se conecta a nada todavía. 1 test.
+- El panel de carga: una web interna, sólo para el equipo. Hoy es una pantalla de login que sólo muestra un aviso y no se conecta a nada. 1 test.
 
 **Lo que no existe aún:** un aviso push real (falta Firebase), el calendario, el modo Llamadas, el panel de carga, la grilla real y las coordenadas de los escenarios.
 
@@ -257,7 +259,7 @@ Datos cargados por el seed: 110 conjuntos (98 con fila 2027), 42 escenarios sin 
 
 ## 10. Reglas y decisiones que hay que respetar
 
-Las 49 decisiones tomadas están en `docs/DECISIONES.md`. Las que más condicionan el trabajo:
+Las 53 decisiones tomadas están en `docs/DECISIONES.md`. Las que más condicionan el trabajo:
 
 - **Zona horaria:** siempre `America/Montevideo`, nunca la del teléfono. Se usan las funciones de `@cuerda/shared`.
 - **Noche lógica:** antes de las 06:00 es la noche anterior. Vale para «hoy», para la temporada vigente y para el modo Llamadas.
@@ -265,7 +267,9 @@ Las 49 decisiones tomadas están en `docs/DECISIONES.md`. Las que más condicion
 - **Hora estimada en Llamadas:** primera comparsa a las 20:00; cada una sale 10 minutos y 150 metros después de la anterior. Recorrido de nueve cuadras por Carlos Gardel e Isla de Flores.
 - **Matching de nombres:** exacto sobre texto normalizado, contra nombre y alias. Nada de coincidencia aproximada.
 - **Escenarios itinerantes:** la ubicación va en cada actuación, no en el escenario.
-- **Alcance geográfico:** Montevideo y área metropolitana, Canelones incluido.
+- **Plataformas:** sólo iPhone y Android. El navegador es una herramienta de desarrollo, no un producto; el panel de carga es una web interna del equipo.
+- **Alcance geográfico:** el carnaval de todo Uruguay. Se lanza con Montevideo y área metropolitana, Canelones incluido; el interior, después del lanzamiento.
+- **Concurso:** entra completo (fixture, resultados de la temporada e historial). Pencas, reseñas y comentarios siguen afuera.
 - **Instagram:** sólo la API oficial desde el backend, nunca scraping, y nunca como fuente de la grilla.
 - **Idioma del código:** tablas y columnas en español con snake_case; código en inglés; commits en español.
 - **Textos:** nada escrito directo en la interfaz; todo pasa por i18n en los dos idiomas.

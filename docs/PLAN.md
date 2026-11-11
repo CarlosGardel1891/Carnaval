@@ -9,15 +9,16 @@ Actualizado: 2026-10-22. Versión editable: <https://claude.ai/artifact/BaEsAAZw
 
 Objetivo: tener publicada en App Store y Google Play, antes del Desfile Inaugural del Carnaval 2027 (jueves 2027-01-21), una app que responda «¿qué hay hoy de carnaval, dónde y a qué hora?», con las Llamadas (5 y 6 de febrero de 2027) como sello. Nombre de trabajo: **Cuerda**.
 
-- **Qué es:** la guía del Carnaval de Montevideo. Pizarrón diario de tablados, Concurso Oficial del Teatro de Verano, desfiles y un modo especial para las Llamadas. Fuera de temporada, mapa de salidas de tambores.
+- **Qué es:** la guía del carnaval en Uruguay, sólo para iPhone y Android: no hay versión web para el público (decisión 50). Pizarrón diario de tablados, Concurso Oficial del Teatro de Verano, desfiles y un modo especial para las Llamadas. Fuera de temporada, mapa de salidas de tambores.
+- **Alcance:** toda la información del carnaval en Uruguay. Se lanza con Montevideo y el área metropolitana; el interior se suma después del lanzamiento (decisión 52).
 - **Para quién:** el carnavalero local (uso diario), el turista (pico de descargas en temporada) y los conjuntos (generan y validan la información).
 - **Stack:** React + TypeScript + Vite + Capacitor + Supabase + Tailwind (el mismo de Travel).
-- **Competencia:** existe Carnaval App (Pedro Franco), centrada en el Concurso, pencas y comunidad. Cuerda se diferencia por alertas por conjunto, escenarios gratuitos, mapa, hora estimada en Llamadas, inglés y uso todo el año. Ver `docs/competencia-carnaval-app.md`.
+- **Competencia:** existe Carnaval App (Pedro Franco), centrada en el Concurso, pencas y comunidad. Cuerda también cubre el Concurso completo como información (fixture, resultados e historial; decisión 53), sin pencas ni comentarios, y se diferencia por alertas por conjunto, escenarios gratuitos, mapa, hora estimada en Llamadas, inglés, alcance nacional y uso todo el año. Ver `docs/competencia-carnaval-app.md`.
 - **Plazo:** enviar a revisión de Apple y Google antes del 2027-01-05.
 
 ## Alcance por versión
 
-El MVP cubre todo el carnaval con datos cargados desde un panel de admin; lo colaborativo y lo «en vivo» queda para después.
+El MVP cubre el carnaval de Montevideo y el área metropolitana con datos cargados desde un panel de admin; el interior, lo colaborativo y lo «en vivo» quedan para después. La app es sólo para iPhone y Android; el panel de admin es una web interna del equipo (decisiones 50 y 51).
 
 | Funcionalidad | Versión | Cuándo |
 | --- | --- | --- |
@@ -26,18 +27,21 @@ El MVP cubre todo el carnaval con datos cargados desde un panel de admin; lo col
 | Fichas de conjuntos por categoría y botón Seguir | MVP | Antes del Inaugural |
 | Push «tu conjunto actúa hoy» y aviso de suspensión o cambio | MVP | Antes del Inaugural |
 | Calendario del carnaval: desfiles, etapas del concurso, corsos | MVP | Antes del Inaugural |
+| Concurso Oficial: fixture del Teatro de Verano por rueda y etapa | MVP | Antes del Inaugural |
 | Modo Llamadas: orden por noche, **hora estimada de paso por cuadra**, fichas de comparsas, recorrido, cortes de calle, glosario | MVP | Antes del Inaugural |
-| Panel admin web con importación de la grilla (CSV o texto de prensa) | MVP | Antes del Inaugural |
+| Panel admin web, interno, con importación de la grilla (CSV o texto de prensa) | MVP | Antes del Inaugural |
 | Idiomas español e inglés | MVP | Antes del Inaugural |
 | «¿Por dónde va el desfile?» con reportes de la gente | v2 | Durante el carnaval |
-| Resultados del concurso por rueda y categoría | v2 | Durante el carnaval |
+| Resultados del Concurso de la temporada, por rueda y categoría | v2 | Durante el carnaval |
 | Ingesta asistida desde Instagram con aprobación manual | v2 | Durante el carnaval |
 | Modo barrio: mapa de salidas de tambores | v3 | Desde marzo 2027 |
 | «Seguí la cuerda»: ubicación en vivo de la comparsa | v3 | Desde marzo 2027 |
 | Cuentas verificadas de conjuntos y comparsas | v3 | Desde marzo 2027 |
+| Historial de resultados del Concurso (años anteriores) | v3 | Desde marzo 2027 |
+| Carnaval del interior del país | A definir | Después del lanzamiento |
 | Portugués | v3 | Antes del Carnaval 2028 |
 
-Fuera de alcance: pencas, reseñas y comentarios (es el terreno de Carnaval App).
+Fuera de alcance: pencas, reseñas y comentarios (es el terreno de Carnaval App), y una versión web para el público.
 
 Recorte de emergencia si no da el tiempo: Hoy + Conjuntos + Modo Llamadas, con el calendario como lista estática.
 
@@ -228,7 +232,8 @@ Oportunidad: el 3 de diciembre es el Día Nacional del Candombe. Sirve para most
 **Después (marzo 2027)**
 
 - Retro con métricas: usuarios, retención por semana, noches pico.
-- Arrancar v3, el modo barrio con salidas de tambores.
+- Arrancar v3: el modo barrio con salidas de tambores y el historial de resultados del Concurso.
+- Definir cuándo y cómo se suma el carnaval del interior.
 - Cuentas verificadas de conjuntos y sponsors para el Carnaval 2028.
 
 ## Cómo trabajar con Claude Code

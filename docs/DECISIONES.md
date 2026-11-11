@@ -4,7 +4,7 @@ Registro de decisiones del proyecto. Si algo de `docs/PLAN.md` choca con este ar
 
 ## 2026-10-22 · Tomadas después de la Fase 0
 
-1. **Alcance geográfico:** Montevideo + área metropolitana. Canelones incluido (Monumental de la Costa, Las Piedras, Paso Carrasco están en la grilla de DAECPU).
+1. **Alcance geográfico:** Montevideo + área metropolitana. Canelones incluido (Monumental de la Costa, Las Piedras, Paso Carrasco están en la grilla de DAECPU). Es el alcance del lanzamiento, no el de la app: ver la decisión 52.
 2. **Escenarios itinerantes** (Escenario Móvil IM 1 y 2, Carnaval de a Pie 1 a 8, Barrio a Barrio): la ubicación va en cada actuación (`direccion_texto`, `ubicacion` PostGIS opcional), no en el escenario. El escenario itinerante no tiene dirección.
 3. **Nulos permitidos:** `escenarios.tipo`, `escenarios.gratis` y `escenarios.itinerante` aceptan nulo (caso: Escenario en Canelones, sin datos todavía).
 4. **Categoría de conjunto:** el enum incluye `otro` además de murga, parodistas, humoristas, revista, comparsa y samba.
@@ -12,7 +12,7 @@ Registro de decisiones del proyecto. Si algo de `docs/PLAN.md` choca con este ar
 6. **Fuentes:** `fuente_url` se guarda como `text[]`. En los CSV viene separada por ` | `.
 7. **Modo Llamadas:** se activa por las fechas de la temporada (`modo_llamadas_desde` / `modo_llamadas_hasta`), nunca por el tipo de evento. La hora estimada de paso por cuadra entra en el MVP: 20:00 la primera comparsa, 10 minutos y 150 metros entre comparsas (reglamento 2026).
 8. **Fecha lógica:** toda la lógica de «hoy» usa `America/Montevideo`. Una actuación antes de las 06:00 pertenece a la noche anterior.
-9. **Posicionamiento frente a Carnaval App:** no hacemos pencas, reseñas ni comentarios. Diferenciales: alertas por conjunto, escenarios gratuitos, mapa, hora estimada en Llamadas, inglés, sin registro.
+9. **Posicionamiento frente a Carnaval App:** no hacemos pencas, reseñas ni comentarios. Diferenciales: alertas por conjunto, escenarios gratuitos, mapa, hora estimada en Llamadas, inglés, sin registro. El Concurso sí entra completo, con resultados e historial: ver la decisión 53, que actualiza este punto.
 10. **Mapas:** MapLibre GL con tiles de MapTiler (key en `VITE_MAPTILER_KEY`).
 11. **Convenciones de código:** tablas y columnas en español, snake_case. Código (variables, funciones, componentes) en inglés. Commits en español.
 12. **Instagram:** sólo API oficial (Business Discovery) desde el backend; nunca scraping. Es v2 y nunca fuente de la grilla.
@@ -129,3 +129,15 @@ Registro de decisiones del proyecto. Si algo de `docs/PLAN.md` choca con este ar
     - Textos en español o inglés según `dispositivos_push.idioma`, con las horas en Montevideo.
     - Un token que FCM rechaza como inexistente o inválido se borra de `dispositivos_push`; con un error transitorio no se borra nada.
     - Con la app abierta no se muestra notificación del sistema: se refresca la grilla.
+
+## 2026-11-11 · Aclaraciones de producto
+
+50. **Sólo iPhone y Android:** la app se publica en App Store y Google Play y nada más. No hay versión web para el público. El navegador (`pnpm dev`) queda sólo como herramienta de desarrollo: sirve para probar pantallas, pero no es un producto, no se publica y no hay que cuidar en él lo que sólo existe en el teléfono (push, permisos nativos).
+51. **El panel de carga (admin) es una web interna:** sólo para el equipo, con login y rol admin (decisión 23). No es parte de lo que ve el público.
+52. **Alcance: todo el carnaval en Uruguay** (amplía la decisión 1). La app es de la información del carnaval de todo el país. Se lanza con Montevideo y el área metropolitana, tal como está en la decisión 1; el interior se suma después del lanzamiento. Hasta entonces no se cargan escenarios ni conjuntos del interior, pero nada del modelo ni de los textos tiene que dar por hecho que el carnaval es sólo el de Montevideo.
+53. **El Concurso entra completo** (actualiza la decisión 9 y deja sin efecto lo de no hacer historial de resultados):
+    - El fixture del Teatro de Verano, desde el lanzamiento (Fase 5).
+    - Los resultados de la temporada, durante el carnaval.
+    - El historial de resultados de años anteriores, después.
+    - Pencas y comentarios siguen afuera, igual que las reseñas: la app informa, no es una comunidad.
+    - Posicionamiento: ya no vale «Carnaval App es la app del Concurso y Cuerda la de salir a ver carnaval». La app cubre también el Concurso como información (fixture, resultados, historial) y deja a Carnaval App la parte social. Los diferenciales siguen siendo los de la decisión 9, más el alcance nacional.
