@@ -2,6 +2,7 @@ import type { Enums, Tables } from './database.types'
 
 export * from './dates'
 export * from './norm'
+export * from './delivery'
 export * from './notices'
 export { noticeTexts } from './noticeTexts'
 export type { NoticeLanguage } from './noticeTexts'

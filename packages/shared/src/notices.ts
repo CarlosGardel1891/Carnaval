@@ -1,5 +1,5 @@
-import { MONTEVIDEO_TZ, minutesOfDayInMontevideo } from './dates'
-import { noticeTexts, type NoticeLanguage, type NoticeTexts } from './noticeTexts'
+import { MONTEVIDEO_TZ, minutesOfDayInMontevideo } from './dates.ts'
+import { noticeTexts, type NoticeLanguage, type NoticeTexts } from './noticeTexts.ts'
 
 /**
  * Los avisos push, sin mandarlos: a partir de las filas que devuelve la base (quién recibe
