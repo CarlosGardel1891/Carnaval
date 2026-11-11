@@ -15,6 +15,7 @@ export const fetchLocatedStages = vi.fn<typeof Api.fetchLocatedStages>(() => Pro
 export const fetchStage = vi.fn<typeof Api.fetchStage>(() => Promise.resolve(null))
 export const fetchGroups = vi.fn<typeof Api.fetchGroups>(() => Promise.resolve([]))
 export const fetchGroup = vi.fn<typeof Api.fetchGroup>(() => Promise.resolve(null))
+export const fetchContestFixture = vi.fn<typeof Api.fetchContestFixture>(() => Promise.resolve([]))
 export const fetchEvent = vi.fn<typeof Api.fetchEvent>(() => Promise.resolve(null))
 export const fetchEvents = vi.fn<typeof Api.fetchEvents>(() => Promise.resolve([]))
 export const fetchUpcomingActs = vi.fn<typeof Api.fetchUpcomingActs>(() => Promise.resolve([]))

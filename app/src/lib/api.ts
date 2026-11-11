@@ -237,6 +237,30 @@ export async function fetchEvent(slug: string): Promise<CalendarEvent | null> {
   return data
 }
 
+// ---------------------------------------------------------------- Concurso
+
+/**
+ * Una fila del fixture del Concurso: un conjunto en una noche (etapa). En una etapa que
+ * todavía no tiene conjuntos cargados, todo lo de la actuación viene vacío.
+ */
+export type FixtureRow = Nullable<
+  Functions['fixture_del_concurso']['Returns'][number],
+  | 'actuacion_id'
+  | 'inicio'
+  | 'estado'
+  | 'conjunto_id'
+  | 'conjunto_slug'
+  | 'conjunto_nombre'
+  | 'conjunto_categoria'
+>
+
+/** El fixture del Concurso de un año, por rueda, etapa y hora. Vacío si no está publicado. */
+export async function fetchContestFixture(year: number): Promise<FixtureRow[]> {
+  const { data, error } = await supabase.rpc('fixture_del_concurso', { p_anio: year })
+  if (error) throw error
+  return data
+}
+
 // ---------------------------------------------------------------- sesión y Seguir
 
 /** El usuario de la sesión guardada en el teléfono, o null si no hay (o ya no sirve). */

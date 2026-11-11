@@ -85,6 +85,22 @@
     "source": "Fuente",
     "noSource": "No hay una fuente cargada para este evento."
   },
+  "contest": {
+    "title": "Concurso Oficial",
+    "venue": "Teatro de Verano",
+    "subtitle": "Teatro de Verano · Carnaval {{year}}",
+    "card": "Las ruedas, las noches y los conjuntos en el Teatro de Verano.",
+    "loading": "Cargando el fixture…",
+    "error": "No pudimos cargar el fixture del Concurso.",
+    "noSeason": "Todavía no hay una temporada cargada.",
+    "notPublished": "El fixture del Concurso {{year}} todavía no se publicó.",
+    "notPublishedHint": "Cuando se publique vas a ver acá cada rueda, con sus noches y los conjuntos de cada una.",
+    "startsOn": "El Concurso empieza el {{date}}.",
+    "startsAround": "El Concurso empezaría alrededor del {{date}}: la fecha todavía es estimada.",
+    "sample": "Fixture de prueba: las noches, el orden y las horas son inventados.",
+    "night": "Etapa {{number}}",
+    "noActs": "Todavía no están cargados los conjuntos de esta noche."
+  },
   "follow": {
     "follow": "Seguir",
     "following": "Siguiendo",

@@ -85,6 +85,22 @@
     "source": "Source",
     "noSource": "No source has been added for this event."
   },
+  "contest": {
+    "title": "Official Contest",
+    "venue": "Teatro de Verano",
+    "subtitle": "Teatro de Verano · Carnival {{year}}",
+    "card": "The rounds, the nights and the groups at Teatro de Verano.",
+    "loading": "Loading the fixture…",
+    "error": "We couldn't load the Contest fixture.",
+    "noSeason": "No season has been added yet.",
+    "notPublished": "The {{year}} Contest fixture hasn't been published yet.",
+    "notPublishedHint": "Once it's out you'll see each round here, with its nights and the groups performing.",
+    "startsOn": "The Contest starts on {{date}}.",
+    "startsAround": "The Contest should start around {{date}}: the date is still an estimate.",
+    "sample": "Sample fixture: the nights, the order and the times are made up.",
+    "night": "Night {{number}}",
+    "noActs": "This night's groups haven't been added yet."
+  },
   "follow": {
     "follow": "Follow",
     "following": "Following",

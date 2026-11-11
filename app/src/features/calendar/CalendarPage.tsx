@@ -6,6 +6,7 @@ import type { CalendarEvent } from '../../lib/api'
 import { formatDayParts, formatIsoDate, formatMonth, formatNight } from '../../lib/format'
 import { joinParts } from '../../lib/labels'
 import { useLocale } from '../../lib/useLocale'
+import { CONTEST_PATH } from '../contest/contest'
 import { buildCalendar, isMultiDay, isPastEvent, isPreseason, type CalendarDay } from './calendar'
 import { eventPath, useSeasonEvents } from './useEvents'
 
@@ -139,6 +140,26 @@ export function CalendarPage() {
           <p className="text-soft text-lg">{t('season.title', { year: season.data.anio })}</p>
         )}
       </header>
+
+      <Link
+        to={CONTEST_PATH}
+        className="bg-surface border-line my-2 flex min-h-12 items-center gap-3 rounded-2xl border px-4 py-3"
+      >
+        <span className="min-w-0 flex-1">
+          <span className="block text-xl font-bold">{t('contest.title')}</span>
+          <span className="text-soft block">{t('contest.card')}</span>
+        </span>
+        <svg
+          viewBox="0 0 24 24"
+          className="text-soft h-6 w-6 shrink-0"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          aria-hidden="true"
+        >
+          <path d="m9 6 6 6-6 6" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      </Link>
 
       {failed ? (
         <div role="alert" className="space-y-3 py-4">
