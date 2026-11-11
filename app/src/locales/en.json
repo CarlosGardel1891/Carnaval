@@ -43,6 +43,17 @@
     "pendingAdmission": "Awaiting the Admission Trial",
     "inLlamadas": "In the Llamadas"
   },
+  "group": {
+    "title": "Group",
+    "loading": "Loading the group…",
+    "error": "We couldn't load the group.",
+    "notFound": "We couldn't find that group.",
+    "links": "Social media",
+    "instagram": "Instagram",
+    "facebook": "Facebook",
+    "upcoming": "Upcoming shows",
+    "noUpcoming": "No shows have been added for this group yet."
+  },
   "today": {
     "title": "Today",
     "otherNight": "Another night",

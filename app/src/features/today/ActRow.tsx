@@ -5,6 +5,7 @@ import { formatTime } from '../../lib/format'
 import { joinParts } from '../../lib/labels'
 import { useLocale } from '../../lib/useLocale'
 import { useDistanceLabel } from '../location/useDistanceLabel'
+import { groupPath } from '../groups/groupPath'
 import { useStagePath } from '../stages/stagePath'
 
 interface ActRowProps {
@@ -43,7 +44,12 @@ export function ActRow({ act, onStage, showStage = false, showDistance = false }
       </time>
       <div className="min-w-0 flex-1">
         <p className="text-lg font-semibold">
-          {suspended ? <s>{act.conjunto_nombre}</s> : act.conjunto_nombre}
+          <Link
+            to={groupPath(act.conjunto_slug)}
+            className="decoration-soft underline underline-offset-4"
+          >
+            {suspended ? <s>{act.conjunto_nombre}</s> : act.conjunto_nombre}
+          </Link>
         </p>
         <p className="text-soft">{details}</p>
         {showStage && (

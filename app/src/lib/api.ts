@@ -143,6 +143,52 @@ export async function fetchGroups(): Promise<Group[]> {
   }))
 }
 
+/** Lo que la ficha muestra de un conjunto. */
+export type GroupDetail = Pick<
+  Tables<'conjuntos'>,
+  'id' | 'slug' | 'nombre' | 'categoria' | 'barrio' | 'bio' | 'instagram' | 'facebook' | 'foto_url'
+> & { temporadas: GroupSeason[] }
+
+/** Un conjunto por su slug, o null si no existe. */
+export async function fetchGroup(slug: string): Promise<GroupDetail | null> {
+  const { data, error } = await supabase
+    .from('conjuntos')
+    .select(
+      'id, slug, nombre, categoria, barrio, bio, instagram, facebook, foto_url, conjunto_temporada(temporada_id, en_concurso, en_llamadas)',
+    )
+    .eq('slug', slug)
+    .maybeSingle()
+  if (error) throw error
+  if (!data) return null
+  const { conjunto_temporada, ...group } = data
+  return { ...group, temporadas: conjunto_temporada }
+}
+
+/** Una actuación que le queda a un conjunto. Igual que `Act`: se corrigen las columnas que pueden venir vacías. */
+export type UpcomingAct = Nullable<
+  Functions['proximas_de_conjunto']['Returns'][number],
+  | 'etapa_rueda'
+  | 'etapa_numero'
+  | 'escenario_tipo'
+  | 'escenario_barrio'
+  | 'direccion'
+  | 'gratis'
+  | 'precio_texto'
+  | 'itinerante'
+  | 'lat'
+  | 'lng'
+>
+
+/** Lo que le queda a un conjunto desde esa noche lógica (incluida), por hora. */
+export async function fetchUpcomingActs(groupId: number, noche: string): Promise<UpcomingAct[]> {
+  const { data, error } = await supabase.rpc('proximas_de_conjunto', {
+    p_conjunto_id: groupId,
+    p_noche: noche,
+  })
+  if (error) throw error
+  return data
+}
+
 /** Un escenario por su slug, o null si no existe. */
 export async function fetchStage(slug: string): Promise<Stage | null> {
   const { data, error } = await supabase

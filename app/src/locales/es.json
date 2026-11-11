@@ -43,6 +43,17 @@
     "pendingAdmission": "Pendiente de la Prueba de Admisión",
     "inLlamadas": "En las Llamadas"
   },
+  "group": {
+    "title": "Conjunto",
+    "loading": "Cargando el conjunto…",
+    "error": "No pudimos cargar el conjunto.",
+    "notFound": "No encontramos ese conjunto.",
+    "links": "Redes",
+    "instagram": "Instagram",
+    "facebook": "Facebook",
+    "upcoming": "Próximas actuaciones",
+    "noUpcoming": "Todavía no hay actuaciones cargadas para este conjunto."
+  },
   "today": {
     "title": "Hoy",
     "otherNight": "Otra noche",

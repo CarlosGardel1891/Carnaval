@@ -1,5 +1,6 @@
 import { Navigate, type RouteObject } from 'react-router'
 import { AppLayout } from './components/AppLayout'
+import { GroupPage } from './features/groups/GroupPage'
 import { GroupsPage } from './features/groups/GroupsPage'
 import { LazyMapPage } from './features/map/LazyMapPage'
 import { StagePage } from './features/stages/StagePage'
@@ -18,6 +19,7 @@ export const routes: RouteObject[] = [
       { path: 'mapa', element: <LazyMapPage /> },
       { path: 'escenarios/:slug', element: <StagePage /> },
       { path: 'conjuntos', element: <GroupsPage /> },
+      { path: 'conjuntos/:slug', element: <GroupPage /> },
       { path: '*', element: <Navigate to="/" replace /> },
     ],
   },
