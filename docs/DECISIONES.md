@@ -152,3 +152,22 @@ Registro de decisiones del proyecto. Si algo de `docs/PLAN.md` choca con este ar
     - **Pantalla de inicio:** el logo al centro sobre el color de fondo de la app (`--color-ground`), que sigue teniendo un solo tema, oscuro (decisión 41). Desde Android 12 la arma el sistema con el ícono de la app sobre ese mismo color.
     - **Avisos en Android:** el ícono es el tambor, teñido con el azul del logo.
 
+## 2026-11-11 · Tomadas al arrancar la Fase 5 (Calendario y Concurso)
+
+55. **Calendario, una sola lista:** los eventos de la temporada por fecha, con los meses como títulos y una fila por día (ajusta el «vista por mes y por día» de `docs/PLAN.md`: no hay grilla de calendario, que con una veintena de eventos quedaría casi vacía). Reglas:
+    - Entra todo lo de la temporada, también la pretemporada (lo anterior a `temporadas.fecha_inicio`), que va rotulada.
+    - Un evento de varios días aparece el día que empieza, con su fecha de fin; mientras está en curso se repite en la fila de hoy.
+    - «Hoy» es la noche lógica en Montevideo (decisión 8) y tiene su fila aunque no haya eventos. Lo que ya terminó va atenuado, no se esconde.
+    - Tocar la fecha de un día abre el pizarrón de esa noche (`/?noche=`); tocar el evento, su ficha (`/calendario/:slug`), con tipo, fecha, lugar, estado y fuente.
+    - Los nombres de los eventos se muestran como están en `research/calendario_2027.csv`, con sus aclaraciones entre paréntesis. Las Llamadas son una fila por noche (decisión 25) y nada más: el modo Llamadas es de la Fase 6.
+56. **Fechas estimadas:** un evento con `estado = 'estimado'` lleva la etiqueta «Fecha estimada» y la fecha con «aprox.», en la lista y en la ficha. Un confirmado no lleva etiqueta: lo que se marca es la duda, no la certeza.
+57. **Fixture del Concurso:**
+    - **Modelo:** el que ya había. Una noche del Concurso es una fila de `etapas_concurso` (rueda, número, fecha) y sus conjuntos son `actuaciones` en el Teatro de Verano con ese `etapa_id`. No hay una tabla aparte para el fixture: así la noche del Concurso también sale en el pizarrón, en la ficha del conjunto y en los avisos.
+    - **Fuente:** `etapas_concurso` suma `fuente` y `fuente_url`, como `actuaciones`, para saber de dónde salió cada etapa y poder marcar las de prueba.
+    - **Consulta:** `fixture_del_concurso(p_anio)` recibe el año de la temporada, no «la vigente», para que sirva igual con años anteriores.
+    - **Sin publicar:** si la temporada no tiene etapas, la pantalla dice que el fixture todavía no se publicó; no muestra una lista vacía.
+    - **Ficticio, sólo local:** `supabase/local/fixture_ficticio.sql`, con `pnpm db:fixture` y las mismas barreras que la grilla ficticia (decisión 27). Usa el Teatro de Verano real y conjuntos reales, todo con `fuente = 'fixture-ficticio'`; con ese fixture cargado la pantalla avisa que es de prueba.
+    - **El real:** cuando se publique, va en `research/fixture_2027.csv` y entra por `pnpm gen:seed`, validado por `research/validate.py`. En la Fase 7 lo reemplaza el panel de carga.
+58. **Resultados e historial, preparados y sin construir** (decisión 53): en esta fase no se crean tablas. Cuando lleguen, los resultados cuelgan del conjunto y de la rueda o la etapa de una temporada, y el historial son temporadas anteriores cargadas en `temporadas` con sus etapas y sus resultados; por eso nada del Concurso da por hecho que hay una sola temporada.
+59. **«Agregar al calendario del teléfono» queda para después** (paso 3 de la Fase 5 de `docs/PLAN.md`): no hay plugin oficial de Capacitor, suma un permiso a la primera versión y en iOS no se puede probar sin Mac. Se retoma con el fixture real publicado.
+
