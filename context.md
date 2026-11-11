@@ -1,6 +1,6 @@
 # Carnavalero · contexto completo del proyecto
 
-Documento para poner al día a alguien que llega de cero. Estado al **2026-11-11**. Repo: <https://github.com/Emiliano-Vanzini/Carnaval>, rama de trabajo `calendario-concurso` (Fase 5); `develop` tiene hasta la Fase 4 y el renombre a Carnavalero.
+Documento para poner al día a alguien que llega de cero. Estado al **2026-11-11**. Repo: <https://github.com/Emiliano-Vanzini/Carnaval>, rama de trabajo `llamadas` (Fase 6); `develop` tiene hasta la Fase 5.
 
 Si algo de acá choca con los documentos del repo, mandan ellos, en este orden: `docs/DECISIONES.md`, `docs/PLAN.md`, `CLAUDE.md`.
 
@@ -101,13 +101,13 @@ El análisis completo está en `docs/competencia-carnaval-app.md`.
 | 2 · Modelo de datos | 6 – 9 nov | **Terminada** (2026-11-10, un día tarde) |
 | 3 · Hoy y escenarios | 10 – 23 nov | **Terminada** (2026-11-10), ya en `develop` |
 | 4 · Conjuntos, Seguir y push | 24 – 30 nov | **Código terminado** (2026-11-11), ya en `develop`; falta un aviso real (Firebase, Apple) |
-| 5 · Calendario y Concurso | 1 – 7 dic | **Código terminado** (2026-11-11) en `calendario-concurso`; falta el fixture real, que no se publicó |
-| 6 · Modo Llamadas | 8 – 13 dic | **Es lo que sigue** |
-| 7 · Datos y panel admin | 1 dic – 10 ene (en paralelo) | Sin empezar |
+| 5 · Calendario y Concurso | 1 – 7 dic | **Código terminado** (2026-11-11), ya en `develop`; falta el fixture real, que no se publicó |
+| 6 · Modo Llamadas | 8 – 13 dic | **Código terminado** (2026-11-11) en `llamadas`; faltan el orden de desfile real y el recorrido y los cortes oficiales |
+| 7 · Datos y panel admin | 1 dic – 10 ene (en paralelo) | **Es lo que sigue** |
 | 8 · QA, beta y publicación | 14 dic – 20 ene | Sin empezar |
 | 9 · Operación en temporada | 21 ene – 7 mar | — |
 
-En una frase: **la app ya muestra la noche, los conjuntos, el calendario de la temporada y el Concurso; deja seguir conjuntos sin registrarse y tiene armados los avisos push, que todavía no salieron nunca de verdad.** Lo hace sobre datos de prueba (la grilla ficticia o la cartelera real del 28/02/2026): todavía no hay grilla real, los escenarios reales no tienen coordenadas y falta Firebase para mandar un aviso real.
+En una frase: **la app ya muestra la noche, los conjuntos, el calendario de la temporada, el Concurso y el Desfile de Llamadas (orden, hora estimada por cuadra, recorrido y glosario, también sin señal); deja seguir conjuntos sin registrarse y tiene armados los avisos push, que todavía no salieron nunca de verdad.** Lo hace sobre datos de prueba (la grilla ficticia o la cartelera real del 28/02/2026): todavía no hay grilla real, los escenarios reales no tienen coordenadas y falta Firebase para mandar un aviso real.
 
 Lo que falta confirmar de la Fase 1:
 
@@ -140,7 +140,7 @@ app/               App móvil (Vite + Capacitor). android/ e ios/ son los proyec
 admin/             Panel web de carga de datos (hoy, sólo un login de adorno)
 packages/shared/   @cuerda/shared: tipos de la base, fechas y normalización de nombres
 packages/db-tests/ Tests de integración de la base contra el Supabase local (pnpm test:db)
-supabase/          config.toml, migraciones, seeds/ y local/ (grilla ficticia y noche real de prueba)
+supabase/          config.toml, migraciones, seeds/ y local/ (datos de prueba: grilla, fixture, orden de Llamadas, noche real)
 scripts/           Generadores del seed y de norm, y el cargador de los datos de prueba
 research/          Datos semilla de la Fase 0, informe y validador
 docs/              PLAN.md, DECISIONES.md y análisis de competencia
@@ -151,20 +151,22 @@ LEEME.md           Cómo arrancar
 
 ### Lo construido, pieza por pieza
 
-**`packages/shared`** — la parte más sólida, con 79 tests.
+**`packages/shared`** — la parte más sólida, con 113 tests.
 
 - `nocheLogica()`: devuelve la fecha de la «noche» en hora de Montevideo, con corte a las 06:00.
 - `calendarDateInMontevideo()`: la fecha calendario en Montevideo.
 - `modoLlamadasActivo()`: dice si la app debe estar en modo Llamadas según las fechas de la temporada.
 - `norm()`: normaliza nombres (minúsculas, sin tildes, espacios simples) para comparar conjuntos y escenarios. Vive en tres lugares (TypeScript, la `norm` de `research/validate.py` y `public.norm` en SQL) y los tres tienen que dar exactamente lo mismo; está comprobado contra un fixture de 420 casos con los nombres, alias y direcciones reales.
 - Avisos push, sin la base ni Firebase: los textos en español e inglés (`noticeTexts.ts`), el armado de una notificación por dispositivo (`notices.ts`), el envío (`delivery.ts`) y el cliente de FCM (`fcm.ts`). Las Edge Functions importan estos mismos archivos.
+- `llamadas.ts`: la hora estimada del Desfile de Llamadas (a qué hora sale cada comparsa y a qué hora pasa por un punto del recorrido), como funciones puras. La usan la app, sin red, y el aviso del día.
 - `database.types.ts`: tipos generados desde la base. No se edita a mano.
 
 **`supabase`**
 
-- Quince migraciones: las 10 tablas del MVP, dos tablas de claves de nombres (`conjunto_nombres` y `escenario_nombres`) que usan el matching y la búsqueda, y las dos de los avisos: la cola de cambios (`cambios_actuacion`) y el registro de avisos (`avisos_enviados`).
+- Diecisiete migraciones (las dos últimas, del desfile de Llamadas y de su aviso del día): las 10 tablas del MVP, dos tablas de claves de nombres (`conjunto_nombres` y `escenario_nombres`) que usan el matching y la búsqueda, y las dos de los avisos: la cola de cambios (`cambios_actuacion`) y el registro de avisos (`avisos_enviados`).
 - Avisos: un trigger encola cada cambio de hora, lugar o estado de una actuación; `tomar_avisos_del_dia` y `tomar_avisos_de_cambios` deciden quién recibe qué y reclaman cada aviso para que no salga dos veces. Un aviso de cambio que no sale se reintenta hasta que la actuación empieza; si no llega a salir, queda registrado. Sólo las ejecuta la service role.
 - Fixture del Concurso: cada etapa dice de dónde salió (`fuente`) y `fixture_del_concurso(año)` lo devuelve entero, por rueda, noche y hora. El de prueba se carga con `pnpm db:fixture`; el real, desde `research/fixture_2027.csv` cuando se publique.
+- Desfile de Llamadas: el orden (`orden_desfile`, con su fuente), las esquinas del recorrido (`desfile_esquinas`), los cortes (`cortes_calle`) y el horario de cada noche (en `eventos`), todo por evento. El recorrido y los cortes cargados son estimados (OpenStreetMap y prensa de 2025); el orden real todavía no existe y el de prueba se carga con `pnpm db:llamadas`.
 - Dos Edge Functions, `avisos-del-dia` y `avisos-de-cambios`. Sin Firebase configurado corren en simulacro. No están desplegadas en ningún lado.
 - Permisos (RLS) en todas las tablas: cualquiera lee; sólo escribe un admin (`es_admin()`, que mira `app_metadata`) o el service role. `favoritos` y `dispositivos_push` son sólo de su dueño.
 - Auth anónima habilitada en el entorno local. En el proyecto remoto hay que activarla a mano.
@@ -177,7 +179,7 @@ LEEME.md           Cómo arrancar
 
 **`packages/db-tests`**
 
-- 220 tests contra el Supabase local: permisos tabla por tabla con usuarios anónimos, admin y falso admin; funciones; invariantes del esquema; seed contra los CSV; grilla ficticia y noche real; los avisos (quién recibe cada uno, sin repetidos) y el fixture del Concurso (la consulta, el de prueba y la carga del real).
+- 259 tests contra el Supabase local: permisos tabla por tabla con usuarios anónimos, admin y falso admin; funciones; invariantes del esquema; seed contra los CSV; grilla ficticia y noche real; los avisos (quién recibe cada uno, sin repetidos) y el fixture del Concurso (la consulta, el de prueba y la carga del real).
 
 **`app`**
 
@@ -190,17 +192,20 @@ LEEME.md           Cómo arrancar
 - **Avisos** (`features/push/`): después de seguir un conjunto, una tarjeta pregunta si se quieren avisos; sólo al aceptar aparece el diálogo del sistema. Registra el teléfono con su idioma y, al tocar un aviso, abre la ficha o el pizarrón. Apagado hasta tener Firebase (`VITE_PUSH_ENABLED`).
 - **Calendario** (`features/calendar/`): todos los eventos de la temporada, pretemporada incluida, por mes y por día. Marca hoy y abre ahí, deja en segundo plano lo que ya pasó, rotula las fechas estimadas, y tocar un día abre el pizarrón de esa noche. Cada evento tiene su ficha, con fecha, lugar, estado, fuente y, cuando se cargue, dónde se compran las entradas.
 - **Concurso** (`features/contest/`): las tres ruedas con sus noches y los conjuntos de cada una, con enlace a sus fichas; la ficha de un conjunto muestra sus noches en el Concurso. Mientras no haya fixture, dice que todavía no se publicó.
+- **Llamadas** (`features/llamadas/`): quinta pestaña, siempre visible, y pantalla de arranque en las fechas del desfile. Por noche: el orden de desfile con la hora estimada de salida, la hora de paso por la cuadra que se elija (o la más cercana, con «Cerca mío»), el recorrido con los cortes en el mapa y en lista, y un glosario de veinte términos. Toda hora va con «≈» y la explicación de la regla. Sin orden publicado, lo dice y lista las clasificadas.
+- **Sin señal:** lo del modo Llamadas se baja al abrir la app en temporada y dura una semana en el teléfono; las horas se calculan ahí mismo y el mapa cae a un fondo liso si no hay calles.
+- **Reloj simulado** (`lib/clock.ts`): sólo en desarrollo, `?ahora=` o `VITE_AHORA` corren la fecha de la app para probar el modo Llamadas.
 - **Caché** (`lib/queryCache.ts`): las consultas se guardan 24 horas en el teléfono; sin red, la app abre con lo último que cargó y lo avisa.
 - **Ciclo de vida** (`lib/lifecycle.ts`): la grilla se refresca cada 5 minutos sólo con la app al frente y al volver a ella; el botón «atrás» de Android vuelve o minimiza.
 - Todo lo que habla con Supabase está en `lib/api.ts`. En el emulador de Android, el cliente reescribe `127.0.0.1` a `10.0.2.2` para llegar al Supabase local.
 - Todo el texto sale de `src/locales/es.json` y `en.json`; un test controla que tengan las mismas claves.
-- 264 tests.
+- 356 tests.
 
 **`admin`**
 
 - El panel de carga: una web interna, sólo para el equipo. Hoy es una pantalla de login que sólo muestra un aviso y no se conecta a nada. 1 test.
 
-**Lo que no existe aún:** un aviso push real (falta Firebase), el fixture real del Concurso (no se publicó), los resultados y el historial, el modo Llamadas, el panel de carga, la grilla real y las coordenadas de los escenarios.
+**Lo que no existe aún:** un aviso push real (falta Firebase), el fixture real del Concurso (no se publicó), los resultados y el historial, el orden de desfile real y el recorrido oficial de las Llamadas, el panel de carga, la grilla real y las coordenadas de los escenarios.
 
 ## 8. Datos semilla (`research/`)
 
@@ -350,6 +355,7 @@ Nativo: `pnpm --filter app android` (o `android:local` para usar el Supabase loc
 - **Firebase:** crear el proyecto, confirmar el identificador de la app y bajar `google-services.json`; con eso se prueba un aviso real en el emulador (pasos en `CLAUDE.md`, «Avisos push»).
 - **iOS:** probar en una Mac, localizar el texto del permiso de ubicación y configurar las push (plist, capability y key de APNs).
 - **Fixture del Concurso:** cuando se publique, cargarlo en `research/fixture_2027.csv` (pasos en `CLAUDE.md`).
+- **Llamadas:** cuando la IM publique el orden de desfile, cargarlo en `research/llamadas_orden_2027.csv`; cuando publique el recorrido y los cortes, corregir los dos CSV estimados y marcar el recorrido como confirmado (pasos en `CLAUDE.md`, «Modo Llamadas»). Confirmar de qué punta sale el desfile.
 - **Venta de entradas del Concurso:** cuando se anuncie la de 2027, cargarla en el evento del Concurso (`eventos.entradas_url`; pasos en `CLAUDE.md`). En 2026 fue por Abitab y la boletería del Teatro de Verano, desde tres días antes.
 - **Avisos en el proyecto remoto:** desplegar las dos Edge Functions y programarlas con `pg_cron`.
 - **17/11:** cargar el resultado de la Prueba de Admisión en `research/conjuntos.csv`, correr `python research/validate.py --post-prueba` y regenerar el seed con `pnpm gen:seed --post-prueba`.

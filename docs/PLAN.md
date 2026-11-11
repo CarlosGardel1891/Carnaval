@@ -185,6 +185,23 @@ Estado al 2026-11-11: hecho en la rama `calendario-concurso`, con los ajustes de
 5. Glosario español e inglés: chico, repique, piano, cuerda, mama vieja, gramillero, escobero.
 6. Ajuste manual desde el admin: marcar qué comparsa está pasando para corregir la estimación. En v2 lo alimentan los reportes de la gente.
 
+Listo cuando (agregado el 2026-11-11; el plan no lo traía):
+
+- En las fechas de Llamadas la app abre en modo Llamadas; fuera de esas fechas, en Hoy.
+- Con el orden ficticio, cada noche muestra el orden de desfile con la hora estimada de cada comparsa, y eligiendo una cuadra se ve a qué hora pasa por ahí.
+- El recorrido y los cortes se ven en el mapa, también sin key de MapTiler y sin señal.
+- Con la red apagada, todo el modo funciona con lo último que se descargó.
+- Toda la interfaz nueva y el glosario están en español y en inglés.
+
+Estado al 2026-11-11: hecho en la rama `llamadas`, con las decisiones 62 a 68. Probado en el navegador y en el emulador de Android con el orden ficticio y la fecha simulada, también con la red del emulador apagada. Cómo quedó cada paso:
+
+- **1 a 3:** hechos. La ficha de cada comparsa es la de conjuntos (Fase 4); la cuerda y los personajes de cada una no están en los datos.
+- **4:** el recorrido y los cortes van como **estimados** (OpenStreetMap y la prensa de 2025), marcados así en la app, hasta que la IM publique los de 2027. No hay «servicios» (baños, puestos de salud): no hay de dónde sacarlos todavía.
+- **5:** veinte términos.
+- **6:** queda el dato (`eventos.desfile_atraso_min`, que corre todas las horas) pero no la pantalla: es del panel, Fase 7.
+- **Además:** el aviso del día suma a las comparsas seguidas que desfilan esa noche (decisión 68).
+- **Falta, y no es código:** el orden de desfile real de las dos noches, y el recorrido y los cortes oficiales. Sin key de MapTiler en la máquina de desarrollo, el mapa del recorrido sólo se vio sobre fondo liso.
+
 ## Fase 7 · Datos y panel admin (1 dic – 10 ene, en paralelo)
 
 La app vale lo que vale su grilla: cada actuación guarda de dónde salió y la app muestra «actualizado hace X».

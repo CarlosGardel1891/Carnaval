@@ -176,3 +176,29 @@ En `calendario_2027.csv`, diez eventos tenían en el nombre una aclaración entr
 - `validate.py` ahora rechaza un nombre de evento con paréntesis.
 - `python research/validate.py`: OK, sin errores, con las mismas 5 advertencias. Seed y fixture de `norm` regenerados.
 
+## 2026-11-11 · Desfile de Llamadas: recorrido, cortes y orden
+
+Tres archivos nuevos, para el modo Llamadas (decisión 64). `pnpm gen:seed` los carga en los dos eventos de tipo `llamadas`.
+
+**`llamadas_recorrido_2027.csv`** — las esquinas del recorrido, en el orden en que pasa el desfile. **Estimado.**
+
+- Columnas: `orden`, `calle` (por la que va el desfile), `cruce` (la que cruza), `lat`, `lng` y `fuente_url`.
+- Diez esquinas, de Carlos Gardel y Zelmar Michelini a Isla de Flores y Minas: nueve cuadras y 949 metros, como dice la decisión 7. Las coordenadas son las de los cruces en OpenStreetMap.
+- Dos pasajes que cortan el recorrido (Francisco Redruello y Ansina) no se cuentan como esquinas.
+- **El sentido es un supuesto:** la prensa de 2025 no dice de qué punta sale el desfile. Va de Zelmar Michelini a Minas; si la IM confirma el contrario, se invierte la columna `orden`.
+
+**`llamadas_cortes_2027.csv`** — cortes de calle y prohibiciones de estacionar. **Estimado**, según lo que se publicó para 2025 (El Observador, 7/2/2025).
+
+- Columnas: `noche` (1 o 2), `slug`, `tipo` (`corte` o `estacionamiento`), `descripcion`, `desde` y `hasta` (hora de Montevideo; vacías si no se sabe), `puntos` (el tramo, como pares `lng lat` separados por `;`; vacío si no se pudo ubicar) y `fuente_url`.
+- 23 filas. La nota de 2025 no da horarios para el sábado: los cortes de la noche 2 van sin hora.
+- Dos tramos de «no estacionar» que llegan hasta Gonzalo Ramírez van sin `puntos`: se listan, pero no se dibujan.
+
+**`llamadas_orden_2027.csv`** — el orden de desfile de cada noche. **Vacío, sólo con el encabezado: el orden 2027 no se publicó.**
+
+- Columnas: `noche` (1 o 2), `posicion` (desde 1), `conjunto` (el slug de `conjuntos.csv`) y `fuente_url`.
+- Para revisar un borrador sin tocar el repo: `python research/validate.py --orden <archivo>`.
+
+Cuando la IM publique el recorrido y los cortes de 2027: corregir los dos archivos y pasar el recorrido a confirmado (pasos en `CLAUDE.md`, «Modo Llamadas»). El seed no toca un recorrido que ya esté confirmado en la base.
+
+- `validate.py` controla que las esquinas estén numeradas de corrido y dentro de Montevideo, que cada corte tenga un tipo válido y un tramo bien escrito, y que en el orden no se repitan posiciones ni comparsas en una noche y los slugs existan.
+- `python research/validate.py`: OK, sin errores, con las mismas 5 advertencias.

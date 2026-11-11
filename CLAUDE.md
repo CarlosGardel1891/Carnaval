@@ -17,11 +17,11 @@ React 19 + TypeScript (strict) + Vite + Capacitor 8 + Tailwind 4, Supabase (Post
 
 - `app/` — app móvil (Vite + Capacitor). `app/android/` y `app/ios/` son los proyectos nativos generados por Capacitor.
 - `admin/` — panel web de carga de datos (por ahora, login placeholder).
-- `supabase/` — `config.toml`, `migrations/`, `seeds/` (`01_temporadas.sql` y `02_research.sql`, generado: no editar a mano), `local/` (grilla ficticia, fixture ficticio del Concurso y noche real del 28/02/2026; sólo para el Supabase local) y `functions/` (las Edge Functions de avisos: `avisos-del-dia`, `avisos-de-cambios` y lo común en `_shared/`).
-- `packages/shared/` (`@cuerda/shared`) — tipos de la base (`database.types.ts`, generado), fechas (`nocheLogica`, `modoLlamadasActivo`, `calendarDateInMontevideo`), `norm` para matching de nombres y los avisos push sin la base ni Firebase: textos (`noticeTexts.ts`), agrupado (`notices.ts`), envío (`delivery.ts`) y FCM (`fcm.ts`).
+- `supabase/` — `config.toml`, `migrations/`, `seeds/` (`01_temporadas.sql` y `02_research.sql`, generado: no editar a mano), `local/` (grilla ficticia, fixture ficticio del Concurso, orden ficticio de las Llamadas y noche real del 28/02/2026; sólo para el Supabase local) y `functions/` (las Edge Functions de avisos: `avisos-del-dia`, `avisos-de-cambios` y lo común en `_shared/`).
+- `packages/shared/` (`@cuerda/shared`) — tipos de la base (`database.types.ts`, generado), fechas (`nocheLogica`, `modoLlamadasActivo`, `calendarDateInMontevideo`), `norm` para matching de nombres, la hora estimada del Desfile de Llamadas (`llamadas.ts`) y los avisos push sin la base ni Firebase: textos (`noticeTexts.ts`), agrupado (`notices.ts`), envío (`delivery.ts`) y FCM (`fcm.ts`).
 - `packages/db-tests/` (`@cuerda/db-tests`) — tests de integración de la base (RLS, funciones, invariantes del esquema) contra el Supabase local. Corren con `pnpm test:db`, aparte de `pnpm test`.
 - `scripts/` — generadores: `gen_seed.py` (el seed, desde los CSV de `research/`), `gen-norm-marks.mjs` (migración de `public.norm`) y `gen_norm_cases.py` (fixture de casos de `norm`); y `db-grilla.mjs`, que carga la grilla ficticia y la noche real de prueba. `norm` vive en tres lugares (TypeScript, Python y SQL) y tienen que dar lo mismo (decisión 22).
-- `research/` — datos semilla de la Fase 0, más `fixture_2027.csv` (el fixture del Concurso, vacío hasta que se publique). **No editar a mano sin correr `python research/validate.py` después.** Si cambia un CSV, regenerar también el seed (`pnpm gen:seed`) y el fixture de `norm` (`python scripts/gen_norm_cases.py`); el CI falla si quedaron viejos.
+- `research/` — datos semilla de la Fase 0, más `fixture_2027.csv` (el fixture del Concurso, vacío hasta que se publique) y los tres `llamadas_…_2027.csv` (recorrido y cortes estimados, y el orden de desfile, vacío hasta que se publique). **No editar a mano sin correr `python research/validate.py` después.** Si cambia un CSV, regenerar también el seed (`pnpm gen:seed`) y el fixture de `norm` (`python scripts/gen_norm_cases.py`); el CI falla si quedaron viejos.
 - `docs/`, `prompts/` — plan, decisiones y prompts.
 
 ## Comandos
@@ -64,6 +64,7 @@ pnpm db:grilla hoy           # ídem, desde la noche de hoy (o desde una fecha: 
 pnpm db:grilla --quitar      # la borra
 pnpm db:noche-real           # carga la noche real del 2026-02-28 (admite hoy, una fecha y --quitar)
 pnpm db:fixture              # carga el fixture ficticio del Concurso desde el 2027-01-25 (admite hoy, una fecha y --quitar)
+pnpm db:llamadas             # carga el orden de desfile ficticio de las dos noches de Llamadas (admite --quitar)
 pnpm supabase functions serve  # sirve las Edge Functions en http://127.0.0.1:55321/functions/v1/
 pnpm supabase stop
 ```
@@ -79,6 +80,25 @@ Fixture del Concurso (decisión 57): una noche del Concurso es una fila de `etap
 - **De prueba:** `pnpm db:fixture` carga las tres ruedas con conjuntos reales y noches inventadas, todo con `fuente = 'fixture-ficticio'`. Tiene las mismas barreras que la grilla ficticia, la app avisa que es de prueba, y `pnpm test:db` lo quita.
 - **El real, cuando se publique:** completar `research/fixture_2027.csv` con una fila por conjunto y noche (`rueda`: primera, segunda o liguilla; `numero` de etapa; `fecha` de la noche; `hora` de Montevideo en HH:MM; `conjunto`: el slug de `conjuntos.csv`; `fuente_url`). Una hora anterior a las 06:00 es de la madrugada siguiente y sigue siendo de esa noche: una actuación a las 00:15 de la etapa del 25/01 lleva `fecha` 2027-01-25. Después `python research/validate.py` y `pnpm gen:seed`, y aplicar el seed (`pnpm supabase db reset` en local; en remoto, como el resto del seed). Antes, quitar el de prueba con `pnpm db:fixture --quitar`. Para probar un borrador sin tocar el repo: `python research/validate.py --fixture <archivo>`.
 - El seed inserta o actualiza y no borra: si un conjunto sale de una noche, hay que borrar esa actuación a mano. Cambiar una hora en el CSV y volver a aplicar el seed manda el aviso de cambio a quienes siguen al conjunto.
+
+Modo Llamadas (decisiones 62 a 68): todo lo del desfile es dato de la base, por evento (cada noche es un evento de tipo `llamadas`), y la app lo lee con `orden_del_desfile`, `recorrido_del_desfile` y `cortes_del_desfile`. Nada de eso necesita otra versión de la app.
+
+- **Orden de prueba:** `pnpm db:llamadas` carga las 46 comparsas clasificadas en un orden inventado, con `fuente = 'orden-ficticio'`. Mismas barreras que la grilla ficticia, la app avisa que es de prueba, y `pnpm test:db` lo quita.
+- **El orden real, cuando se publique:** completar `research/llamadas_orden_2027.csv` (`noche`: 1 o 2; `posicion`; `conjunto`: el slug; `fuente_url`), después `python research/validate.py` y `pnpm gen:seed`, y aplicar el seed. Antes, `pnpm db:llamadas --quitar`. Para probar un borrador: `python research/validate.py --orden <archivo>`. El seed inserta o actualiza y no borra: si una comparsa sale del orden, hay que borrar su fila de `orden_desfile` a mano.
+- **Recorrido y cortes:** hoy son los **estimados** de `research/llamadas_recorrido_2027.csv` y `research/llamadas_cortes_2027.csv`, y la app lo dice. Cuando la IM publique los oficiales: corregir los dos CSV, regenerar el seed y aplicarlo, y marcar el recorrido como confirmado en cada noche (el seed no toca un recorrido ya confirmado, así que desde ahí manda la base):
+
+```sql
+update public.eventos
+   set recorrido_estado = 'confirmado',
+       recorrido_fuente_url = array['https://…']   -- dónde lo publicó la IM
+ where tipo = 'llamadas' and fecha_inicio >= '2027-02-05';
+```
+
+- **Horario y atraso, a último momento:** `eventos.desfile_inicio` (hora de Montevideo), `desfile_intervalo_min` y `desfile_separacion_m` cambian la regla de esa noche; vacíos, valen las 20:00, 10 minutos y 150 metros. `desfile_atraso_min` corre todas las horas estimadas (por ejemplo, si el desfile arrancó 40 minutos tarde):
+
+```sql
+update public.eventos set desfile_atraso_min = 40 where slug = 'llamadas-noche-1-2027';
+```
 
 Venta de entradas (decisión 60): es un dato de cada evento, `eventos.entradas_url` y `eventos.entradas_texto`, y no sale del seed. Se carga cuando se anuncia la venta, desde el SQL editor del proyecto (o Studio en local); en la Fase 7, desde el panel. La del Concurso va en su evento de tipo `concurso` (`concurso-inicio-2027`):
 
@@ -113,7 +133,7 @@ En el emulador Android, la app reescribe `127.0.0.1`/`localhost` a `10.0.2.2` pa
 
 ## App
 
-- Pantallas en `app/src/features/`: `today/` (pizarrón «Hoy»), `map/` (mapa de la noche), `stages/` (ficha de escenario), `groups/` (lista y ficha de conjuntos), `follow/` (Seguir y la sesión), `push/` (avisos), `calendar/` (calendario de la temporada y ficha de evento), `contest/` (el Concurso Oficial), `location/` («cerca mío») y `season/`. Todo lo que habla con Supabase está en `app/src/lib/api.ts`; todo lo que habla con el plugin de push, en `app/src/lib/push.ts`.
+- Pantallas en `app/src/features/`: `today/` (pizarrón «Hoy»), `map/` (mapa de la noche), `stages/` (ficha de escenario), `groups/` (lista y ficha de conjuntos), `follow/` (Seguir y la sesión), `push/` (avisos), `calendar/` (calendario de la temporada y ficha de evento), `contest/` (el Concurso Oficial), `llamadas/` (el modo Llamadas: orden, por cuadra, recorrido y glosario), `location/` («cerca mío») y `season/`. Todo lo que habla con Supabase está en `app/src/lib/api.ts`; todo lo que habla con el plugin de push, en `app/src/lib/push.ts`.
 - Los tests de pantallas usan `vi.mock('…/lib/api')`, que toma el doble de `app/src/lib/__mocks__/api.ts`. Al agregar una función a `api.ts` hay que sumarla ahí.
 - La sesión es anónima y se crea recién con el primer «Seguir» (decisión 44). Se guarda con `@capacitor/preferences` (`lib/preferencesStorage.ts`). La app tiene que andar igual sin sesión: `fetchFollowed` devuelve vacío y «mis conjuntos» muestra su estado vacío.
 - «Mis conjuntos» es `?mios=1` y lo filtra la base (`p_solo_favoritos`). Esa consulta no se guarda en el teléfono y se vuelve a pedir cuando cambian los seguidos.
@@ -122,13 +142,32 @@ En el emulador Android, la app reescribe `127.0.0.1`/`localhost` a `10.0.2.2` pa
 - El Concurso está en `/calendario/concurso`, antes que `/calendario/:slug` en `routes.tsx`. Un fixture sin etapas no es una lista vacía: es «todavía no se publicó».
 - `/mapa` se carga aparte (`features/map/LazyMapPage.tsx`), así «Hoy» arranca sin MapLibre. Fuera de `features/map/`, nadie importa `MapPage` ni `MontevideoMap`.
 - Las consultas se guardan en el teléfono 24 horas (`app/src/lib/queryCache.ts`, decisión 37). Si cambia la forma de lo que devuelve una consulta, subir `CACHE_VERSION`. Una consulta que lleve la posición del usuario va con `meta: { persist: false }`.
+- Lo del modo Llamadas se guarda una semana (decisión 65): son las consultas cuya clave empieza con `llamadas` (`features/llamadas/useLlamadas.ts`), y `usePrefetchLlamadas` las baja al abrir la app en temporada. Una consulta nueva del modo tiene que llevar esa clave y sumarse ahí.
+- Con el modo Llamadas activo, la app abre en `/llamadas` (`useOpenInLlamadas`, sólo en el arranque en `/`). Toda hora del desfile sale de `@cuerda/shared` (`departureTime`, `passTime`) y se muestra con `EstimatedTime`, que le pone el «≈»: nunca una hora estimada sola (decisión 63).
+- El glosario son textos de la app (`llamadas.glossary` en los locales); la lista y el orden de los términos están en `features/llamadas/glossary.ts`.
+- El mapa del recorrido es `features/map/ParadeMap.tsx`, que se carga aparte (`LazyParadeMap`). Sin key, o si el estilo no carga, dibuja sobre el fondo liso (`mapStyle.ts`).
+- «Ahora» es siempre `useNow()` o `now()` de `lib/clock.ts`, nunca `new Date()`: así vale el reloj simulado.
 - Toda distancia que se muestra pasa por `useDistanceLabel` (`features/location/`): con una ubicación aproximada va redondeada al kilómetro (decisión 42).
 - «App al frente», refresco al volver y botón «atrás» de Android: `app/src/lib/lifecycle.ts` (decisiones 32 y 33).
 - El color de fondo está en tres lugares que tienen que coincidir: `--color-ground` (`app/src/index.css`), `GROUND` (`app/capacitor.config.ts`) y `ground` (`app/android/app/src/main/res/values/colors.xml`, lo que se ve detrás de las barras del sistema; decisión 41).
 
+### Simular la fecha
+
+Para probar lo que depende del día (el modo Llamadas, la noche lógica), el reloj de la app se puede correr (decisión 66). Sólo vale con `pnpm dev` o cuando la app apunta al Supabase local; la app lo avisa en una franja arriba.
+
+- **Navegador:** agregar `?ahora=2027-02-05T21:00` (hora de Montevideo) a la dirección. Queda para toda la pestaña y el reloj sigue corriendo; `?ahora=` vuelve a la hora real.
+- **Emulador de Android:** se fija al compilar, con `VITE_AHORA` (en `app/.env` o en la terminal):
+
+```powershell
+$env:VITE_AHORA = "2027-02-05T21:00"
+pnpm --filter app android:local --target emulator-5554
+```
+
+- **Sin red en el emulador:** `adb shell svc wifi disable` y `adb shell svc data disable` (y `enable` para volver). Abrir la app una vez con red antes, para que baje el modo Llamadas.
+
 ## Variables de entorno
 
-Copiar `app/.env.example` a `app/.env`: `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` (publishable key), `VITE_MAPTILER_KEY` y `VITE_PUSH_ENABLED` (vacío hasta tener Firebase; ver «Avisos push»). Nunca subir `.env` al repo; mantener `.env.example` al día.
+Copiar `app/.env.example` a `app/.env`: `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` (publishable key), `VITE_MAPTILER_KEY`, `VITE_PUSH_ENABLED` (vacío hasta tener Firebase; ver «Avisos push») y `VITE_AHORA` (vacío; ver «Simular la fecha»). Nunca subir `.env` al repo; mantener `.env.example` al día.
 
 La key de MapTiler queda dentro de la app, así que hay que restringirla por origen en MapTiler Cloud (Account → API keys → Allowed HTTP origins). Los orígenes de la app son: `http://localhost:5173` (desarrollo), `https://localhost` (Android) y `capacitor://localhost` (iOS). Sin key, el mapa muestra los marcadores sobre un fondo liso y avisa que falta.
 
@@ -136,9 +175,9 @@ La key de MapTiler queda dentro de la app, así que hay que restringirla por ori
 
 Decisiones 45 a 49. Tres piezas, cada una con sus tests:
 
-- **Quién recibe qué: la base.** Un trigger en `actuaciones` encola los cambios de hora, lugar o estado en `cambios_actuacion` (las altas no encolan). `tomar_avisos_del_dia(noche)` y `tomar_avisos_de_cambios(noche, hasta)` devuelven las filas ya reclamadas en `avisos_enviados`, así el mismo aviso no sale dos veces; `cerrar_avisos(ids)` marca los que salieron. Sólo las ejecuta la service role. Tests: `packages/db-tests/src/avisos.test.ts`.
+- **Quién recibe qué: la base.** Un trigger en `actuaciones` encola los cambios de hora, lugar o estado en `cambios_actuacion` (las altas no encolan). `tomar_avisos_del_dia(noche)` (las actuaciones de la noche y, en las Llamadas, las comparsas seguidas que desfilan; decisión 68) y `tomar_avisos_de_cambios(noche, hasta)` devuelven las filas ya reclamadas en `avisos_enviados`, así el mismo aviso no sale dos veces; `cerrar_avisos(ids)` marca los que salieron. Sólo las ejecuta la service role. Tests: `packages/db-tests/src/avisos.test.ts`.
 - **Textos y envío: `@cuerda/shared`.** `buildDailyNotices` y `buildChangeNotices` arman una notificación por dispositivo, en su idioma y con las horas de Montevideo; los textos están en `noticeTexts.ts` (es y en, mismas claves). `deliver` manda con un `Sender`: `createFcmSender` (FCM HTTP v1) o `dryRunSender`.
-- **Edge Functions: sólo juntan y mandan.** Importan los archivos de `packages/shared/src/` por ruta relativa y con extensión `.ts` (Deno); por eso `notices.ts`, `delivery.ts`, `fcm.ts`, `dates.ts` y `noticeTexts.ts` sólo pueden tener imports relativos con `.ts` (lo controla `denoImports.test.ts`).
+- **Edge Functions: sólo juntan y mandan.** Importan los archivos de `packages/shared/src/` por ruta relativa y con extensión `.ts` (Deno); por eso `notices.ts`, `delivery.ts`, `fcm.ts`, `dates.ts`, `llamadas.ts` y `noticeTexts.ts` sólo pueden tener imports relativos con `.ts` (lo controla `denoImports.test.ts`).
 
 Probarlas en local, sin Firebase (simulacro: devuelven los avisos armados y no mandan nada):
 

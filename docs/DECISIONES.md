@@ -188,7 +188,7 @@ Registro de decisiones del proyecto. Si algo de `docs/PLAN.md` choca con este ar
 
 62. **Navegación del modo Llamadas:**
     - Quinta pestaña, «Llamadas», visible siempre: Hoy · Llamadas · Mapa · Conjuntos · Calendario. Fuera de fecha muestra las dos noches con lo que haya cargado.
-    - Con el modo activo (`modoLlamadasActivo()`, por las fechas de la temporada; decisiones 7 y 16), la app abre en `/llamadas` en vez de en Hoy. Vale sólo para el arranque: tocar «Hoy» lleva al pizarrón y no rebota. Un aviso push que trae su ruta manda sobre esto.
+    - Con el modo activo (`modoLlamadasActivo()`, por las fechas de la temporada; decisiones 7 y 16), la app abre en `/llamadas` en vez de en Hoy. Vale sólo para el arranque en la pantalla principal y sin parámetros: tocar «Hoy» lleva al pizarrón y no rebota, y si la app se abrió en otra pantalla o en una noche en particular no se toca. Un aviso push que trae su ruta manda sobre esto. El modo va por noche lógica: desde las 06:00 del primer día hasta las 06:00 de la mañana siguiente a la última noche.
     - Cuatro vistas con un selector de noche (por defecto la de hoy o la próxima): el orden de desfile, la hora de paso por cuadra, el recorrido en el mapa y el glosario.
 63. **Hora estimada** (completa la decisión 7):
     - La comparsa en la posición `n` sale a `inicio + (n − 1) × intervalo`. Por defecto, 20:00 de Montevideo y 10 minutos.
@@ -196,6 +196,7 @@ Registro de decisiones del proyecto. Si algo de `docs/PLAN.md` choca con este ar
     - El cálculo es una función pura de `@cuerda/shared` (`llamadas.ts`) y se hace en el teléfono: no pide nada a la red.
     - Los tres números (hora de la primera, intervalo y separación) son datos de cada evento; si faltan valen los de la decisión 7. `eventos.desfile_atraso_min` corre todas las horas: es el ajuste manual del panel (Fase 7) y la entrada de «¿por dónde va el desfile?» (v2).
     - **Siempre se muestra como estimación:** con «≈» adelante, el rótulo «Hora estimada» y una línea que explica la regla y que el desfile real suele atrasarse. Lo que cae después de medianoche sigue siendo de esa noche.
+    - La hora de paso por una cuadra es la del medio de la cuadra.
 64. **Datos del desfile, todos en la base y por evento** (cada noche puede tener lo suyo; nada de esto va en el código):
     - **Orden:** `orden_desfile`, que suma `fuente` y `fuente_url`. Sin orden cargado, la app dice que todavía no se publicó y lista las comparsas clasificadas (`conjunto_temporada.en_llamadas`), sin número ni hora.
     - **Recorrido:** `desfile_esquinas`, las esquinas en orden. Dos esquinas seguidas son una cuadra; la línea del recorrido y la distancia de cada esquina a la salida se calculan a partir de ellas. `eventos.recorrido_estado` dice si es estimado o confirmado, con su fuente. `eventos.recorrido` (decisión 26) queda sin uso: una sola fuente para el recorrido.
@@ -203,11 +204,11 @@ Registro de decisiones del proyecto. Si algo de `docs/PLAN.md` choca con este ar
     - **Hasta que la IM publique 2027:** el recorrido y los cortes van como estimados, con las coordenadas de OpenStreetMap y la prensa de 2025 como fuente, en `research/` y por `pnpm gen:seed`. El seed no toca un recorrido que ya esté confirmado.
     - **Orden ficticio, sólo local:** `supabase/local/orden_ficticio.sql`, con `pnpm db:llamadas` y las barreras de la decisión 27. Comparsas reales en un orden inventado, con `fuente = 'orden-ficticio'`; la app avisa que es de prueba.
 65. **El modo Llamadas anda sin señal** (ajusta la decisión 37 sólo para estos datos): en el desfile la red de celular se satura.
-    - Al abrir la app en temporada se descargan los datos de las dos noches (eventos, orden, recorrido, cortes y clasificadas), aunque no se entre a la pestaña.
-    - Esos datos se guardan 7 días, no 24 horas: vale más un orden de ayer, con su «actualizado hace…», que nada.
+    - Al abrir la app en temporada (desde el inicio de la temporada y hasta la última noche del desfile) se descargan los datos de las dos noches (eventos, orden, recorrido, cortes y clasificadas), aunque no se entre a la pestaña. Lo que ya está fresco no se vuelve a pedir.
+    - Esos datos se guardan 7 días, no 24 horas: vale más un orden de ayer, con su «actualizado hace…», que nada. Son las consultas cuya clave empieza con `llamadas`; al abrir, cada consulta guardada vuelve sólo si no pasó su plazo (un día o una semana), y pasada una semana sin abrir la app se descarta todo.
     - Las horas y la cuadra se calculan en el teléfono; el glosario y los textos van en la app.
     - El mapa no depende de la red: si no hay key de MapTiler o el estilo no carga, dibuja el recorrido, las esquinas y los cortes sobre el fondo liso de la decisión 35, y avisa que faltan las calles.
-66. **Simular la fecha, sólo para probar:** `?ahora=AAAA-MM-DDTHH:MM` (hora de Montevideo) fija el reloj de la app, que después sigue corriendo. Vale en `pnpm dev` y cuando la app apunta al Supabase local, que es como se instala en el emulador con `android:local`. Una versión que apunta a un proyecto remoto lo ignora.
+66. **Simular la fecha, sólo para probar:** `?ahora=AAAA-MM-DDTHH:MM` (hora de Montevideo) fija el reloj de la app, que después sigue corriendo. Vale en `pnpm dev` y cuando la app apunta al Supabase local, que es como se instala en el emulador con `android:local`. Una versión que apunta a un proyecto remoto lo ignora. En el emulador no hay dónde escribir una dirección: ahí el reloj se fija al compilar, con la variable `VITE_AHORA`. Mientras el reloj está corrido, la app lo dice en una franja arriba de todo.
 67. **Glosario:** veinte términos del candombe y de las Llamadas, pensados para el turista, en español y en inglés. Son textos de la app (`es.json` y `en.json`), no datos: van dentro de la app y andan sin señal.
-68. **El aviso del día incluye las Llamadas:** si una comparsa que se sigue desfila esa noche, el aviso «tu conjunto actúa hoy» (decisión 47) la suma con su hora estimada de salida, calculada con la misma función que usa la app.
+68. **El aviso del día incluye las Llamadas:** si una comparsa que se sigue desfila esa noche, el aviso «tu conjunto actúa hoy» (decisión 47) la suma con su hora estimada de salida, calculada con la misma función que usa la app. `tomar_avisos_del_dia` devuelve una fila por cada comparsa seguida que está en el orden de un evento de tipo `llamadas` de esa noche. El aviso sigue siendo uno por usuario, conjunto y noche; dice que la hora es estimada y abre el modo Llamadas en esa noche.
 
