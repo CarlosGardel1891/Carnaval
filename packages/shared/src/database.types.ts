@@ -283,6 +283,87 @@ export type Database = {
         }
         Relationships: []
       }
+      cortes_calle: {
+        Row: {
+          descripcion: string
+          desde: string | null
+          estado: Database['public']['Enums']['estado_evento']
+          evento_id: number
+          fuente_url: string[]
+          hasta: string | null
+          id: number
+          slug: string
+          tipo: Database['public']['Enums']['tipo_corte']
+          tramo: unknown
+        }
+        ComputedFields: never
+        Insert: {
+          descripcion: string
+          desde?: string | null
+          estado: Database['public']['Enums']['estado_evento']
+          evento_id: number
+          fuente_url?: string[]
+          hasta?: string | null
+          id?: never
+          slug: string
+          tipo: Database['public']['Enums']['tipo_corte']
+          tramo?: unknown
+        }
+        Update: {
+          descripcion?: string
+          desde?: string | null
+          estado?: Database['public']['Enums']['estado_evento']
+          evento_id?: number
+          fuente_url?: string[]
+          hasta?: string | null
+          id?: never
+          slug?: string
+          tipo?: Database['public']['Enums']['tipo_corte']
+          tramo?: unknown
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'cortes_calle_evento_id_fkey'
+            columns: ['evento_id']
+            isOneToOne: false
+            referencedRelation: 'eventos'
+            referencedColumns: ['id']
+          },
+        ]
+      }
+      desfile_esquinas: {
+        Row: {
+          calle: string
+          cruce: string
+          evento_id: number
+          orden: number
+          punto: unknown
+        }
+        ComputedFields: never
+        Insert: {
+          calle: string
+          cruce: string
+          evento_id: number
+          orden: number
+          punto: unknown
+        }
+        Update: {
+          calle?: string
+          cruce?: string
+          evento_id?: number
+          orden?: number
+          punto?: unknown
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'desfile_esquinas_evento_id_fkey'
+            columns: ['evento_id']
+            isOneToOne: false
+            referencedRelation: 'eventos'
+            referencedColumns: ['id']
+          },
+        ]
+      }
       dispositivos_push: {
         Row: {
           actualizado_en: string
@@ -431,6 +512,10 @@ export type Database = {
       }
       eventos: {
         Row: {
+          desfile_atraso_min: number
+          desfile_inicio: string | null
+          desfile_intervalo_min: number | null
+          desfile_separacion_m: number | null
           entradas_texto: string | null
           entradas_url: string | null
           estado: Database['public']['Enums']['estado_evento']
@@ -442,12 +527,18 @@ export type Database = {
           lugar: string | null
           nombre: string
           recorrido: unknown
+          recorrido_estado: Database['public']['Enums']['estado_evento'] | null
+          recorrido_fuente_url: string[]
           slug: string
           temporada_id: number
           tipo: Database['public']['Enums']['tipo_evento']
         }
         ComputedFields: never
         Insert: {
+          desfile_atraso_min?: number
+          desfile_inicio?: string | null
+          desfile_intervalo_min?: number | null
+          desfile_separacion_m?: number | null
           entradas_texto?: string | null
           entradas_url?: string | null
           estado: Database['public']['Enums']['estado_evento']
@@ -459,11 +550,17 @@ export type Database = {
           lugar?: string | null
           nombre: string
           recorrido?: unknown
+          recorrido_estado?: Database['public']['Enums']['estado_evento'] | null
+          recorrido_fuente_url?: string[]
           slug: string
           temporada_id: number
           tipo: Database['public']['Enums']['tipo_evento']
         }
         Update: {
+          desfile_atraso_min?: number
+          desfile_inicio?: string | null
+          desfile_intervalo_min?: number | null
+          desfile_separacion_m?: number | null
           entradas_texto?: string | null
           entradas_url?: string | null
           estado?: Database['public']['Enums']['estado_evento']
@@ -475,6 +572,8 @@ export type Database = {
           lugar?: string | null
           nombre?: string
           recorrido?: unknown
+          recorrido_estado?: Database['public']['Enums']['estado_evento'] | null
+          recorrido_fuente_url?: string[]
           slug?: string
           temporada_id?: number
           tipo?: Database['public']['Enums']['tipo_evento']
@@ -520,17 +619,23 @@ export type Database = {
         Row: {
           conjunto_id: number
           evento_id: number
+          fuente: string
+          fuente_url: string | null
           posicion: number
         }
         ComputedFields: never
         Insert: {
           conjunto_id: number
           evento_id: number
+          fuente: string
+          fuente_url?: string | null
           posicion: number
         }
         Update: {
           conjunto_id?: number
           evento_id?: number
+          fuente?: string
+          fuente_url?: string | null
           posicion?: number
         }
         Relationships: [
@@ -628,6 +733,20 @@ export type Database = {
         }[]
       }
       cerrar_avisos: { Args: { p_avisos: number[] }; Returns: undefined }
+      cortes_del_desfile: {
+        Args: { p_evento_id: number }
+        Returns: {
+          corte_id: number
+          descripcion: string
+          desde: string
+          estado: Database['public']['Enums']['estado_evento']
+          fuente_url: string[]
+          hasta: string
+          puntos: Json
+          slug: string
+          tipo: Database['public']['Enums']['tipo_corte']
+        }[]
+      }
       es_admin: { Args: Record<PropertyKey, never>; Returns: boolean }
       escenarios_cercanos: {
         Args: { p_lat: number; p_lng: number; p_noche: string; p_radio_m: number }
@@ -666,6 +785,17 @@ export type Database = {
       mis_favoritos: { Args: Record<PropertyKey, never>; Returns: number[] }
       norm: { Args: { t: string }; Returns: string }
       norm_lista: { Args: { t: string[] }; Returns: string[] }
+      orden_del_desfile: {
+        Args: { p_evento_id: number }
+        Returns: {
+          conjunto_barrio: string
+          conjunto_id: number
+          conjunto_nombre: string
+          conjunto_slug: string
+          fuente: string
+          posicion: number
+        }[]
+      }
       proximas_de_conjunto: {
         Args: { p_conjunto_id: number; p_noche: string }
         Returns: {
@@ -686,6 +816,17 @@ export type Database = {
           lng: number
           noche: string
           precio_texto: string
+        }[]
+      }
+      recorrido_del_desfile: {
+        Args: { p_evento_id: number }
+        Returns: {
+          calle: string
+          cruce: string
+          distancia_m: number
+          lat: number
+          lng: number
+          orden: number
         }[]
       }
       registrar_dispositivo_push: {
@@ -745,6 +886,7 @@ export type Database = {
       plataforma_push: 'ios' | 'android'
       rueda_concurso: 'primera' | 'segunda' | 'liguilla'
       tipo_aviso: 'hoy' | 'cambio'
+      tipo_corte: 'corte' | 'estacionamiento'
       tipo_escenario:
         'teatro_verano' | 'privado' | 'popular' | 'movil' | 'gratuito' | 'barrio_a_barrio'
       tipo_evento: 'inaugural' | 'samba' | 'llamadas' | 'corso' | 'admision' | 'concurso' | 'otro'
@@ -874,6 +1016,7 @@ export const Constants = {
       plataforma_push: ['ios', 'android'],
       rueda_concurso: ['primera', 'segunda', 'liguilla'],
       tipo_aviso: ['hoy', 'cambio'],
+      tipo_corte: ['corte', 'estacionamiento'],
       tipo_escenario: [
         'teatro_verano',
         'privado',

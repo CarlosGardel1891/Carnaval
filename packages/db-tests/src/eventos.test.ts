@@ -82,9 +82,9 @@ describe('eventos y orden de desfile: un admin, con su propio JWT', () => {
       await admin()
         .from('orden_desfile')
         .insert([
-          { evento_id: noche1, conjunto_id: uno, posicion: 1 },
-          { evento_id: noche1, conjunto_id: dos, posicion: 2 },
-          { evento_id: noche2, conjunto_id: tres, posicion: 1 },
+          { evento_id: noche1, conjunto_id: uno, posicion: 1, fuente: 'test' },
+          { evento_id: noche1, conjunto_id: dos, posicion: 2, fuente: 'test' },
+          { evento_id: noche2, conjunto_id: tres, posicion: 1, fuente: 'test' },
         ])
         .select(),
     )
@@ -98,15 +98,15 @@ describe('eventos y orden de desfile: un admin, con su propio JWT', () => {
   it('no admite dos conjuntos en la misma posición ni un conjunto dos veces la misma noche', async () => {
     const posicion = await admin()
       .from('orden_desfile')
-      .insert({ evento_id: noche1, conjunto_id: tres, posicion: 2 })
+      .insert({ evento_id: noche1, conjunto_id: tres, posicion: 2, fuente: 'test' })
     expect(posicion.error?.code).toBe('23505')
     const conjunto = await admin()
       .from('orden_desfile')
-      .insert({ evento_id: noche1, conjunto_id: uno, posicion: 3 })
+      .insert({ evento_id: noche1, conjunto_id: uno, posicion: 3, fuente: 'test' })
     expect(conjunto.error?.code).toBe('23505')
     const cero = await admin()
       .from('orden_desfile')
-      .insert({ evento_id: noche1, conjunto_id: tres, posicion: 0 })
+      .insert({ evento_id: noche1, conjunto_id: tres, posicion: 0, fuente: 'test' })
     expect(cero.error?.code).toBe('23514')
   })
 
@@ -116,8 +116,8 @@ describe('eventos y orden de desfile: un admin, con su propio JWT', () => {
         .from('orden_desfile')
         .upsert(
           [
-            { evento_id: noche1, conjunto_id: uno, posicion: 2 },
-            { evento_id: noche1, conjunto_id: dos, posicion: 1 },
+            { evento_id: noche1, conjunto_id: uno, posicion: 2, fuente: 'test' },
+            { evento_id: noche1, conjunto_id: dos, posicion: 1, fuente: 'test' },
           ],
           { onConflict: 'evento_id,conjunto_id' },
         )
@@ -215,7 +215,7 @@ describe('eventos y orden de desfile: RLS', () => {
     expectRechazo(
       await db
         .from('orden_desfile')
-        .insert({ evento_id: noche2, conjunto_id: uno, posicion: 9 })
+        .insert({ evento_id: noche2, conjunto_id: uno, posicion: 9, fuente: 'test' })
         .select(),
     )
     expectRechazo(
