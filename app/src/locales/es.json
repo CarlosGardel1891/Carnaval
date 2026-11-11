@@ -68,6 +68,23 @@
     "preseason": "Pretemporada",
     "openNight": "Ver la noche del {{date}}"
   },
+  "event": {
+    "title": "Evento",
+    "loading": "Cargando el evento…",
+    "error": "No pudimos cargar el evento.",
+    "notFound": "No encontramos ese evento.",
+    "when": "Cuándo",
+    "range": "Del {{start}} al {{end}}",
+    "approxRange": "Aprox. del {{start}} al {{end}}",
+    "approx": "aprox. {{date}}",
+    "estimatedHint": "Es una fecha estimada según años anteriores: todavía no es oficial.",
+    "where": "Dónde",
+    "noPlace": "Todavía no está cargado el lugar.",
+    "seeNight": "Ver el pizarrón de esa noche",
+    "seeTonight": "Ver el pizarrón de esta noche",
+    "source": "Fuente",
+    "noSource": "No hay una fuente cargada para este evento."
+  },
   "follow": {
     "follow": "Seguir",
     "following": "Siguiendo",

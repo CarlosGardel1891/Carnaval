@@ -1,6 +1,7 @@
 import { Navigate, type RouteObject } from 'react-router'
 import { AppLayout } from './components/AppLayout'
 import { CalendarPage } from './features/calendar/CalendarPage'
+import { EventPage } from './features/calendar/EventPage'
 import { GroupPage } from './features/groups/GroupPage'
 import { GroupsPage } from './features/groups/GroupsPage'
 import { LazyMapPage } from './features/map/LazyMapPage'
@@ -22,6 +23,7 @@ export const routes: RouteObject[] = [
       { path: 'conjuntos', element: <GroupsPage /> },
       { path: 'conjuntos/:slug', element: <GroupPage /> },
       { path: 'calendario', element: <CalendarPage /> },
+      { path: 'calendario/:slug', element: <EventPage /> },
       { path: '*', element: <Navigate to="/" replace /> },
     ],
   },

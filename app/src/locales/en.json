@@ -68,6 +68,23 @@
     "preseason": "Pre-season",
     "openNight": "See the night of {{date}}"
   },
+  "event": {
+    "title": "Event",
+    "loading": "Loading the event…",
+    "error": "We couldn't load the event.",
+    "notFound": "We couldn't find that event.",
+    "when": "When",
+    "range": "{{start}} to {{end}}",
+    "approxRange": "Around {{start}} to {{end}}",
+    "approx": "Around {{date}}",
+    "estimatedHint": "It's an estimated date based on previous years: it isn't official yet.",
+    "where": "Where",
+    "noPlace": "The location hasn't been added yet.",
+    "seeNight": "See that night's board",
+    "seeTonight": "See tonight's board",
+    "source": "Source",
+    "noSource": "No source has been added for this event."
+  },
   "follow": {
     "follow": "Follow",
     "following": "Following",

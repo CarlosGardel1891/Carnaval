@@ -226,6 +226,17 @@ export async function fetchEvents(seasonId: number): Promise<CalendarEvent[]> {
   return data
 }
 
+/** Un evento por su slug, o null si no existe. */
+export async function fetchEvent(slug: string): Promise<CalendarEvent | null> {
+  const { data, error } = await supabase
+    .from('eventos')
+    .select(EVENT_COLUMNS)
+    .eq('slug', slug)
+    .maybeSingle()
+  if (error) throw error
+  return data
+}
+
 // ---------------------------------------------------------------- sesión y Seguir
 
 /** El usuario de la sesión guardada en el teléfono, o null si no hay (o ya no sirve). */
