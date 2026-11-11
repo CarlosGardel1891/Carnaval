@@ -106,3 +106,26 @@ Registro de decisiones del proyecto. Si algo de `docs/PLAN.md` choca con este ar
     - La posición es «aproximada» si el usuario dio sólo ese permiso o si el teléfono la informa con un margen de más de 1 km (`APPROXIMATE_FROM_M` en `app/src/lib/geo.ts`); esto último cubre iOS con «ubicación exacta» apagada y un navegador sin GPS.
     - Con una posición aproximada «cerca mío» anda igual, pero las distancias van redondeadas al kilómetro («menos de 1 km», «aprox. 3 km») y un aviso dice que el orden entre escenarios cercanos puede no ser exacto y cómo activar la precisa. La app no vuelve a pedir el permiso por su cuenta.
     - Todo lo que muestra una distancia pasa por `useDistanceLabel` (`app/src/features/location/`).
+
+## 2026-11-11 · Tomadas al arrancar la Fase 4 (Conjuntos, Seguir y push)
+
+43. **Pestaña Conjuntos:** lista los conjuntos con fila en la temporada vigente (`conjunto_temporada`). Los demás del catálogo no se listan, pero el buscador los encuentra y su ficha anda: hace falta para llegar desde el pizarrón. La búsqueda es por «contiene» sobre nombre y alias normalizados con `norm`, en la app y sin tolerancia a errores de tipeo (decisión 5).
+44. **Sesión anónima:** se crea recién con el primer «Seguir», no al abrir la app, para no gastar altas contra el límite por IP (decisión 23). Se guarda con `@capacitor/preferences` como storage de supabase-js. Si se pierde (reinstalación, datos borrados, sesión inválida), la app queda como sin sesión y el próximo «Seguir» crea un usuario nuevo; los favoritos del anterior no se recuperan. Es el costo de no pedir registro.
+45. **Permiso de notificaciones:** nunca al abrir. Después del primer «Seguir» exitoso, en un dispositivo, una tarjeta de la app pregunta si se quieren avisos; sólo al aceptar se muestra el diálogo del sistema (en Android 13 o más, `POST_NOTIFICATIONS`). Si se niega, la app no lo vuelve a pedir por su cuenta: la ficha explica cómo prender los avisos desde los ajustes del teléfono. Seguir y «mis conjuntos» andan igual.
+46. **Push por FCM en Android y en iOS** (ajusta el paso 5 de la Fase 4 de `docs/PLAN.md`, que decía «APNs y FCM»): plugin `@capacitor-firebase/messaging`, token de FCM en las dos plataformas y un solo camino de envío (FCM HTTP v1) desde las Edge Functions. En iOS, APNs queda por debajo de Firebase: hay que subir la key de APNs a Firebase. La cuenta de servicio va como secret de Supabase (`FIREBASE_SERVICE_ACCOUNT`); `google-services.json` y `GoogleService-Info.plist` no van al repo. La app sólo carga el plugin con `VITE_PUSH_ENABLED=1`: sin `google-services.json`, Firebase no arranca en Android. La app no se registra en Firebase hasta confirmar el identificador (decisión 13).
+47. **Aviso «tu conjunto actúa hoy»:**
+    - Uno por dispositivo y por pasada, agrupado. Un conjunto en un escenario: hora y lugar. Un conjunto en varios escenarios esa noche: un solo aviso con todas sus horas. Varios conjuntos: un resumen. Las suspendidas no entran.
+    - Primera pasada a las 12:00 de Montevideo y repasos cada 30 minutos hasta las 19:00. Los repasos sólo mandan lo que todavía no se avisó: la grilla se puede cargar hasta las 18:00 (Fase 9) y alguien puede seguir un conjunto a la tarde.
+    - La hora la decide la Edge Function con `America/Montevideo`, no la programación: el cron corre en UTC y sólo la despierta.
+    - Al tocarlo abre la ficha del conjunto o, si son varios, el pizarrón de esa noche con «mis conjuntos».
+48. **Avisos de cambio y suspensión** (ajusta el paso 7 de la Fase 4 de `docs/PLAN.md`, que decía «disparada al cambiar `actuaciones.estado`»):
+    - Un trigger en `actuaciones` encola cada cambio de `estado`, `inicio`, `escenario_id` o `direccion_texto` con los valores anteriores. No llama a nada. Las altas no encolan: importar una grilla nueva no avisa.
+    - La Edge Function vacía la cola con una ventana de calma de 60 segundos y manda un aviso por dispositivo con todo lo suyo, no uno por fila. Si una actuación cambió varias veces, cuenta cómo quedó; si quedó igual que antes, no se avisa.
+    - Se avisa de la noche de hoy y de las futuras (con el día en el texto si no es hoy); las pasadas se descartan. Una suspendida que vuelve a estar programada se avisa como cambio.
+    - En el proyecto remoto la despierta `pg_cron` cada minuto; el botón «suspender noche» de la Fase 7 puede llamarla directo.
+49. **Avisos, reglas comunes:**
+    - Quién recibe qué lo deciden funciones SQL que sólo ejecuta la service role; el agrupado y los textos, un módulo puro de `@cuerda/shared`; las Edge Functions sólo juntan y mandan. Sin el secret de Firebase corren en simulacro: devuelven los avisos armados y no mandan nada.
+    - Sin duplicados: cada aviso se reclama en `avisos_enviados` (clave única por usuario y aviso) antes de mandarlo. Si el envío falla por un error transitorio se libera para la pasada siguiente, hasta tres intentos.
+    - Textos en español o inglés según `dispositivos_push.idioma`, con las horas en Montevideo.
+    - Un token que FCM rechaza como inexistente o inválido se borra de `dispositivos_push`; con un error transitorio no se borra nada.
+    - Con la app abierta no se muestra notificación del sistema: se refresca la grilla.
