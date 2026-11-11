@@ -208,10 +208,12 @@ export type CalendarEvent = Pick<
   | 'estado'
   | 'info'
   | 'fuente_url'
+  | 'entradas_url'
+  | 'entradas_texto'
 >
 
 const EVENT_COLUMNS =
-  'id, slug, tipo, nombre, fecha_inicio, fecha_fin, lugar, estado, info, fuente_url'
+  'id, slug, tipo, nombre, fecha_inicio, fecha_fin, lugar, estado, info, fuente_url, entradas_url, entradas_texto'
 
 /** Los eventos de una temporada, por fecha (pretemporada incluida). */
 export async function fetchEvents(seasonId: number): Promise<CalendarEvent[]> {

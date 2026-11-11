@@ -85,6 +85,11 @@
     "source": "Source",
     "noSource": "No source has been added for this event."
   },
+  "tickets": {
+    "title": "Tickets",
+    "buy": "Go to the official ticket sale",
+    "note": "Carnavalero doesn't sell tickets: this takes you to the official seller's site."
+  },
   "contest": {
     "title": "Official Contest",
     "venue": "Teatro de Verano",

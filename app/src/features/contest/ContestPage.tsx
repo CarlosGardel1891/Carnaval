@@ -3,9 +3,10 @@ import { useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { Link, useLocation, useNavigate } from 'react-router'
 import { Button } from '../../components/Button'
-import { fetchEvents } from '../../lib/api'
+import { fetchEvents, type CalendarEvent } from '../../lib/api'
 import { formatIsoDate, formatNight, formatTime } from '../../lib/format'
 import { useLocale } from '../../lib/useLocale'
+import { hasTickets, Tickets } from '../calendar/Tickets'
 import { groupPath } from '../groups/groupPath'
 import { contestRounds, isSampleFixture, type ContestNight } from './contest'
 import { useContestFixture } from './useContestFixture'
@@ -86,24 +87,35 @@ function NightCard({ night, today }: { night: ContestNight; today: string }) {
   )
 }
 
-/** Cuándo arranca el Concurso según el calendario, para cuando el fixture no está publicado. */
-function ContestStart({ seasonId }: { seasonId: number }) {
-  const { t } = useTranslation()
-  const locale = useLocale()
-  // La misma consulta que el calendario: viniendo de ahí, ya está en la caché.
+/**
+ * Los eventos del Concurso en el calendario de la temporada, el primero adelante (si hay una
+ * fecha confirmada y otra estimada el mismo día, la confirmada). Es la misma consulta que el
+ * calendario: viniendo de ahí, ya está en la caché.
+ */
+function useContestEvents(seasonId: number | undefined) {
   const events = useQuery({
     queryKey: ['eventos', seasonId],
-    queryFn: () => fetchEvents(seasonId),
+    queryFn: () => fetchEvents(seasonId as number),
+    enabled: seasonId !== undefined,
     staleTime: 60 * 60_000,
   })
-  // El primer día del Concurso; si hay una fecha confirmada y otra estimada, la confirmada.
-  const first = (events.data ?? [])
-    .filter((event) => event.tipo === 'concurso')
-    .sort(
-      (a, b) =>
-        a.fecha_inicio.localeCompare(b.fecha_inicio) ||
-        Number(a.estado === 'estimado') - Number(b.estado === 'estimado'),
-    )[0]
+  return useMemo(
+    () =>
+      (events.data ?? [])
+        .filter((event) => event.tipo === 'concurso')
+        .sort(
+          (a, b) =>
+            a.fecha_inicio.localeCompare(b.fecha_inicio) ||
+            Number(a.estado === 'estimado') - Number(b.estado === 'estimado'),
+        ),
+    [events.data],
+  )
+}
+
+/** Cuándo arranca el Concurso según el calendario, para cuando el fixture no está publicado. */
+function ContestStart({ first }: { first: CalendarEvent | undefined }) {
+  const { t } = useTranslation()
+  const locale = useLocale()
   if (!first) return null
   return (
     <p className="text-soft text-lg">
@@ -125,6 +137,9 @@ export function ContestPage() {
   const failed = season.isError || (fixture.isError && !rows)
   const retry = () => void (season.isError ? season.refetch() : fixture.refetch())
   const noSeason = !season.isPending && !season.isError && !season.data
+  const contestEvents = useContestEvents(season.data?.id)
+  // Las entradas del Concurso son las de su evento en el calendario (decisión 60).
+  const withTickets = contestEvents.find(hasTickets)
 
   const back = () => void (location.key === 'default' ? navigate('/calendario') : navigate(-1))
 
@@ -139,6 +154,8 @@ export function ContestPage() {
           {season.data ? t('contest.subtitle', { year: season.data.anio }) : t('contest.venue')}
         </p>
       </header>
+
+      {withTickets && <Tickets event={withTickets} />}
 
       {failed ? (
         <div role="alert" className="space-y-3">
@@ -156,7 +173,7 @@ export function ContestPage() {
             {t('contest.notPublished', { year: season.data.anio })}
           </p>
           <p className="text-soft">{t('contest.notPublishedHint')}</p>
-          <ContestStart seasonId={season.data.id} />
+          <ContestStart first={contestEvents[0]} />
         </div>
       ) : (
         <>

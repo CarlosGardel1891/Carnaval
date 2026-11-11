@@ -1,6 +1,8 @@
+import { readFileSync } from 'node:fs'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { anonClient, serviceClient } from './clients'
 import { admin, expectRechazo, intrusos, lectores, limpiar, ok } from './helpers'
+import { repoPath } from './research'
 
 let temporadaId: number
 let uno: number
@@ -231,6 +233,66 @@ describe('eventos y orden de desfile: RLS', () => {
       [2, uno],
     ])
     expect(await ordenDe(noche2)).toEqual([[1, tres]])
+  })
+})
+
+describe('eventos: venta de entradas', () => {
+  const entradas = async () =>
+    ok(
+      await anonClient()
+        .from('eventos')
+        .select('entradas_url, entradas_texto')
+        .eq('id', noche2)
+        .single(),
+    )
+
+  it('un evento nace sin venta cargada', async () => {
+    expect(await entradas()).toEqual({ entradas_url: null, entradas_texto: null })
+  })
+
+  it('un admin la carga cuando se anuncia, y la lee cualquiera', async () => {
+    ok(
+      await admin()
+        .from('eventos')
+        .update({
+          entradas_url: 'https://example.org/entradas',
+          entradas_texto: 'En la boletería, desde tres días antes.',
+        })
+        .eq('id', noche2)
+        .select('id'),
+    )
+    expect(await entradas()).toEqual({
+      entradas_url: 'https://example.org/entradas',
+      entradas_texto: 'En la boletería, desde tres días antes.',
+    })
+  })
+
+  it.each(intrusos)('%s no puede cambiarla', async (_quien, cliente) => {
+    expectRechazo(
+      await cliente()
+        .from('eventos')
+        .update({ entradas_url: 'https://example.org/trucha' })
+        .eq('id', noche2)
+        .select(),
+    )
+    expect((await entradas()).entradas_url).toBe('https://example.org/entradas')
+  })
+
+  it('la dirección tiene que ser una dirección web, y el texto no puede quedar vacío', async () => {
+    for (const cambio of [
+      { entradas_url: 'abitab' },
+      { entradas_url: 'javascript:alert(1)' },
+      { entradas_url: '' },
+      { entradas_texto: '' },
+    ]) {
+      const { error } = await admin().from('eventos').update(cambio).eq('id', noche2)
+      expect(error?.code).toBe('23514')
+    }
+  })
+
+  it('el seed no trae venta de entradas: no pisa la que se cargue después', () => {
+    const seed = readFileSync(repoPath('supabase', 'seeds', '02_research.sql'), 'utf8')
+    expect(seed).not.toMatch(/entradas_/)
   })
 })
 

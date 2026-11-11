@@ -80,6 +80,17 @@ Fixture del Concurso (decisión 57): una noche del Concurso es una fila de `etap
 - **El real, cuando se publique:** completar `research/fixture_2027.csv` con una fila por conjunto y noche (`rueda`: primera, segunda o liguilla; `numero` de etapa; `fecha` de la noche; `hora` de Montevideo en HH:MM; `conjunto`: el slug de `conjuntos.csv`; `fuente_url`). Una hora anterior a las 06:00 es de la madrugada siguiente y sigue siendo de esa noche: una actuación a las 00:15 de la etapa del 25/01 lleva `fecha` 2027-01-25. Después `python research/validate.py` y `pnpm gen:seed`, y aplicar el seed (`pnpm supabase db reset` en local; en remoto, como el resto del seed). Antes, quitar el de prueba con `pnpm db:fixture --quitar`. Para probar un borrador sin tocar el repo: `python research/validate.py --fixture <archivo>`.
 - El seed inserta o actualiza y no borra: si un conjunto sale de una noche, hay que borrar esa actuación a mano. Cambiar una hora en el CSV y volver a aplicar el seed manda el aviso de cambio a quienes siguen al conjunto.
 
+Venta de entradas (decisión 60): es un dato de cada evento, `eventos.entradas_url` y `eventos.entradas_texto`, y no sale del seed. Se carga cuando se anuncia la venta, desde el SQL editor del proyecto (o Studio en local); en la Fase 7, desde el panel. La del Concurso va en su evento de tipo `concurso` (`concurso-inicio-2027`):
+
+```sql
+update public.eventos
+   set entradas_url = 'https://…',                          -- la dirección de la venta oficial
+       entradas_texto = 'Dónde y desde cuándo se venden.'   -- opcional
+ where slug = 'concurso-inicio-2027';
+```
+
+Mientras las dos columnas estén vacías, la app no muestra nada de entradas. La dirección tiene que empezar con `http://` o `https://`. No cargar la venta de un año anterior como si fuera la de éste.
+
 Noche real (decisión 39): la cartelera publicada del sábado 28/02/2026, para probar con una noche de tamaño real (`/?noche=2026-02-28`). Va con `fuente = 'cartelera-2026-02-28'`, sólo en el Supabase local. Cada línea se resuelve por `norm` contra los nombres y alias del seed; lo que no coincide no se carga y `pnpm db:noche-real` lo lista. Los escenarios reales no tienen coordenadas: no aparecen en el mapa ni en «cerca mío».
 
 Supabase remoto (São Paulo): `pnpm supabase login`, `pnpm supabase link --project-ref <ref>`, `pnpm supabase db push`. El seed no se aplica solo en remoto: correr `supabase/seeds/01_temporadas.sql` y después `supabase/seeds/02_research.sql` con el SQL editor o con `psql` (o `pnpm supabase db push --include-seed`, que corre los seeds de `config.toml`). `supabase/local/` nunca se corre en remoto.

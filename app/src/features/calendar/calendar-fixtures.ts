@@ -23,6 +23,8 @@ export function makeEvent(
     estado: 'confirmado',
     info: null,
     fuente_url: [],
+    entradas_url: null,
+    entradas_texto: null,
     ...overrides,
   }
 }

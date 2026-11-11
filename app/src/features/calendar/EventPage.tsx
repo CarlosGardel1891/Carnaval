@@ -10,6 +10,7 @@ import { useNow } from '../../lib/useNow'
 import { useCurrentSeason } from '../season/useCurrentSeason'
 import { CONTEST_PATH } from '../contest/contest'
 import { isMultiDay, isPreseason } from './calendar'
+import { Tickets } from './Tickets'
 
 const action =
   'bg-accent text-accent-ink inline-flex min-h-12 items-center rounded-xl px-5 font-semibold'
@@ -153,6 +154,8 @@ export function EventPage() {
           </Link>
         )}
       </p>
+
+      <Tickets event={event} />
 
       <section aria-labelledby="fuente" className="space-y-2">
         <h2 id="fuente" className="text-xl font-bold">

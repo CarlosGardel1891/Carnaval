@@ -169,7 +169,17 @@ Registro de decisiones del proyecto. Si algo de `docs/PLAN.md` choca con este ar
     - **Sin publicar:** si la temporada no tiene etapas, la pantalla dice que el fixture todavía no se publicó; no muestra una lista vacía. Si el calendario tiene el inicio del Concurso, lo dice (como estimado, si lo es).
     - **Ficticio, sólo local:** `supabase/local/fixture_ficticio.sql`, con `pnpm db:fixture` y las mismas barreras que la grilla ficticia (decisión 27). Usa el Teatro de Verano real y conjuntos reales, todo con `fuente = 'fixture-ficticio'`; con ese fixture cargado la pantalla avisa que es de prueba.
     - **El real:** cuando se publique, va en `research/fixture_2027.csv` (una fila por conjunto y noche: rueda, número de etapa, fecha, hora de Montevideo, slug del conjunto y fuente) y entra por `pnpm gen:seed`, validado por `research/validate.py`. Una hora anterior a las 06:00 es de la madrugada siguiente y sigue siendo la noche de esa etapa. Como el resto del seed, inserta o actualiza y no borra; volver a correrlo sin cambios no toca nada, y un cambio de hora encola su aviso (decisión 48). No se carga encima del fixture ficticio. En la Fase 7 lo reemplaza el panel de carga.
-    - **Entradas:** `docs/PLAN.md` pide un enlace a la venta oficial de entradas. No se puso: no está relevado cuál es el sitio oficial para 2027, y no se inventa.
+    - **Entradas:** el enlace a la venta oficial que pide `docs/PLAN.md` es un dato de la base, no código: decisión 60.
 58. **Resultados e historial, preparados y sin construir** (decisión 53): en esta fase no se crean tablas. Cuando lleguen, los resultados cuelgan del conjunto y de la rueda o la etapa de una temporada, y el historial son temporadas anteriores cargadas en `temporadas` con sus etapas y sus resultados; por eso nada del Concurso da por hecho que hay una sola temporada.
 59. **«Agregar al calendario del teléfono» queda para después** (paso 3 de la Fase 5 de `docs/PLAN.md`): no hay plugin oficial de Capacitor, suma un permiso a la primera versión y en iOS no se puede probar sin Mac. Se retoma con el fixture real publicado.
+
+## 2026-11-11 · Tomadas al cerrar la Fase 5
+
+60. **La venta de entradas es un dato de la base:** `eventos.entradas_url` (la dirección de la venta oficial) y `eventos.entradas_texto` (dónde y desde cuándo se venden, en pocas palabras).
+    - **Por qué en la base:** la venta del Concurso se anuncia días antes de que empiece, después del envío a las tiendas del 5/1. Tiene que poder cargarse sin sacar otra versión de la app.
+    - **Por evento y para el Concurso:** cada evento tiene la suya. La del Concurso es la de su evento de tipo `concurso` en el calendario de la temporada; la pantalla del Concurso la muestra arriba, con o sin fixture.
+    - **Vacío no se muestra:** mientras no haya nada cargado, ni la ficha ni el Concurso dicen nada de entradas. Con sólo el texto, se muestra el texto sin botón.
+    - **La app no vende:** el botón lleva al sitio de la venta oficial, y se dice.
+    - **No sale del seed:** no está en los CSV de `research/` y `pnpm gen:seed` no la toca, así que volver a aplicar el seed no la pisa.
+    - **Referencia de 2026, que no es dato de 2027:** se vendió por Abitab (web y locales) y en la boletería del Teatro de Verano, desde tres días antes del Concurso. No se carga para 2027 hasta que se anuncie.
 

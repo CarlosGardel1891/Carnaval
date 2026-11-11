@@ -431,6 +431,8 @@ export type Database = {
       }
       eventos: {
         Row: {
+          entradas_texto: string | null
+          entradas_url: string | null
           estado: Database['public']['Enums']['estado_evento']
           fecha_fin: string
           fecha_inicio: string
@@ -446,6 +448,8 @@ export type Database = {
         }
         ComputedFields: never
         Insert: {
+          entradas_texto?: string | null
+          entradas_url?: string | null
           estado: Database['public']['Enums']['estado_evento']
           fecha_fin: string
           fecha_inicio: string
@@ -460,6 +464,8 @@ export type Database = {
           tipo: Database['public']['Enums']['tipo_evento']
         }
         Update: {
+          entradas_texto?: string | null
+          entradas_url?: string | null
           estado?: Database['public']['Enums']['estado_evento']
           fecha_fin?: string
           fecha_inicio?: string

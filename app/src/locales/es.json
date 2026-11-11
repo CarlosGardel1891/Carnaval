@@ -85,6 +85,11 @@
     "source": "Fuente",
     "noSource": "No hay una fuente cargada para este evento."
   },
+  "tickets": {
+    "title": "Entradas",
+    "buy": "Ir a la venta oficial",
+    "note": "Carnavalero no vende entradas: te lleva al sitio de la venta oficial."
+  },
   "contest": {
     "title": "Concurso Oficial",
     "venue": "Teatro de Verano",
