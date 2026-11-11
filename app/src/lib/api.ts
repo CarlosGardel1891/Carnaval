@@ -189,6 +189,80 @@ export async function fetchUpcomingActs(groupId: number, noche: string): Promise
   return data
 }
 
+// ---------------------------------------------------------------- sesión y Seguir
+
+/** El usuario de la sesión guardada en el teléfono, o null si no hay (o ya no sirve). */
+export async function getUserId(): Promise<string | null> {
+  const { data, error } = await supabase.auth.getSession()
+  if (error) return null
+  return data.session?.user.id ?? null
+}
+
+/** Avisa cada vez que cambia el usuario de la sesión. Devuelve cómo dejar de escuchar. */
+export function onUserChange(listener: (userId: string | null) => void): () => void {
+  const { data } = supabase.auth.onAuthStateChange((_event, session) => {
+    listener(session?.user.id ?? null)
+  })
+  return () => data.subscription.unsubscribe()
+}
+
+/** Con la app al frente la sesión se renueva sola; en segundo plano, no. */
+export function setAuthActive(active: boolean): void {
+  void (active ? supabase.auth.startAutoRefresh() : supabase.auth.stopAutoRefresh())
+}
+
+/** La sesión anónima se crea recién acá, con el primer «Seguir» (decisión 44). */
+async function ensureSession(): Promise<void> {
+  if (await getUserId()) return
+  const { error } = await supabase.auth.signInAnonymously()
+  if (error) throw error
+}
+
+/** Si el alta anónima chocó con el límite por IP de Supabase (decisión 23). */
+export function isRateLimited(error: unknown): boolean {
+  return typeof error === 'object' && error !== null && 'status' in error && error.status === 429
+}
+
+/** Ids de los conjuntos que sigue el usuario de la sesión. Sin sesión, ninguno. */
+export async function fetchFollowed(): Promise<number[]> {
+  if (!(await getUserId())) return []
+  const { data, error } = await supabase.from('favoritos').select('conjunto_id')
+  if (error) throw error
+  return data.map((row) => row.conjunto_id)
+}
+
+/**
+ * Errores que dicen que la sesión guardada ya no sirve del lado de la base: el usuario
+ * anónimo se borró (23503, la FK a `auth.users`) o el token no se acepta.
+ */
+const SESSION_GONE = new Set(['23503', 'PGRST301', 'PGRST303'])
+const ALREADY_FOLLOWED = '23505'
+
+/**
+ * Sigue un conjunto. Si no hay sesión, crea la anónima; si la que había ya no sirve, la
+ * descarta, crea otra y prueba una vez más.
+ */
+export async function followGroup(groupId: number): Promise<void> {
+  const insert = () => supabase.from('favoritos').insert({ conjunto_id: groupId })
+  await ensureSession()
+  let { error } = await insert()
+  if (error && SESSION_GONE.has(error.code)) {
+    await supabase.auth.signOut({ scope: 'local' })
+    await ensureSession()
+    ;({ error } = await insert())
+  }
+  if (error && error.code !== ALREADY_FOLLOWED) throw error
+}
+
+/** Deja de seguir un conjunto. Sin sesión no hay nada que borrar. */
+export async function unfollowGroup(groupId: number): Promise<void> {
+  if (!(await getUserId())) return
+  const { error } = await supabase.from('favoritos').delete().eq('conjunto_id', groupId)
+  if (error) throw error
+}
+
+// ---------------------------------------------------------------- escenarios
+
 /** Un escenario por su slug, o null si no existe. */
 export async function fetchStage(slug: string): Promise<Stage | null> {
   const { data, error } = await supabase

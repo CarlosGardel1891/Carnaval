@@ -8,6 +8,7 @@ import { formatNight, formatTime } from '../../lib/format'
 import { joinParts } from '../../lib/labels'
 import { useLocale } from '../../lib/useLocale'
 import { useNow } from '../../lib/useNow'
+import { FollowButton } from '../follow/FollowButton'
 import { useCurrentSeason } from '../season/useCurrentSeason'
 import { GroupBadges } from './GroupBadges'
 import { byNight, useGroup, useGroupFromList, useUpcomingActs } from './useGroup'
@@ -130,6 +131,8 @@ export function GroupPage() {
           <GroupBadges season={participation} />
         </div>
       </header>
+
+      <FollowButton groupId={group.id} groupName={group.nombre} />
 
       {group.bio && <p className="text-lg whitespace-pre-line">{group.bio}</p>}
 

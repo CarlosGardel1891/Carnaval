@@ -1,7 +1,7 @@
-import { Preferences } from '@capacitor/preferences'
 import { createAsyncStoragePersister } from '@tanstack/query-async-storage-persister'
 import { QueryClient, type Query } from '@tanstack/react-query'
 import type { PersistQueryClientOptions } from '@tanstack/react-query-persist-client'
+import { preferencesStorage } from './preferencesStorage'
 
 /** Cuánto vale lo guardado: pasado un día, la grilla vieja confunde más de lo que ayuda. */
 export const CACHE_MAX_AGE_MS = 24 * 60 * 60_000
@@ -50,11 +50,7 @@ export function cachePersistOptions(
   const persister = createAsyncStoragePersister({
     key: CACHE_KEY,
     throttleTime,
-    storage: {
-      getItem: async (key) => (await Preferences.get({ key })).value,
-      setItem: (key, value) => Preferences.set({ key, value }),
-      removeItem: (key) => Preferences.remove({ key }),
-    },
+    storage: preferencesStorage,
   })
   return {
     persister,

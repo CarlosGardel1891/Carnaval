@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { focusManager, QueryClient, QueryObserver } from '@tanstack/react-query'
 import { nightActsQuery, REFRESH_MS } from '../features/today/useNightActs'
-import { fetchNightActs } from './api'
+import { fetchNightActs, setAuthActive } from './api'
 import { initLifecycle } from './lifecycle'
 
 type Listener = (event: never) => void
@@ -43,6 +43,13 @@ describe('ciclo de vida de la app', () => {
     expect(focusManager.isFocused()).toBe(false)
     emit('appStateChange', { isActive: true })
     expect(focusManager.isFocused()).toBe(true)
+  })
+
+  it('la sesión se renueva sola sólo con la app al frente', () => {
+    emit('appStateChange', { isActive: false })
+    expect(setAuthActive).toHaveBeenLastCalledWith(false)
+    emit('appStateChange', { isActive: true })
+    expect(setAuthActive).toHaveBeenLastCalledWith(true)
   })
 
   it('la grilla se vuelve a pedir cada 5 minutos sólo con la app al frente, y al volver', async () => {

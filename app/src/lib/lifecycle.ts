@@ -1,5 +1,6 @@
 import { App as NativeApp } from '@capacitor/app'
 import { focusManager } from '@tanstack/react-query'
+import { setAuthActive } from './api'
 
 /**
  * Conecta la app con su ciclo de vida. Se llama una sola vez, al arrancar.
@@ -8,6 +9,7 @@ import { focusManager } from '@tanstack/react-query'
  *   siempre se dispara. Acá sale de `appStateChange` de @capacitor/app (en la web, ese
  *   evento es `visibilitychange`). De eso cuelgan el refresco al volver, la pausa del
  *   refetch periódico en segundo plano y el reloj de `useNow`.
+ * - Sesión: se renueva sola sólo con la app al frente.
  * - Botón «atrás» de Android: vuelve en el historial y, si no hay adónde, minimiza la app
  *   en vez de cerrarla.
  */
@@ -15,6 +17,7 @@ export function initLifecycle(): void {
   focusManager.setEventListener((setFocused) => {
     const listener = NativeApp.addListener('appStateChange', ({ isActive }) => {
       setFocused(isActive)
+      setAuthActive(isActive)
     })
     return () => {
       void listener.then((handle) => handle.remove())

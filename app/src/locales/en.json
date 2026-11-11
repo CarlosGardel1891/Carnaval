@@ -54,6 +54,14 @@
     "upcoming": "Upcoming shows",
     "noUpcoming": "No shows have been added for this group yet."
   },
+  "follow": {
+    "follow": "Follow",
+    "following": "Following",
+    "followName": "Follow {{name}}",
+    "followingName": "Following {{name}}. Tap to unfollow.",
+    "error": "We couldn't save the change. Try again.",
+    "rateLimited": "Too many people are connecting from your network. Try again in a while."
+  },
   "today": {
     "title": "Today",
     "otherNight": "Another night",

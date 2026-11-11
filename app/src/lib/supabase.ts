@@ -1,6 +1,7 @@
 import { createClient } from '@supabase/supabase-js'
 import { Capacitor } from '@capacitor/core'
 import type { Database } from '@cuerda/shared'
+import { preferencesStorage } from './preferencesStorage'
 import { resolveSupabaseUrl } from './supabaseUrl'
 
 // En runtime pueden faltar aunque el tipo diga `string`: Vite deja `undefined` si no hay .env.
@@ -13,7 +14,21 @@ if (!url || !anonKey) {
   )
 }
 
+/**
+ * La app lee todo con la key pública. La sesión (anónima) recién existe después del primer
+ * «Seguir» (decisión 44) y se guarda con `@capacitor/preferences`, no en el `localStorage`
+ * del WebView: con la sesión se perderían los conjuntos seguidos y el registro de push.
+ */
 export const supabase = createClient<Database>(
   resolveSupabaseUrl(url, Capacitor.getPlatform()),
   anonKey,
+  {
+    auth: {
+      storage: preferencesStorage,
+      persistSession: true,
+      autoRefreshToken: true,
+      // No hay inicio de sesión por enlace: la URL de la app nunca trae una sesión.
+      detectSessionInUrl: false,
+    },
+  },
 )

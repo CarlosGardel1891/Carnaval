@@ -54,6 +54,14 @@
     "upcoming": "Próximas actuaciones",
     "noUpcoming": "Todavía no hay actuaciones cargadas para este conjunto."
   },
+  "follow": {
+    "follow": "Seguir",
+    "following": "Siguiendo",
+    "followName": "Seguir a {{name}}",
+    "followingName": "Siguiendo a {{name}}. Tocá para dejar de seguir.",
+    "error": "No pudimos guardar el cambio. Probá de nuevo.",
+    "rateLimited": "Hay muchas personas conectadas desde tu misma red. Probá de nuevo en un rato."
+  },
   "today": {
     "title": "Hoy",
     "otherNight": "Otra noche",
