@@ -36,6 +36,29 @@ export function formatNight(noche: string, locale: string): string {
   }).format(new Date(`${noche}T00:00:00Z`))
 }
 
+/** Un mes (`YYYY-MM`) con su año: «enero de 2027». */
+export function formatMonth(month: string, locale: string): string {
+  return new Intl.DateTimeFormat(locale, {
+    month: 'long',
+    year: 'numeric',
+    timeZone: 'UTC',
+  }).format(new Date(`${month}-01T00:00:00Z`))
+}
+
+/** El día del mes y el día de la semana abreviado de una fecha pura: «28» y «jue». */
+export function formatDayParts(
+  isoDate: string,
+  locale: string,
+): { weekday: string; dayOfMonth: string } {
+  const date = new Date(`${isoDate}T00:00:00Z`)
+  const part = (options: Intl.DateTimeFormatOptions) =>
+    new Intl.DateTimeFormat(locale, { ...options, timeZone: 'UTC' }).format(date)
+  return {
+    weekday: part({ weekday: 'short' }).replace('.', ''),
+    dayOfMonth: part({ day: 'numeric' }),
+  }
+}
+
 const timeFormatters = new Map<string, Intl.DateTimeFormat>()
 
 function timeFormatter(locale: string): Intl.DateTimeFormat {

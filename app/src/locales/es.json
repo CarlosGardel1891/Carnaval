@@ -28,7 +28,8 @@
     "label": "Navegación principal",
     "today": "Hoy",
     "map": "Mapa",
-    "groups": "Conjuntos"
+    "groups": "Conjuntos",
+    "calendar": "Calendario"
   },
   "groups": {
     "title": "Conjuntos",
@@ -53,6 +54,19 @@
     "facebook": "Facebook",
     "upcoming": "Próximas actuaciones",
     "noUpcoming": "Todavía no hay actuaciones cargadas para este conjunto."
+  },
+  "calendar": {
+    "title": "Calendario",
+    "loading": "Cargando el calendario…",
+    "error": "No pudimos cargar el calendario.",
+    "empty": "Todavía no hay eventos cargados para esta temporada.",
+    "today": "Hoy",
+    "nothingToday": "Hoy no empieza ningún evento del calendario.",
+    "ongoing": "En curso",
+    "until": "hasta el {{date}}",
+    "approxUntil": "aprox. hasta el {{date}}",
+    "preseason": "Pretemporada",
+    "openNight": "Ver la noche del {{date}}"
   },
   "follow": {
     "follow": "Seguir",
@@ -122,6 +136,19 @@
     "comparsa": "Comparsa",
     "samba": "Escuela de samba",
     "otro": "Otro"
+  },
+  "eventType": {
+    "inaugural": "Desfile Inaugural",
+    "samba": "Escuelas de samba",
+    "llamadas": "Llamadas",
+    "corso": "Corso",
+    "admision": "Admisión",
+    "concurso": "Concurso Oficial",
+    "otro": "Otro evento"
+  },
+  "eventStatus": {
+    "confirmado": "Fecha confirmada",
+    "estimado": "Fecha estimada"
   },
   "stageType": {
     "teatro_verano": "Teatro de Verano",

@@ -29,6 +29,15 @@ function GroupsIcon() {
   )
 }
 
+function CalendarIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="2">
+      <rect x="3.5" y="5" width="17" height="15.5" rx="2.5" />
+      <path d="M3.5 10h17M8 3v4M16 3v4" strokeLinecap="round" />
+    </svg>
+  )
+}
+
 interface TabProps {
   to: string
   label: string
@@ -58,7 +67,7 @@ function Tab({ to, label, icon, withChildren = false }: TabProps) {
   )
 }
 
-/** Barra inferior. Hoy tiene tres pestañas; las fases 5 y 6 suman hasta cinco. */
+/** Barra inferior. Hoy tiene cuatro pestañas; la Fase 6 suma la quinta. */
 export function TabBar() {
   const { t } = useTranslation()
   return (
@@ -70,6 +79,7 @@ export function TabBar() {
         <Tab to="/" label={t('nav.today')} icon={<TodayIcon />} />
         <Tab to="/mapa" label={t('nav.map')} icon={<MapIcon />} />
         <Tab to="/conjuntos" label={t('nav.groups')} icon={<GroupsIcon />} withChildren />
+        <Tab to="/calendario" label={t('nav.calendar')} icon={<CalendarIcon />} withChildren />
       </ul>
     </nav>
   )

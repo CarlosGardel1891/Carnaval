@@ -193,6 +193,39 @@ export async function fetchUpcomingActs(groupId: number, noche: string): Promise
   return data
 }
 
+// ---------------------------------------------------------------- calendario
+
+/** Un evento del calendario. Las fechas son puras (`YYYY-MM-DD`), sin hora. */
+export type CalendarEvent = Pick<
+  Tables<'eventos'>,
+  | 'id'
+  | 'slug'
+  | 'tipo'
+  | 'nombre'
+  | 'fecha_inicio'
+  | 'fecha_fin'
+  | 'lugar'
+  | 'estado'
+  | 'info'
+  | 'fuente_url'
+>
+
+const EVENT_COLUMNS =
+  'id, slug, tipo, nombre, fecha_inicio, fecha_fin, lugar, estado, info, fuente_url'
+
+/** Los eventos de una temporada, por fecha (pretemporada incluida). */
+export async function fetchEvents(seasonId: number): Promise<CalendarEvent[]> {
+  const { data, error } = await supabase
+    .from('eventos')
+    .select(EVENT_COLUMNS)
+    .eq('temporada_id', seasonId)
+    .order('fecha_inicio')
+    .order('fecha_fin')
+    .order('nombre')
+  if (error) throw error
+  return data
+}
+
 // ---------------------------------------------------------------- sesión y Seguir
 
 /** El usuario de la sesión guardada en el teléfono, o null si no hay (o ya no sirve). */

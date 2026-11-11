@@ -28,7 +28,8 @@
     "label": "Main navigation",
     "today": "Today",
     "map": "Map",
-    "groups": "Groups"
+    "groups": "Groups",
+    "calendar": "Calendar"
   },
   "groups": {
     "title": "Groups",
@@ -53,6 +54,19 @@
     "facebook": "Facebook",
     "upcoming": "Upcoming shows",
     "noUpcoming": "No shows have been added for this group yet."
+  },
+  "calendar": {
+    "title": "Calendar",
+    "loading": "Loading the calendar…",
+    "error": "We couldn't load the calendar.",
+    "empty": "No events have been added for this season yet.",
+    "today": "Today",
+    "nothingToday": "No calendar events start today.",
+    "ongoing": "Ongoing",
+    "until": "until {{date}}",
+    "approxUntil": "until around {{date}}",
+    "preseason": "Pre-season",
+    "openNight": "See the night of {{date}}"
   },
   "follow": {
     "follow": "Follow",
@@ -122,6 +136,19 @@
     "comparsa": "Comparsa",
     "samba": "Samba school",
     "otro": "Other"
+  },
+  "eventType": {
+    "inaugural": "Opening Parade",
+    "samba": "Samba schools",
+    "llamadas": "Llamadas",
+    "corso": "Neighbourhood parade",
+    "admision": "Admission",
+    "concurso": "Official Contest",
+    "otro": "Other event"
+  },
+  "eventStatus": {
+    "confirmado": "Confirmed date",
+    "estimado": "Estimated date"
   },
   "stageType": {
     "teatro_verano": "Teatro de Verano",
