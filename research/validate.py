@@ -40,6 +40,17 @@ FIXTURE_COLUMNAS = ["rueda", "numero", "fecha", "hora", "conjunto", "fuente_url"
 RUEDAS = ["primera", "segunda", "liguilla"]
 HORA_RE = re.compile(r"^([01]\d|2[0-3]):[0-5]\d$")
 
+# El recorrido y los cortes de calle del Desfile de Llamadas. Tampoco son catálogos: se
+# validan aparte (chequeo_recorrido y chequeo_cortes).
+RECORRIDO = "llamadas_recorrido_2027.csv"
+RECORRIDO_COLUMNAS = ["orden", "calle", "cruce", "lat", "lng", "fuente_url"]
+CORTES = "llamadas_cortes_2027.csv"
+CORTES_COLUMNAS = ["noche", "slug", "tipo", "descripcion", "desde", "hasta", "puntos", "fuente_url"]
+TIPOS_CORTE = ["corte", "estacionamiento"]
+MOMENTO_RE = re.compile(r"^\d{4}-\d{2}-\d{2}T([01]\d|2[0-3]):[0-5]\d$")
+# Montevideo y alrededores: una coordenada fuera de acá está mal escrita (o al revés).
+LAT_MVD, LNG_MVD = (-35.1, -34.6), (-56.6, -55.8)
+
 BOOL = {"true", "false"}
 # columna -> (valores válidos, ¿se permite vacío?, ¿vacío es sólo advertencia?)
 ENUMS = {
@@ -300,6 +311,82 @@ def chequeo_fixture(df, conjuntos):
         vistos.add(clave)
 
 
+def fuentes_ok(a, fila, valor):
+    if not valor:
+        err(a, fila, "fuente_url vacía")
+        return
+    for parte in valor.split(" | "):
+        if not URL_RE.match(parte):
+            err(a, fila, f"fuente_url: no es URL: {parte!r}")
+
+
+def coordenada_ok(a, fila, lat, lng):
+    try:
+        lat_f, lng_f = float(lat), float(lng)
+    except ValueError:
+        err(a, fila, f"coordenada que no es un número: {lat!r}, {lng!r}")
+        return False
+    if not (LAT_MVD[0] <= lat_f <= LAT_MVD[1] and LNG_MVD[0] <= lng_f <= LNG_MVD[1]):
+        err(a, fila, f"coordenada fuera de Montevideo (¿latitud y longitud al revés?): {lat}, {lng}")
+        return False
+    return True
+
+
+def chequeo_recorrido(df):
+    """El recorrido del Desfile de Llamadas: las esquinas, en orden, de la salida a la llegada."""
+    a = RECORRIDO
+    if len(df) == 1:
+        err(a, "-", "un recorrido necesita al menos dos esquinas")
+    for i, row in df.iterrows():
+        fila = f"fila {i + 2} ({row['calle']} y {row['cruce']})"
+        if row["orden"] != str(i + 1):
+            err(a, fila, f"orden {row['orden']!r}: las esquinas van numeradas 1, 2, 3… sin saltos")
+        for c in ("calle", "cruce"):
+            if not row[c] or row[c] != row[c].strip():
+                err(a, fila, f"'{c}' vacío o con espacios sobrantes")
+        coordenada_ok(a, fila, row["lat"], row["lng"])
+        fuentes_ok(a, fila, row["fuente_url"])
+
+
+def chequeo_cortes(df):
+    """Los cortes de calle y las prohibiciones de estacionar de cada noche del desfile.
+
+    `desde` y `hasta` son hora de Montevideo (AAAA-MM-DDTHH:MM) y pueden faltar. `puntos` es el
+    tramo, como «longitud latitud» separados por «;», y también puede faltar.
+    """
+    a = CORTES
+    vistos = set()
+    for i, row in df.iterrows():
+        fila = f"fila {i + 2} (noche {row['noche']}, {row['slug']})"
+        if row["noche"] not in ("1", "2"):
+            err(a, fila, f"noche {row['noche']!r}: tiene que ser 1 o 2")
+        if not SLUG_RE.match(row["slug"]):
+            err(a, fila, f"slug inválido: {row['slug']!r}")
+        if (row["noche"], row["slug"]) in vistos:
+            err(a, fila, "slug repetido en la misma noche")
+        vistos.add((row["noche"], row["slug"]))
+        if row["tipo"] not in TIPOS_CORTE:
+            err(a, fila, f"tipo {row['tipo']!r} no es uno de {TIPOS_CORTE}")
+        if not row["descripcion"] or row["descripcion"] != row["descripcion"].strip():
+            err(a, fila, "descripcion vacía o con espacios sobrantes")
+        for c in ("desde", "hasta"):
+            if row[c] and not MOMENTO_RE.match(row[c]):
+                err(a, fila, f"{c} no es AAAA-MM-DDTHH:MM: {row[c]!r}")
+        if row["desde"] and row["hasta"] and row["hasta"] < row["desde"]:
+            err(a, fila, "hasta anterior a desde")
+        if row["puntos"]:
+            puntos = row["puntos"].split(";")
+            if len(puntos) < 2:
+                err(a, fila, "un tramo necesita al menos dos puntos")
+            for punto in puntos:
+                partes = punto.split(" ")
+                if len(partes) != 2:
+                    err(a, fila, f"punto mal escrito (va «longitud latitud»): {punto!r}")
+                else:
+                    coordenada_ok(a, fila, partes[1], partes[0])
+        fuentes_ok(a, fila, row["fuente_url"])
+
+
 def resumen(dfs):
     print("=" * 60)
     print("RESUMEN")
@@ -321,6 +408,12 @@ def resumen(dfs):
     if k is not None:
         print(f"calendario_2027.csv: {len(k)} eventos", dict(Counter(k["estado"])))
         print("  tipo:", dict(Counter(k["tipo"])))
+    r = dfs.get(RECORRIDO)
+    if r is not None:
+        print(f"{RECORRIDO}: {len(r)} esquinas ({max(len(r) - 1, 0)} cuadras)")
+    k = dfs.get(CORTES)
+    if k is not None:
+        print(f"{CORTES}: {len(k)} filas", dict(Counter(zip(k["noche"], k["tipo"]))))
     f = dfs.get(FIXTURE)
     if f is not None:
         if len(f) == 0:
@@ -354,6 +447,14 @@ def main():
         chequeo_escenarios(dfs["escenarios.csv"])
     if "calendario_2027.csv" in dfs:
         chequeo_calendario(dfs["calendario_2027.csv"])
+    recorrido = leer(RECORRIDO, RECORRIDO_COLUMNAS)
+    if recorrido is not None:
+        dfs[RECORRIDO] = recorrido
+        chequeo_recorrido(recorrido)
+    cortes = leer(CORTES, CORTES_COLUMNAS)
+    if cortes is not None:
+        dfs[CORTES] = cortes
+        chequeo_cortes(cortes)
     fixture = leer(FIXTURE, FIXTURE_COLUMNAS, args.fixture)
     if fixture is not None:
         dfs[FIXTURE] = fixture

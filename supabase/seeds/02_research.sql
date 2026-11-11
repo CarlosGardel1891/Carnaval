@@ -381,4 +381,91 @@ on conflict (slug) do update set
 
 -- research/fixture_2027.csv todavía no tiene filas: el fixture 2027 no se publicó.
 
+-- ---------------------------------------------------------------- recorrido de las Llamadas (10 esquinas)
+
+delete from public.desfile_esquinas where evento_id in (
+  select ev.id
+  from public.eventos ev
+  join public.temporadas t on t.id = ev.temporada_id
+  where t.anio = 2027
+    and ev.tipo = 'llamadas'
+    and ev.recorrido_estado is distinct from 'confirmado'
+);
+
+insert into public.desfile_esquinas (evento_id, orden, calle, cruce, punto)
+select ev.id, v.orden, v.calle, v.cruce, v.punto
+from (values
+  (1, 'Carlos Gardel', 'Zelmar Michelini', 'SRID=4326;POINT(-56.189620 -34.911396)'::extensions.geography),
+  (2, 'Isla de Flores', 'Carlos Quijano', 'SRID=4326;POINT(-56.188506 -34.911317)'::extensions.geography),
+  (3, 'Isla de Flores', 'Aquiles Lanza', 'SRID=4326;POINT(-56.187389 -34.911210)'::extensions.geography),
+  (4, 'Isla de Flores', 'Ejido', 'SRID=4326;POINT(-56.186268 -34.911126)'::extensions.geography),
+  (5, 'Isla de Flores', 'Santiago de Chile', 'SRID=4326;POINT(-56.184905 -34.911029)'::extensions.geography),
+  (6, 'Isla de Flores', 'Javier Barrios Amorín', 'SRID=4326;POINT(-56.184035 -34.910964)'::extensions.geography),
+  (7, 'Isla de Flores', 'Martínez Trueba', 'SRID=4326;POINT(-56.182757 -34.910881)'::extensions.geography),
+  (8, 'Isla de Flores', 'Salto', 'SRID=4326;POINT(-56.181768 -34.910804)'::extensions.geography),
+  (9, 'Isla de Flores', 'Lorenzo Carnelli', 'SRID=4326;POINT(-56.180357 -34.910703)'::extensions.geography),
+  (10, 'Isla de Flores', 'Minas', 'SRID=4326;POINT(-56.179273 -34.910625)'::extensions.geography)
+) as v (orden, calle, cruce, punto)
+cross join (
+  select ev.id
+  from public.eventos ev
+  join public.temporadas t on t.id = ev.temporada_id
+  where t.anio = 2027
+    and ev.tipo = 'llamadas'
+    and ev.recorrido_estado is distinct from 'confirmado'
+) as ev;
+
+update public.eventos
+   set recorrido_estado = 'estimado',
+       recorrido_fuente_url = array['https://www.elobservador.com.uy/carnaval/cortes-transito-montevideo-el-desfile-llamadas-2025-mira-las-calles-afectadas-y-los-desvios-omnibus-n5983582', 'https://www.openstreetmap.org/#map=17/-34.9110/-56.1845']
+ where id in (
+  select ev.id
+  from public.eventos ev
+  join public.temporadas t on t.id = ev.temporada_id
+  where t.anio = 2027
+    and ev.tipo = 'llamadas'
+    and ev.recorrido_estado is distinct from 'confirmado'
+);
+
+-- ---------------------------------------------------------------- cortes de calle de las Llamadas (23)
+
+insert into public.cortes_calle as k
+  (evento_id, slug, tipo, descripcion, desde, hasta, tramo, estado, fuente_url)
+select ev.id, v.slug, v.tipo::public.tipo_corte, v.descripcion, v.desde, v.hasta, v.tramo,
+       'estimado', v.fuente_url
+from (values
+  ('llamadas-noche-1-2027', 'recorrido', 'corte', 'Carlos Gardel e Isla de Flores, de Zelmar Michelini a Minas: todo el recorrido del desfile', ('2027-02-05 12:00'::timestamp at time zone 'America/Montevideo'), null::timestamptz, 'SRID=4326;LINESTRING(-56.189620 -34.911396, -56.188506 -34.911317, -56.187389 -34.911210, -56.186268 -34.911126, -56.184905 -34.911029, -56.184035 -34.910964, -56.182757 -34.910881, -56.181768 -34.910804, -56.180357 -34.910703, -56.179273 -34.910625)'::extensions.geography, array['https://www.elobservador.com.uy/carnaval/cortes-transito-montevideo-el-desfile-llamadas-2025-mira-las-calles-afectadas-y-los-desvios-omnibus-n5983582']),
+  ('llamadas-noche-1-2027', 'desvios', 'corte', 'Desvíos de ómnibus en Carlos Gardel e Isla de Flores, de Héctor Gutiérrez Ruiz a Magallanes: una cuadra más a cada extremo del recorrido', null::timestamptz, null::timestamptz, 'SRID=4326;LINESTRING(-56.190778 -34.911478, -56.189620 -34.911396, -56.188506 -34.911317, -56.187389 -34.911210, -56.186268 -34.911126, -56.184905 -34.911029, -56.184035 -34.910964, -56.182757 -34.910881, -56.181768 -34.910804, -56.180357 -34.910703, -56.179273 -34.910625, -56.178182 -34.910561)'::extensions.geography, array['https://www.elobservador.com.uy/carnaval/cortes-transito-montevideo-el-desfile-llamadas-2025-mira-las-calles-afectadas-y-los-desvios-omnibus-n5983582']),
+  ('llamadas-noche-1-2027', 'cruce-ejido', 'corte', 'Cruce de Ejido con Isla de Flores', ('2027-02-05 17:00'::timestamp at time zone 'America/Montevideo'), null::timestamptz, 'SRID=4326;LINESTRING(-56.186268 -34.911126, -56.186268 -34.911126)'::extensions.geography, array['https://www.elobservador.com.uy/carnaval/cortes-transito-montevideo-el-desfile-llamadas-2025-mira-las-calles-afectadas-y-los-desvios-omnibus-n5983582']),
+  ('llamadas-noche-1-2027', 'cruce-martinez-trueba', 'corte', 'Cruce de Martínez Trueba con Isla de Flores', ('2027-02-05 17:00'::timestamp at time zone 'America/Montevideo'), null::timestamptz, 'SRID=4326;LINESTRING(-56.182757 -34.910881, -56.182757 -34.910881)'::extensions.geography, array['https://www.elobservador.com.uy/carnaval/cortes-transito-montevideo-el-desfile-llamadas-2025-mira-las-calles-afectadas-y-los-desvios-omnibus-n5983582']),
+  ('llamadas-noche-1-2027', 'aquiles-lanza', 'corte', 'Aquiles Lanza e Isla de Flores', ('2027-02-04 07:00'::timestamp at time zone 'America/Montevideo'), null::timestamptz, 'SRID=4326;LINESTRING(-56.187389 -34.911210, -56.187389 -34.911210)'::extensions.geography, array['https://www.elobservador.com.uy/carnaval/cortes-transito-montevideo-el-desfile-llamadas-2025-mira-las-calles-afectadas-y-los-desvios-omnibus-n5983582']),
+  ('llamadas-noche-1-2027', 'sin-estacionar-martinez-trueba-norte', 'estacionamiento', 'Martínez Trueba, entre Isla de Flores y Durazno', ('2027-02-05 08:00'::timestamp at time zone 'America/Montevideo'), null::timestamptz, 'SRID=4326;LINESTRING(-56.182757 -34.910881, -56.182853 -34.910000)'::extensions.geography, array['https://www.elobservador.com.uy/carnaval/cortes-transito-montevideo-el-desfile-llamadas-2025-mira-las-calles-afectadas-y-los-desvios-omnibus-n5983582']),
+  ('llamadas-noche-1-2027', 'sin-estacionar-martinez-trueba-sur', 'estacionamiento', 'Martínez Trueba, entre Isla de Flores y San Salvador', ('2027-02-05 08:00'::timestamp at time zone 'America/Montevideo'), null::timestamptz, 'SRID=4326;LINESTRING(-56.182757 -34.910881, -56.182657 -34.911786)'::extensions.geography, array['https://www.elobservador.com.uy/carnaval/cortes-transito-montevideo-el-desfile-llamadas-2025-mira-las-calles-afectadas-y-los-desvios-omnibus-n5983582']),
+  ('llamadas-noche-1-2027', 'sin-estacionar-ejido-sur', 'estacionamiento', 'Ejido, entre Durazno y Gonzalo Ramírez', ('2027-02-05 08:00'::timestamp at time zone 'America/Montevideo'), null::timestamptz, null::extensions.geography, array['https://www.elobservador.com.uy/carnaval/cortes-transito-montevideo-el-desfile-llamadas-2025-mira-las-calles-afectadas-y-los-desvios-omnibus-n5983582']),
+  ('llamadas-noche-1-2027', 'sin-estacionar-ejido-norte', 'estacionamiento', 'Ejido, entre Isla de Flores y Durazno', ('2027-02-05 08:00'::timestamp at time zone 'America/Montevideo'), null::timestamptz, 'SRID=4326;LINESTRING(-56.186268 -34.911126, -56.186353 -34.910258)'::extensions.geography, array['https://www.elobservador.com.uy/carnaval/cortes-transito-montevideo-el-desfile-llamadas-2025-mira-las-calles-afectadas-y-los-desvios-omnibus-n5983582']),
+  ('llamadas-noche-1-2027', 'sin-estacionar-magallanes-norte', 'estacionamiento', 'Magallanes, entre Durazno e Isla de Flores', ('2027-02-05 08:00'::timestamp at time zone 'America/Montevideo'), null::timestamptz, 'SRID=4326;LINESTRING(-56.178274 -34.909675, -56.178182 -34.910561)'::extensions.geography, array['https://www.elobservador.com.uy/carnaval/cortes-transito-montevideo-el-desfile-llamadas-2025-mira-las-calles-afectadas-y-los-desvios-omnibus-n5983582']),
+  ('llamadas-noche-1-2027', 'sin-estacionar-magallanes-sur', 'estacionamiento', 'Magallanes, entre San Salvador e Isla de Flores', ('2027-02-05 08:00'::timestamp at time zone 'America/Montevideo'), null::timestamptz, 'SRID=4326;LINESTRING(-56.178087 -34.911470, -56.178182 -34.910561)'::extensions.geography, array['https://www.elobservador.com.uy/carnaval/cortes-transito-montevideo-el-desfile-llamadas-2025-mira-las-calles-afectadas-y-los-desvios-omnibus-n5983582']),
+  ('llamadas-noche-1-2027', 'sin-estacionar-redruello', 'estacionamiento', 'Francisco Redruello, entre Isla de Flores y Gonzalo Ramírez', ('2027-02-05 08:00'::timestamp at time zone 'America/Montevideo'), null::timestamptz, null::extensions.geography, array['https://www.elobservador.com.uy/carnaval/cortes-transito-montevideo-el-desfile-llamadas-2025-mira-las-calles-afectadas-y-los-desvios-omnibus-n5983582']),
+  ('llamadas-noche-2-2027', 'recorrido', 'corte', 'Carlos Gardel e Isla de Flores, de Zelmar Michelini a Minas: todo el recorrido del desfile', null::timestamptz, null::timestamptz, 'SRID=4326;LINESTRING(-56.189620 -34.911396, -56.188506 -34.911317, -56.187389 -34.911210, -56.186268 -34.911126, -56.184905 -34.911029, -56.184035 -34.910964, -56.182757 -34.910881, -56.181768 -34.910804, -56.180357 -34.910703, -56.179273 -34.910625)'::extensions.geography, array['https://www.elobservador.com.uy/carnaval/cortes-transito-montevideo-el-desfile-llamadas-2025-mira-las-calles-afectadas-y-los-desvios-omnibus-n5983582']),
+  ('llamadas-noche-2-2027', 'desvios', 'corte', 'Desvíos de ómnibus en Carlos Gardel e Isla de Flores, de Héctor Gutiérrez Ruiz a Magallanes: una cuadra más a cada extremo del recorrido', null::timestamptz, null::timestamptz, 'SRID=4326;LINESTRING(-56.190778 -34.911478, -56.189620 -34.911396, -56.188506 -34.911317, -56.187389 -34.911210, -56.186268 -34.911126, -56.184905 -34.911029, -56.184035 -34.910964, -56.182757 -34.910881, -56.181768 -34.910804, -56.180357 -34.910703, -56.179273 -34.910625, -56.178182 -34.910561)'::extensions.geography, array['https://www.elobservador.com.uy/carnaval/cortes-transito-montevideo-el-desfile-llamadas-2025-mira-las-calles-afectadas-y-los-desvios-omnibus-n5983582']),
+  ('llamadas-noche-2-2027', 'cruce-ejido', 'corte', 'Cruce de Ejido con Isla de Flores', null::timestamptz, null::timestamptz, 'SRID=4326;LINESTRING(-56.186268 -34.911126, -56.186268 -34.911126)'::extensions.geography, array['https://www.elobservador.com.uy/carnaval/cortes-transito-montevideo-el-desfile-llamadas-2025-mira-las-calles-afectadas-y-los-desvios-omnibus-n5983582']),
+  ('llamadas-noche-2-2027', 'cruce-martinez-trueba', 'corte', 'Cruce de Martínez Trueba con Isla de Flores', null::timestamptz, null::timestamptz, 'SRID=4326;LINESTRING(-56.182757 -34.910881, -56.182757 -34.910881)'::extensions.geography, array['https://www.elobservador.com.uy/carnaval/cortes-transito-montevideo-el-desfile-llamadas-2025-mira-las-calles-afectadas-y-los-desvios-omnibus-n5983582']),
+  ('llamadas-noche-2-2027', 'sin-estacionar-martinez-trueba-norte', 'estacionamiento', 'Martínez Trueba, entre Isla de Flores y Durazno', null::timestamptz, null::timestamptz, 'SRID=4326;LINESTRING(-56.182757 -34.910881, -56.182853 -34.910000)'::extensions.geography, array['https://www.elobservador.com.uy/carnaval/cortes-transito-montevideo-el-desfile-llamadas-2025-mira-las-calles-afectadas-y-los-desvios-omnibus-n5983582']),
+  ('llamadas-noche-2-2027', 'sin-estacionar-martinez-trueba-sur', 'estacionamiento', 'Martínez Trueba, entre Isla de Flores y San Salvador', null::timestamptz, null::timestamptz, 'SRID=4326;LINESTRING(-56.182757 -34.910881, -56.182657 -34.911786)'::extensions.geography, array['https://www.elobservador.com.uy/carnaval/cortes-transito-montevideo-el-desfile-llamadas-2025-mira-las-calles-afectadas-y-los-desvios-omnibus-n5983582']),
+  ('llamadas-noche-2-2027', 'sin-estacionar-ejido-sur', 'estacionamiento', 'Ejido, entre Durazno y Gonzalo Ramírez', null::timestamptz, null::timestamptz, null::extensions.geography, array['https://www.elobservador.com.uy/carnaval/cortes-transito-montevideo-el-desfile-llamadas-2025-mira-las-calles-afectadas-y-los-desvios-omnibus-n5983582']),
+  ('llamadas-noche-2-2027', 'sin-estacionar-ejido-norte', 'estacionamiento', 'Ejido, entre Isla de Flores y Durazno', null::timestamptz, null::timestamptz, 'SRID=4326;LINESTRING(-56.186268 -34.911126, -56.186353 -34.910258)'::extensions.geography, array['https://www.elobservador.com.uy/carnaval/cortes-transito-montevideo-el-desfile-llamadas-2025-mira-las-calles-afectadas-y-los-desvios-omnibus-n5983582']),
+  ('llamadas-noche-2-2027', 'sin-estacionar-magallanes-norte', 'estacionamiento', 'Magallanes, entre Durazno e Isla de Flores', null::timestamptz, null::timestamptz, 'SRID=4326;LINESTRING(-56.178274 -34.909675, -56.178182 -34.910561)'::extensions.geography, array['https://www.elobservador.com.uy/carnaval/cortes-transito-montevideo-el-desfile-llamadas-2025-mira-las-calles-afectadas-y-los-desvios-omnibus-n5983582']),
+  ('llamadas-noche-2-2027', 'sin-estacionar-magallanes-sur', 'estacionamiento', 'Magallanes, entre San Salvador e Isla de Flores', null::timestamptz, null::timestamptz, 'SRID=4326;LINESTRING(-56.178087 -34.911470, -56.178182 -34.910561)'::extensions.geography, array['https://www.elobservador.com.uy/carnaval/cortes-transito-montevideo-el-desfile-llamadas-2025-mira-las-calles-afectadas-y-los-desvios-omnibus-n5983582']),
+  ('llamadas-noche-2-2027', 'sin-estacionar-redruello', 'estacionamiento', 'Francisco Redruello, entre Isla de Flores y Gonzalo Ramírez', null::timestamptz, null::timestamptz, null::extensions.geography, array['https://www.elobservador.com.uy/carnaval/cortes-transito-montevideo-el-desfile-llamadas-2025-mira-las-calles-afectadas-y-los-desvios-omnibus-n5983582'])
+) as v (evento, slug, tipo, descripcion, desde, hasta, tramo, fuente_url)
+join public.eventos ev on ev.slug = v.evento
+on conflict on constraint cortes_calle_slug_unico do update set
+  tipo = excluded.tipo,
+  descripcion = excluded.descripcion,
+  desde = excluded.desde,
+  hasta = excluded.hasta,
+  tramo = excluded.tramo,
+  fuente_url = excluded.fuente_url
+where k.estado <> 'confirmado';
+
 commit;

@@ -38,6 +38,8 @@ SEED = RAIZ / "supabase" / "seeds" / "02_research.sql"
 TEMPORADA = 2027
 CALENDARIO = f"calendario_{TEMPORADA}.csv"
 FIXTURE = f"fixture_{TEMPORADA}.csv"
+RECORRIDO = f"llamadas_recorrido_{TEMPORADA}.csv"
+CORTES = f"llamadas_cortes_{TEMPORADA}.csv"
 # El escenario del Concurso y la marca de lo que sale del fixture publicado.
 TEATRO_DE_VERANO = "teatro-de-verano-ramon-collazo"
 FUENTE_FIXTURE = f"research/{FIXTURE}"
@@ -324,11 +326,110 @@ where (a.etapa_id, a.inicio, a.fuente, a.fuente_url)
 """
 
 
+def sql_recorrido(esquinas):
+    """El recorrido del Desfile de Llamadas, igual para las dos noches, como estimado.
+
+    El recorrido de una noche que ya está confirmado (el oficial, cargado después) no se toca.
+    En las demás se reemplaza entero: las esquinas son una lista ordenada, no filas sueltas.
+    """
+    titulo = f"-- ---------------------------------------------------------------- recorrido de las Llamadas ({len(esquinas)} esquinas)\n"
+    if not esquinas:
+        return titulo + f"\n-- research/{RECORRIDO} no tiene filas: no hay recorrido que cargar.\n"
+    fuentes = []
+    for e in esquinas:
+        for url in e["fuente_url"].split(" | "):
+            if url and url not in fuentes:
+                fuentes.append(url)
+    valores = filas(
+        (e["orden"], texto(e["calle"]), texto(e["cruce"]),
+         f"'SRID=4326;POINT({e['lng']} {e['lat']})'::extensions.geography")
+        for e in esquinas
+    )
+    por_tocar = f"""select ev.id
+  from public.eventos ev
+  join public.temporadas t on t.id = ev.temporada_id
+  where t.anio = {TEMPORADA}
+    and ev.tipo = 'llamadas'
+    and ev.recorrido_estado is distinct from 'confirmado'"""
+    return titulo + f"""
+delete from public.desfile_esquinas where evento_id in (
+  {por_tocar}
+);
+
+insert into public.desfile_esquinas (evento_id, orden, calle, cruce, punto)
+select ev.id, v.orden, v.calle, v.cruce, v.punto
+from (values
+{valores}
+) as v (orden, calle, cruce, punto)
+cross join (
+  {por_tocar}
+) as ev;
+
+update public.eventos
+   set recorrido_estado = 'estimado',
+       recorrido_fuente_url = {lista(" | ".join(fuentes), " | ")}
+ where id in (
+  {por_tocar}
+);
+"""
+
+
+def sql_cortes(cortes):
+    """Los cortes de calle de cada noche, como estimados. Inserta o actualiza por (evento, slug),
+    no borra, y no toca un corte que ya está confirmado."""
+    titulo = f"-- ---------------------------------------------------------------- cortes de calle de las Llamadas ({len(cortes)})\n"
+    if not cortes:
+        return titulo + f"\n-- research/{CORTES} no tiene filas: no hay cortes que cargar.\n"
+
+    def momento(valor):
+        # Hora de Montevideo, escrita sin zona en el CSV.
+        return f"({texto(valor.replace('T', ' '))}::timestamp at time zone 'America/Montevideo')" if valor else "null::timestamptz"
+
+    def tramo(valor):
+        if not valor:
+            return "null::extensions.geography"
+        return f"'SRID=4326;LINESTRING({valor.replace(';', ', ')})'::extensions.geography"
+
+    valores = filas(
+        (
+            texto(f"llamadas-noche-{c['noche']}-{TEMPORADA}"),
+            texto(c["slug"]),
+            texto(c["tipo"]),
+            texto(c["descripcion"]),
+            momento(c["desde"]),
+            momento(c["hasta"]),
+            tramo(c["puntos"]),
+            lista(c["fuente_url"], " | "),
+        )
+        for c in cortes
+    )
+    return titulo + f"""
+insert into public.cortes_calle as k
+  (evento_id, slug, tipo, descripcion, desde, hasta, tramo, estado, fuente_url)
+select ev.id, v.slug, v.tipo::public.tipo_corte, v.descripcion, v.desde, v.hasta, v.tramo,
+       'estimado', v.fuente_url
+from (values
+{valores}
+) as v (evento, slug, tipo, descripcion, desde, hasta, tramo, fuente_url)
+join public.eventos ev on ev.slug = v.evento
+on conflict on constraint cortes_calle_slug_unico do update set
+  tipo = excluded.tipo,
+  descripcion = excluded.descripcion,
+  desde = excluded.desde,
+  hasta = excluded.hasta,
+  tramo = excluded.tramo,
+  fuente_url = excluded.fuente_url
+where k.estado <> 'confirmado';
+"""
+
+
 def generar():
     conjuntos = leer("conjuntos.csv")
     escenarios = leer("escenarios.csv")
     eventos = leer(CALENDARIO)
     fixture = leer(FIXTURE)
+    esquinas = leer(RECORRIDO)
+    cortes = leer(CORTES)
     temporada, con_lista, sin_lista = sql_conjunto_temporada(conjuntos)
     cabecera = f"""-- Generado por scripts/gen_seed.py a partir de research/*.csv. No editar a mano:
 -- cambiar los CSV, correr `python research/validate.py` y regenerar con `pnpm gen:seed`.
@@ -353,12 +454,15 @@ $$;
         sql_escenarios(escenarios),
         sql_eventos(eventos),
         sql_fixture(fixture),
+        sql_recorrido(esquinas),
+        sql_cortes(cortes),
         "commit;\n",
     ]
     resumen = (
         f"{len(conjuntos)} conjuntos ({con_lista} con participación {TEMPORADA}, "
         f"{sin_lista} sin lista {TEMPORADA}), {len(escenarios)} escenarios, {len(eventos)} eventos, "
-        f"{len(fixture)} actuaciones del fixture del Concurso"
+f"{len(fixture)} actuaciones del fixture del Concurso, "
+        f"{len(esquinas)} esquinas y {len(cortes)} cortes de las Llamadas"
     )
     return "\n".join(partes), resumen
 
