@@ -20,6 +20,7 @@
     "db:grilla": "node scripts/db-grilla.mjs",
     "db:noche-real": "node scripts/db-grilla.mjs --real",
     "db:fixture": "node scripts/db-grilla.mjs --fixture",
+    "db:llamadas": "node scripts/db-grilla.mjs --llamadas",
     "gen:types": "supabase gen types typescript --local --schema public > packages/shared/src/database.types.ts && prettier --write packages/shared/src/database.types.ts"
   },
   "type": "module",

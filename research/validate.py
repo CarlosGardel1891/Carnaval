@@ -47,6 +47,9 @@ RECORRIDO_COLUMNAS = ["orden", "calle", "cruce", "lat", "lng", "fuente_url"]
 CORTES = "llamadas_cortes_2027.csv"
 CORTES_COLUMNAS = ["noche", "slug", "tipo", "descripcion", "desde", "hasta", "puntos", "fuente_url"]
 TIPOS_CORTE = ["corte", "estacionamiento"]
+# El orden de desfile de cada noche. Vacío hasta que la IM lo publique.
+ORDEN = "llamadas_orden_2027.csv"
+ORDEN_COLUMNAS = ["noche", "posicion", "conjunto", "fuente_url"]
 MOMENTO_RE = re.compile(r"^\d{4}-\d{2}-\d{2}T([01]\d|2[0-3]):[0-5]\d$")
 # Montevideo y alrededores: una coordenada fuera de acá está mal escrita (o al revés).
 LAT_MVD, LNG_MVD = (-35.1, -34.6), (-56.6, -55.8)
@@ -387,6 +390,38 @@ def chequeo_cortes(df):
         fuentes_ok(a, fila, row["fuente_url"])
 
 
+def chequeo_orden(df, conjuntos):
+    """El orden de desfile de las Llamadas: una fila por comparsa y noche, numeradas desde 1."""
+    a = ORDEN
+    slugs = set(conjuntos["slug"]) if conjuntos is not None else None
+    en_llamadas = (
+        dict(zip(conjuntos["slug"], conjuntos["en_llamadas"])) if conjuntos is not None else {}
+    )
+    posiciones, vistos = {"1": [], "2": []}, set()
+    for i, row in df.iterrows():
+        fila = f"fila {i + 2} (noche {row['noche']}, {row['posicion']}: {row['conjunto']})"
+        if row["noche"] not in posiciones:
+            err(a, fila, f"noche {row['noche']!r}: tiene que ser 1 o 2")
+            continue
+        if not (row["posicion"].isdigit() and int(row["posicion"]) > 0):
+            err(a, fila, f"posicion no es un entero positivo: {row['posicion']!r}")
+        else:
+            posiciones[row["noche"]].append(int(row["posicion"]))
+        if row["conjunto"] == "":
+            err(a, fila, "falta el conjunto")
+        elif slugs is not None and row["conjunto"] not in slugs:
+            err(a, fila, f"el conjunto {row['conjunto']!r} no es un slug de conjuntos.csv")
+        elif en_llamadas.get(row["conjunto"]) != "true":
+            aviso(a, fila, f"{row['conjunto']} no figura con en_llamadas = true en conjuntos.csv (¿invitada?)")
+        if (row["noche"], row["conjunto"]) in vistos:
+            err(a, fila, "la comparsa está dos veces en la misma noche")
+        vistos.add((row["noche"], row["conjunto"]))
+        fuentes_ok(a, fila, row["fuente_url"])
+    for noche, lista in posiciones.items():
+        if lista and sorted(lista) != list(range(1, len(lista) + 1)):
+            err(a, "-", f"noche {noche}: las posiciones tienen que ir del 1 al {len(lista)}, sin saltos ni repetidas")
+
+
 def resumen(dfs):
     print("=" * 60)
     print("RESUMEN")
@@ -414,6 +449,12 @@ def resumen(dfs):
     k = dfs.get(CORTES)
     if k is not None:
         print(f"{CORTES}: {len(k)} filas", dict(Counter(zip(k["noche"], k["tipo"]))))
+    o = dfs.get(ORDEN)
+    if o is not None:
+        if len(o) == 0:
+            print(f"{ORDEN}: sin filas (el orden de desfile todavía no se publicó)")
+        else:
+            print(f"{ORDEN}: {len(o)} lugares;", "comparsas por noche:", dict(Counter(o["noche"])))
     f = dfs.get(FIXTURE)
     if f is not None:
         if len(f) == 0:
@@ -429,6 +470,8 @@ def main():
     ap.add_argument("--post-prueba", action="store_true",
                     help="exigir en_concurso completo y 39 conjuntos en el Concurso 2027")
     ap.add_argument("-q", "--quiet", action="store_true", help="no listar advertencias, sólo contarlas")
+    ap.add_argument("--orden", metavar="ARCHIVO", type=Path,
+                    help=f"validar ese archivo como orden de desfile, en vez de research/{ORDEN}")
     ap.add_argument("--fixture", metavar="ARCHIVO", type=Path,
                     help=f"validar ese archivo como fixture del Concurso, en vez de research/{FIXTURE}")
     args = ap.parse_args()
@@ -455,6 +498,10 @@ def main():
     if cortes is not None:
         dfs[CORTES] = cortes
         chequeo_cortes(cortes)
+    orden = leer(ORDEN, ORDEN_COLUMNAS, args.orden)
+    if orden is not None:
+        dfs[ORDEN] = orden
+        chequeo_orden(orden, dfs.get("conjuntos.csv"))
     fixture = leer(FIXTURE, FIXTURE_COLUMNAS, args.fixture)
     if fixture is not None:
         dfs[FIXTURE] = fixture

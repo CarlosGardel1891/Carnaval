@@ -25,6 +25,12 @@
 //   pnpm db:fixture 2027-02-01    desde esa fecha
 //   pnpm db:fixture --quitar      lo borra
 //
+// El orden de desfile ficticio de las Llamadas (orden_ficticio.sql), en las dos noches de la
+// temporada (no lleva fecha):
+//
+//   pnpm db:llamadas              lo carga
+//   pnpm db:llamadas --quitar     lo borra
+//
 // Entra por `docker exec` al contenedor de la base local: no usa URL ni keys, así que no
 // puede llegar a un proyecto remoto.
 import { spawnSync } from 'node:child_process'
@@ -53,6 +59,14 @@ const DATASETS = {
       delete from public.etapas_concurso where fuente = 'fixture-ficticio';
     `,
   },
+  llamadas: {
+    command: 'db:llamadas',
+    label: 'orden de desfile ficticio de las Llamadas',
+    file: 'orden_ficticio.sql',
+    // Las noches son las de la temporada: no se le pasa una fecha.
+    noDate: true,
+    removeSql: `delete from public.orden_desfile where fuente = 'orden-ficticio';`,
+  },
   real: {
     command: 'db:noche-real',
     label: 'noche real del 28/02/2026',
@@ -66,7 +80,9 @@ const dataset = args.includes('--real')
   ? DATASETS.real
   : args.includes('--fixture')
     ? DATASETS.fixture
-    : DATASETS.ficticia
+    : args.includes('--llamadas')
+      ? DATASETS.llamadas
+      : DATASETS.ficticia
 const sqlFile = path.join(root, 'supabase', 'local', dataset.file)
 
 function fail(message) {
@@ -75,11 +91,14 @@ function fail(message) {
 }
 
 const remove = args.includes('--quitar')
-const rest = args.filter((a) => a !== '--quitar' && a !== '--real' && a !== '--fixture')
+const rest = args.filter((a) => !['--quitar', '--real', '--fixture', '--llamadas'].includes(a))
 if (rest.length > 1 || (remove && rest.length > 0)) {
   fail(`uso: pnpm ${dataset.command} [hoy | YYYY-MM-DD] | pnpm ${dataset.command} --quitar`)
 }
 const from = rest[0] ?? ''
+if (from && dataset.noDate) {
+  fail(`uso: pnpm ${dataset.command} | pnpm ${dataset.command} --quitar (no lleva fecha).`)
+}
 if (from && from !== 'hoy' && !/^\d{4}-\d{2}-\d{2}$/.test(from)) {
   fail(`«${from}» no es una fecha (YYYY-MM-DD) ni «hoy».`)
 }

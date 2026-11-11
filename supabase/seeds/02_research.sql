@@ -468,4 +468,8 @@ on conflict on constraint cortes_calle_slug_unico do update set
   fuente_url = excluded.fuente_url
 where k.estado <> 'confirmado';
 
+-- ---------------------------------------------------------------- orden de desfile de las Llamadas (0)
+
+-- research/llamadas_orden_2027.csv todavía no tiene filas: el orden de desfile 2027 no se publicó.
+
 commit;

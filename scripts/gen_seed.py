@@ -22,6 +22,8 @@ Uso:
     python scripts/gen_seed.py --solo-fixture ARCHIVO
                                                imprime sólo el SQL del fixture de ese archivo,
                                                sin validar ni escribir nada (para probarlo)
+    python scripts/gen_seed.py --solo-orden ARCHIVO
+                                               lo mismo, con el orden de desfile de las Llamadas
 
 Sólo usa la biblioteca estándar (research/validate.py necesita pandas).
 """
@@ -40,6 +42,8 @@ CALENDARIO = f"calendario_{TEMPORADA}.csv"
 FIXTURE = f"fixture_{TEMPORADA}.csv"
 RECORRIDO = f"llamadas_recorrido_{TEMPORADA}.csv"
 CORTES = f"llamadas_cortes_{TEMPORADA}.csv"
+ORDEN = f"llamadas_orden_{TEMPORADA}.csv"
+FUENTE_ORDEN = f"research/{ORDEN}"
 # El escenario del Concurso y la marca de lo que sale del fixture publicado.
 TEATRO_DE_VERANO = "teatro-de-verano-ramon-collazo"
 FUENTE_FIXTURE = f"research/{FIXTURE}"
@@ -423,6 +427,49 @@ where k.estado <> 'confirmado';
 """
 
 
+def sql_orden(orden):
+    """El orden de desfile de cada noche de las Llamadas.
+
+    Un orden es una lista: se reemplaza entero. El seed sólo reemplaza lo que él mismo cargó;
+    si una noche tiene un orden de otra fuente (cargado a mano a último momento), no la toca.
+    """
+    titulo = f"-- ---------------------------------------------------------------- orden de desfile de las Llamadas ({len(orden)})\n"
+    if not orden:
+        return titulo + f"""
+-- research/{ORDEN} todavía no tiene filas: el orden de desfile {TEMPORADA} no se publicó.
+"""
+    valores = filas(
+        (
+            texto(f"llamadas-noche-{o['noche']}-{TEMPORADA}"),
+            str(int(o["posicion"])),
+            texto(o["conjunto"]),
+            texto(o["fuente_url"].split(" | ")[0]),
+        )
+        for o in orden
+    )
+    return titulo + f"""
+do $$
+begin
+  if exists (select 1 from public.orden_desfile where fuente = 'orden-ficticio') then
+    raise exception 'Hay un orden ficticio cargado: quitarlo antes con `pnpm db:llamadas --quitar`.';
+  end if;
+end
+$$;
+
+delete from public.orden_desfile where fuente = {texto(FUENTE_ORDEN)};
+
+insert into public.orden_desfile (evento_id, conjunto_id, posicion, fuente, fuente_url)
+select ev.id, c.id, v.posicion, {texto(FUENTE_ORDEN)}, v.fuente_url
+from (values
+{valores}
+) as v (evento, posicion, conjunto, fuente_url)
+join public.eventos ev on ev.slug = v.evento
+join public.conjuntos c on c.slug = v.conjunto
+-- Una noche con un orden de otra fuente queda como está.
+where not exists (select 1 from public.orden_desfile otro where otro.evento_id = ev.id);
+"""
+
+
 def generar():
     conjuntos = leer("conjuntos.csv")
     escenarios = leer("escenarios.csv")
@@ -430,6 +477,7 @@ def generar():
     fixture = leer(FIXTURE)
     esquinas = leer(RECORRIDO)
     cortes = leer(CORTES)
+    orden = leer(ORDEN)
     temporada, con_lista, sin_lista = sql_conjunto_temporada(conjuntos)
     cabecera = f"""-- Generado por scripts/gen_seed.py a partir de research/*.csv. No editar a mano:
 -- cambiar los CSV, correr `python research/validate.py` y regenerar con `pnpm gen:seed`.
@@ -456,13 +504,14 @@ $$;
         sql_fixture(fixture),
         sql_recorrido(esquinas),
         sql_cortes(cortes),
+        sql_orden(orden),
         "commit;\n",
     ]
     resumen = (
         f"{len(conjuntos)} conjuntos ({con_lista} con participación {TEMPORADA}, "
         f"{sin_lista} sin lista {TEMPORADA}), {len(escenarios)} escenarios, {len(eventos)} eventos, "
 f"{len(fixture)} actuaciones del fixture del Concurso, "
-        f"{len(esquinas)} esquinas y {len(cortes)} cortes de las Llamadas"
+        f"{len(esquinas)} esquinas, {len(cortes)} cortes y {len(orden)} lugares del orden de las Llamadas"
     )
     return "\n".join(partes), resumen
 
@@ -472,9 +521,16 @@ def main():
     ap.add_argument("--post-prueba", action="store_true",
                     help="validar con --post-prueba (después del resultado de la Prueba de Admisión)")
     ap.add_argument("--check", action="store_true", help="no escribir: fallar si el seed no está al día")
+    ap.add_argument("--solo-orden", metavar="ARCHIVO", type=Path,
+                    help="imprimir sólo el SQL del orden de desfile de ese archivo, sin validar ni escribir")
     ap.add_argument("--solo-fixture", metavar="ARCHIVO", type=Path,
                     help="imprimir sólo el SQL del fixture de ese archivo, sin validar ni escribir")
     args = ap.parse_args()
+
+    if args.solo_orden:
+        sys.stdout.reconfigure(encoding="utf-8", newline="\n")
+        print(sql_orden(leer(args.solo_orden.resolve())))
+        return
 
     if args.solo_fixture:
         sys.stdout.reconfigure(encoding="utf-8", newline="\n")
