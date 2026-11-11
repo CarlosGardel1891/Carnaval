@@ -6,6 +6,7 @@ import { ContestPage } from './features/contest/ContestPage'
 import { GroupPage } from './features/groups/GroupPage'
 import { GroupsPage } from './features/groups/GroupsPage'
 import { BlockView } from './features/llamadas/BlockView'
+import { GlossaryView } from './features/llamadas/GlossaryView'
 import { LlamadasLayout } from './features/llamadas/LlamadasLayout'
 import { OrderView } from './features/llamadas/OrderView'
 import { RouteView } from './features/llamadas/RouteView'
@@ -38,6 +39,7 @@ export const routes: RouteObject[] = [
           { index: true, element: <OrderView /> },
           { path: 'cuadra', element: <BlockView /> },
           { path: 'recorrido', element: <RouteView /> },
+          { path: 'glosario', element: <GlossaryView /> },
         ],
       },
       { path: '*', element: <Navigate to="/" replace /> },

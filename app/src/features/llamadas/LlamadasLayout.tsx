@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next'
-import { NavLink, Outlet, useSearchParams } from 'react-router'
+import { NavLink, Outlet, useLocation, useSearchParams } from 'react-router'
 import { Button } from '../../components/Button'
 import { formatNight } from '../../lib/format'
 import { useLocale } from '../../lib/useLocale'
@@ -32,6 +32,8 @@ export function LlamadasLayout() {
   const [params] = useSearchParams()
   const { today, nights, night, isPending, isError, updatedAt, stale, retry } = useLlamadas()
   const search = params.get('noche') ? `?noche=${params.get('noche')}` : ''
+  // El glosario son textos de la app: no depende de que haya datos del desfile, ni de la red.
+  const glossary = useLocation().pathname === '/llamadas/glosario'
 
   return (
     <main className="mx-auto max-w-2xl px-4 pb-6">
@@ -58,7 +60,9 @@ export function LlamadasLayout() {
         ))}
       </nav>
 
-      {isError ? (
+      {glossary ? (
+        <Outlet />
+      ) : isError ? (
         <div role="alert" className="space-y-3 py-4">
           <p className="text-lg">{t('llamadas.error')}</p>
           <Button onClick={retry}>{t('today.retry')}</Button>

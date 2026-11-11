@@ -179,6 +179,92 @@
       "osm": "Coordinates: © OpenStreetMap contributors."
     }
   },
+  "glossary": {
+    "title": "Glossary",
+    "intro": "The words of candombe and the Llamadas, to make sense of what goes by in the street.",
+    "terms": {
+      "candombe": {
+        "term": "Candombe",
+        "text": "Afro-Uruguayan drum music and dance, born in Montevideo. UNESCO Intangible Cultural Heritage since 2009."
+      },
+      "llamada": {
+        "term": "Llamada",
+        "text": "The drum call that once summoned players from one neighbourhood to another. Today, also the parade itself."
+      },
+      "comparsa": {
+        "term": "Comparsa",
+        "text": "A candombe group: drummers, dancers and traditional characters."
+      },
+      "cuerda": {
+        "term": "Cuerda",
+        "text": "A comparsa's drum line."
+      },
+      "tamborilero": {
+        "term": "Tamborilero",
+        "text": "A drummer."
+      },
+      "chico": {
+        "term": "Chico",
+        "text": "The smallest, highest-pitched drum. It keeps a steady pulse."
+      },
+      "repique": {
+        "term": "Repique",
+        "text": "The mid-sized drum. It improvises and “talks” to the others."
+      },
+      "piano": {
+        "term": "Piano",
+        "text": "The largest, deepest drum. It lays down the base."
+      },
+      "lonja": {
+        "term": "Lonja",
+        "text": "The drumhead, made of hide."
+      },
+      "templar": {
+        "term": "Templar",
+        "text": "Tuning the drums by warming the drumheads at a fire before setting off."
+      },
+      "madera": {
+        "term": "Madera",
+        "text": "The stick tapped on the side of the drum, marking the basic pattern."
+      },
+      "toque": {
+        "term": "Toque",
+        "text": "Each neighbourhood's playing style. The traditional ones are Cuareim, Ansina and Cordón."
+      },
+      "cuerpoDeBaile": {
+        "term": "Cuerpo de baile",
+        "text": "The dancers who go ahead of the drums."
+      },
+      "mamaVieja": {
+        "term": "Mama vieja",
+        "text": "A character: the matriarch, in a full dress, with a fan and a parasol."
+      },
+      "gramillero": {
+        "term": "Gramillero",
+        "text": "A character: the old healer, white-bearded, with a cane and a case of herbs. He dances with a tremble."
+      },
+      "escobero": {
+        "term": "Escobero",
+        "text": "A character: he juggles a small broom and clears the way for the comparsa."
+      },
+      "vedette": {
+        "term": "Vedette",
+        "text": "The lead dancer, in feathers and sequins."
+      },
+      "estandarte": {
+        "term": "Estandarte",
+        "text": "The banner bearing the comparsa's name. It leads the way."
+      },
+      "banderas": {
+        "term": "Banderas",
+        "text": "Large flags in the comparsa's colours, waved at the front."
+      },
+      "medialunaYEstrella": {
+        "term": "Medialuna y estrella",
+        "text": "The crescent and star emblems carried on tall poles at the front of the comparsa."
+      }
+    }
+  },
   "follow": {
     "follow": "Follow",
     "following": "Following",

@@ -179,6 +179,92 @@
       "osm": "Coordenadas: © colaboradores de OpenStreetMap."
     }
   },
+  "glossary": {
+    "title": "Glosario",
+    "intro": "Las palabras del candombe y de las Llamadas, para entender lo que pasa por la calle.",
+    "terms": {
+      "candombe": {
+        "term": "Candombe",
+        "text": "Música y danza afrouruguaya de tambores, nacida en Montevideo. Patrimonio Cultural Inmaterial de la Humanidad desde 2009."
+      },
+      "llamada": {
+        "term": "Llamada",
+        "text": "El toque con el que los tambores se «llamaban» de un barrio a otro. Hoy, también el desfile."
+      },
+      "comparsa": {
+        "term": "Comparsa",
+        "text": "Cada agrupación de candombe: los tambores, el cuerpo de baile y los personajes."
+      },
+      "cuerda": {
+        "term": "Cuerda",
+        "text": "El conjunto de tambores de una comparsa."
+      },
+      "tamborilero": {
+        "term": "Tamborilero",
+        "text": "Quien toca el tambor."
+      },
+      "chico": {
+        "term": "Chico",
+        "text": "El tambor más chico y agudo. Marca el pulso, siempre igual."
+      },
+      "repique": {
+        "term": "Repique",
+        "text": "El tambor del medio. Improvisa y «conversa» con los otros."
+      },
+      "piano": {
+        "term": "Piano",
+        "text": "El tambor más grande y grave. Es la base."
+      },
+      "lonja": {
+        "term": "Lonja",
+        "text": "El cuero del tambor."
+      },
+      "templar": {
+        "term": "Templar",
+        "text": "Afinar los tambores calentando la lonja al fuego, antes de salir."
+      },
+      "madera": {
+        "term": "Madera",
+        "text": "El golpe del palo contra el costado del tambor, que marca la clave."
+      },
+      "toque": {
+        "term": "Toque",
+        "text": "La manera de tocar de cada barrio. Los tradicionales son Cuareim, Ansina y Cordón."
+      },
+      "cuerpoDeBaile": {
+        "term": "Cuerpo de baile",
+        "text": "Las bailarinas y los bailarines que van delante de la cuerda."
+      },
+      "mamaVieja": {
+        "term": "Mama vieja",
+        "text": "Personaje: la matriarca, de vestido amplio, con abanico y sombrilla."
+      },
+      "gramillero": {
+        "term": "Gramillero",
+        "text": "Personaje: el viejo curandero, de barba blanca, con bastón y maletín de yuyos. Baila temblando."
+      },
+      "escobero": {
+        "term": "Escobero",
+        "text": "Personaje: hace malabares con una escobita y le abre camino a la comparsa."
+      },
+      "vedette": {
+        "term": "Vedette",
+        "text": "La bailarina principal, con plumas y brillos."
+      },
+      "estandarte": {
+        "term": "Estandarte",
+        "text": "La insignia con el nombre de la comparsa. Va adelante de todo."
+      },
+      "banderas": {
+        "term": "Banderas",
+        "text": "Las banderas grandes con los colores de la comparsa, que se hacen flamear al frente."
+      },
+      "medialunaYEstrella": {
+        "term": "Medialuna y estrella",
+        "text": "Los emblemas que se llevan en lo alto de una vara, al frente de la comparsa."
+      }
+    }
+  },
   "follow": {
     "follow": "Seguir",
     "following": "Siguiendo",
