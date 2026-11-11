@@ -17,11 +17,11 @@ React 19 + TypeScript (strict) + Vite + Capacitor 8 + Tailwind 4, Supabase (Post
 
 - `app/` — app móvil (Vite + Capacitor). `app/android/` y `app/ios/` son los proyectos nativos generados por Capacitor.
 - `admin/` — panel web de carga de datos (por ahora, login placeholder).
-- `supabase/` — `config.toml`, `migrations/`, `seeds/` (`01_temporadas.sql` y `02_research.sql`, generado: no editar a mano), `local/` (grilla ficticia y noche real del 28/02/2026; sólo para el Supabase local) y `functions/` (las Edge Functions de avisos: `avisos-del-dia`, `avisos-de-cambios` y lo común en `_shared/`).
+- `supabase/` — `config.toml`, `migrations/`, `seeds/` (`01_temporadas.sql` y `02_research.sql`, generado: no editar a mano), `local/` (grilla ficticia, fixture ficticio del Concurso y noche real del 28/02/2026; sólo para el Supabase local) y `functions/` (las Edge Functions de avisos: `avisos-del-dia`, `avisos-de-cambios` y lo común en `_shared/`).
 - `packages/shared/` (`@cuerda/shared`) — tipos de la base (`database.types.ts`, generado), fechas (`nocheLogica`, `modoLlamadasActivo`, `calendarDateInMontevideo`), `norm` para matching de nombres y los avisos push sin la base ni Firebase: textos (`noticeTexts.ts`), agrupado (`notices.ts`), envío (`delivery.ts`) y FCM (`fcm.ts`).
 - `packages/db-tests/` (`@cuerda/db-tests`) — tests de integración de la base (RLS, funciones, invariantes del esquema) contra el Supabase local. Corren con `pnpm test:db`, aparte de `pnpm test`.
 - `scripts/` — generadores: `gen_seed.py` (el seed, desde los CSV de `research/`), `gen-norm-marks.mjs` (migración de `public.norm`) y `gen_norm_cases.py` (fixture de casos de `norm`); y `db-grilla.mjs`, que carga la grilla ficticia y la noche real de prueba. `norm` vive en tres lugares (TypeScript, Python y SQL) y tienen que dar lo mismo (decisión 22).
-- `research/` — datos semilla de la Fase 0. **No editar a mano sin correr `python research/validate.py` después.** Si cambia un CSV, regenerar también el seed (`pnpm gen:seed`) y el fixture de `norm` (`python scripts/gen_norm_cases.py`); el CI falla si quedaron viejos.
+- `research/` — datos semilla de la Fase 0, más `fixture_2027.csv` (el fixture del Concurso, vacío hasta que se publique). **No editar a mano sin correr `python research/validate.py` después.** Si cambia un CSV, regenerar también el seed (`pnpm gen:seed`) y el fixture de `norm` (`python scripts/gen_norm_cases.py`); el CI falla si quedaron viejos.
 - `docs/`, `prompts/` — plan, decisiones y prompts.
 
 ## Comandos
@@ -63,6 +63,7 @@ pnpm db:grilla               # carga la grilla ficticia (tres noches desde el 20
 pnpm db:grilla hoy           # ídem, desde la noche de hoy (o desde una fecha: YYYY-MM-DD)
 pnpm db:grilla --quitar      # la borra
 pnpm db:noche-real           # carga la noche real del 2026-02-28 (admite hoy, una fecha y --quitar)
+pnpm db:fixture              # carga el fixture ficticio del Concurso desde el 2027-01-25 (admite hoy, una fecha y --quitar)
 pnpm supabase functions serve  # sirve las Edge Functions en http://127.0.0.1:55321/functions/v1/
 pnpm supabase stop
 ```
@@ -72,6 +73,12 @@ Studio local: http://127.0.0.1:55323. API: http://127.0.0.1:55321.
 Seed (decisión 26): `pnpm gen:seed` corre antes `research/validate.py` y no escribe nada si hay errores; con `--post-prueba` le pasa esa opción (para después del 17/11), y con `--check` sólo avisa si el seed quedó viejo. El seed se puede volver a correr sobre una base con datos.
 
 Grilla ficticia (decisión 27): conjuntos reales en escenarios inventados (`ficticio-…`), con `fuente = 'ficticia'`. Sirve para desarrollar pantallas mientras no haya grilla real. `pnpm db:grilla` entra por `docker exec` a la base local; no hay forma de apuntarlo al proyecto remoto, y `pnpm supabase db reset` la borra.
+
+Fixture del Concurso (decisión 57): una noche del Concurso es una fila de `etapas_concurso` y sus conjuntos son las `actuaciones` del Teatro de Verano con ese `etapa_id`; la app lo lee con `fixture_del_concurso(año)`.
+
+- **De prueba:** `pnpm db:fixture` carga las tres ruedas con conjuntos reales y noches inventadas, todo con `fuente = 'fixture-ficticio'`. Tiene las mismas barreras que la grilla ficticia, la app avisa que es de prueba, y `pnpm test:db` lo quita.
+- **El real, cuando se publique:** completar `research/fixture_2027.csv` con una fila por conjunto y noche (`rueda`: primera, segunda o liguilla; `numero` de etapa; `fecha` de la noche; `hora` de Montevideo en HH:MM; `conjunto`: el slug de `conjuntos.csv`; `fuente_url`). Una hora anterior a las 06:00 es de la madrugada siguiente y sigue siendo de esa noche: una actuación a las 00:15 de la etapa del 25/01 lleva `fecha` 2027-01-25. Después `python research/validate.py` y `pnpm gen:seed`, y aplicar el seed (`pnpm supabase db reset` en local; en remoto, como el resto del seed). Antes, quitar el de prueba con `pnpm db:fixture --quitar`. Para probar un borrador sin tocar el repo: `python research/validate.py --fixture <archivo>`.
+- El seed inserta o actualiza y no borra: si un conjunto sale de una noche, hay que borrar esa actuación a mano. Cambiar una hora en el CSV y volver a aplicar el seed manda el aviso de cambio a quienes siguen al conjunto.
 
 Noche real (decisión 39): la cartelera publicada del sábado 28/02/2026, para probar con una noche de tamaño real (`/?noche=2026-02-28`). Va con `fuente = 'cartelera-2026-02-28'`, sólo en el Supabase local. Cada línea se resuelve por `norm` contra los nombres y alias del seed; lo que no coincide no se carga y `pnpm db:noche-real` lo lista. Los escenarios reales no tienen coordenadas: no aparecen en el mapa ni en «cerca mío».
 
@@ -95,11 +102,13 @@ En el emulador Android, la app reescribe `127.0.0.1`/`localhost` a `10.0.2.2` pa
 
 ## App
 
-- Pantallas en `app/src/features/`: `today/` (pizarrón «Hoy»), `map/` (mapa de la noche), `stages/` (ficha de escenario), `groups/` (lista y ficha de conjuntos), `follow/` (Seguir y la sesión), `push/` (avisos), `location/` («cerca mío») y `season/`. Todo lo que habla con Supabase está en `app/src/lib/api.ts`; todo lo que habla con el plugin de push, en `app/src/lib/push.ts`.
+- Pantallas en `app/src/features/`: `today/` (pizarrón «Hoy»), `map/` (mapa de la noche), `stages/` (ficha de escenario), `groups/` (lista y ficha de conjuntos), `follow/` (Seguir y la sesión), `push/` (avisos), `calendar/` (calendario de la temporada y ficha de evento), `contest/` (el Concurso Oficial), `location/` («cerca mío») y `season/`. Todo lo que habla con Supabase está en `app/src/lib/api.ts`; todo lo que habla con el plugin de push, en `app/src/lib/push.ts`.
 - Los tests de pantallas usan `vi.mock('…/lib/api')`, que toma el doble de `app/src/lib/__mocks__/api.ts`. Al agregar una función a `api.ts` hay que sumarla ahí.
 - La sesión es anónima y se crea recién con el primer «Seguir» (decisión 44). Se guarda con `@capacitor/preferences` (`lib/preferencesStorage.ts`). La app tiene que andar igual sin sesión: `fetchFollowed` devuelve vacío y «mis conjuntos» muestra su estado vacío.
 - «Mis conjuntos» es `?mios=1` y lo filtra la base (`p_solo_favoritos`). Esa consulta no se guarda en el teléfono y se vuelve a pedir cuando cambian los seguidos.
 - La noche que se muestra sale de `nocheLogica()` o de `?noche=YYYY-MM-DD`; los filtros viven en la URL.
+- Las fechas de los eventos y de las etapas son fechas puras (`YYYY-MM-DD`): se comparan como texto y se formatean en UTC (`formatIsoDate`, `formatNight`, `formatMonth`, `formatDayParts` en `lib/format.ts`). «Hoy» es siempre `nocheLogica()`. Una fecha con `estado = 'estimado'` nunca se muestra sin su marca (decisión 56).
+- El Concurso está en `/calendario/concurso`, antes que `/calendario/:slug` en `routes.tsx`. Un fixture sin etapas no es una lista vacía: es «todavía no se publicó».
 - `/mapa` se carga aparte (`features/map/LazyMapPage.tsx`), así «Hoy» arranca sin MapLibre. Fuera de `features/map/`, nadie importa `MapPage` ni `MontevideoMap`.
 - Las consultas se guardan en el teléfono 24 horas (`app/src/lib/queryCache.ts`, decisión 37). Si cambia la forma de lo que devuelve una consulta, subir `CACHE_VERSION`. Una consulta que lleve la posición del usuario va con `meta: { persist: false }`.
 - Toda distancia que se muestra pasa por `useDistanceLabel` (`features/location/`): con una ubicación aproximada va redondeada al kilómetro (decisión 42).

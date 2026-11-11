@@ -143,3 +143,15 @@ Once conjuntos que van a la Prueba de Admisión 2027 tenían `temporada_lista=20
 - Ahora los 34 aspirantes tienen `temporada_lista=2027`, y el seed les crea la fila de `conjunto_temporada` 2027 con `en_concurso` nulo (98 filas en total).
 - Quedan 12 con `temporada_lista=2026`, sin fila 2027: Curtidores de Hongos, Los Adams, Jorge, Herencia Ancestral y los ocho fuera de concurso.
 - `python research/validate.py`: OK, sin errores, con las mismas 5 advertencias.
+
+## 2026-11-11 · Fixture del Concurso Oficial
+
+Archivo nuevo: `fixture_2027.csv`, con el fixture del Concurso en el Teatro de Verano. **Está vacío, sólo con el encabezado: el fixture 2027 todavía no se publicó.**
+
+- Columnas: `rueda` (primera, segunda o liguilla), `numero` (de etapa, dentro de la rueda), `fecha` (la noche, AAAA-MM-DD), `hora` (de Montevideo, HH:MM), `conjunto` (el slug de `conjuntos.csv`) y `fuente_url`.
+- Una fila por conjunto y noche. Una hora anterior a las 06:00 es de la madrugada siguiente y sigue siendo de esa noche: no se le suma un día a `fecha`.
+- `validate.py` controla que cada etapa tenga una sola fecha, que no haya dos etapas la misma noche, que un conjunto no esté dos veces en una etapa y que el slug exista; avisa si el conjunto no figura con `en_concurso = true`.
+- Para revisar un borrador sin tocar el repo: `python research/validate.py --fixture <archivo>`.
+- `pnpm gen:seed` lo carga como etapas y actuaciones del Teatro de Verano.
+- `python research/validate.py`: OK, sin errores, con las mismas 5 advertencias.
+

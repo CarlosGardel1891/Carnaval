@@ -168,6 +168,14 @@ Estado al 2026-11-11: el código de los siete puntos está hecho en la rama `con
 2. Concurso Oficial: fixture por rueda y etapa, con link a la venta oficial de entradas (la app no vende).
 3. Agregar al calendario del teléfono un evento o una etapa.
 
+Listo cuando (agregado el 2026-11-11; el plan no lo traía):
+
+- El calendario muestra todos los eventos de la temporada cargados desde `research/`, con las fechas estimadas marcadas, y tocar un día abre el pizarrón de esa noche.
+- Con el fixture ficticio, el Concurso muestra cada rueda con sus noches y sus conjuntos, y desde ahí se llega a las fichas. Sin fixture, avisa que todavía no se publicó.
+- Toda la interfaz nueva está en español y en inglés.
+
+Estado al 2026-11-11: hecho en la rama `calendario-concurso`, con los ajustes de las decisiones 55 a 59. El calendario es una sola lista por mes y por día, sin grilla (decisión 55). El fixture usa el modelo que ya había, etapas y actuaciones del Teatro de Verano (decisión 57); el real se carga desde `research/fixture_2027.csv` cuando se publique. Probado en el navegador y en el emulador de Android con el fixture ficticio. **Quedó sin hacer:** el enlace a la venta oficial de entradas (falta saber cuál es el sitio) y el paso 3, «agregar al calendario del teléfono», que se postergó (decisión 59). Los resultados y el historial no se construyeron: sólo quedó escrito cómo van a colgar (decisión 58).
+
 ### Fase 6 · Modo Llamadas (8 – 13 dic)
 
 1. La app cambia sola de pantalla principal entre `modo_llamadas_desde` y `modo_llamadas_hasta` de la temporada (nunca por tipo de evento).
