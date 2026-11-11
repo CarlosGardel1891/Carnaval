@@ -390,5 +390,8 @@
     "aboutDistance": "about {{distance}}",
     "hidden_one": "{{count}} stage with no location on file is not shown in “Near me”.",
     "hidden_other": "{{count}} stages with no location on file are not shown in “Near me”."
+  },
+  "dev": {
+    "simulatedClock": "Simulated clock: {{date}}, {{time}}"
   }
 }

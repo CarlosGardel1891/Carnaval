@@ -390,5 +390,8 @@
     "aboutDistance": "aprox. {{distance}}",
     "hidden_one": "{{count}} escenario sin ubicación cargada no aparece en «Cerca mío».",
     "hidden_other": "{{count}} escenarios sin ubicación cargada no aparecen en «Cerca mío»."
+  },
+  "dev": {
+    "simulatedClock": "Reloj simulado: {{date}}, {{time}}"
   }
 }

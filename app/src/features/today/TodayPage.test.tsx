@@ -171,7 +171,8 @@ describe('pizarrón Hoy', () => {
     vi.setSystemTime(new Date('2026-11-10T21:00:00-03:00'))
     renderApp('/')
     expect(await screen.findByRole('region', { name: 'Tablado Centro' })).toBeInTheDocument()
-    expect(fetchCurrentSeason).not.toHaveBeenCalled()
+    // El marco de la app sí pide la temporada (para el modo Llamadas); el pizarrón no la muestra.
+    expect(screen.queryByRole('heading', { name: 'Carnaval 2027' })).not.toBeInTheDocument()
   })
 
   it('si falla la carga lo dice y deja reintentar', async () => {
