@@ -40,6 +40,8 @@ export function expectRechazo(res: { data: unknown; error: { code: string } | nu
  */
 export async function limpiar(): Promise<void> {
   await withSql(async (sql) => {
+    // Los avisos de los tests son de noches de 2031 en adelante.
+    await sql.query(`delete from public.avisos_enviados where noche >= '2031-01-01'`)
     await sql.query(
       `delete from public.actuaciones
         where conjunto_id in (select id from public.conjuntos where slug like 'zz-%')

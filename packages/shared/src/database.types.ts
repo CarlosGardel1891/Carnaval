@@ -74,6 +74,82 @@ export type Database = {
           },
         ]
       }
+      avisos_enviados: {
+        Row: {
+          clave: string
+          enviado_en: string | null
+          id: number
+          intentos: number
+          noche: string
+          reclamado_en: string
+          tipo: Database['public']['Enums']['tipo_aviso']
+          usuario_id: string
+        }
+        ComputedFields: never
+        Insert: {
+          clave: string
+          enviado_en?: string | null
+          id?: never
+          intentos?: number
+          noche: string
+          reclamado_en?: string
+          tipo: Database['public']['Enums']['tipo_aviso']
+          usuario_id: string
+        }
+        Update: {
+          clave?: string
+          enviado_en?: string | null
+          id?: never
+          intentos?: number
+          noche?: string
+          reclamado_en?: string
+          tipo?: Database['public']['Enums']['tipo_aviso']
+          usuario_id?: string
+        }
+        Relationships: []
+      }
+      cambios_actuacion: {
+        Row: {
+          actuacion_id: number
+          creado_en: string
+          direccion_anterior: string | null
+          escenario_anterior: number
+          estado_anterior: Database['public']['Enums']['estado_actuacion']
+          id: number
+          inicio_anterior: string
+          procesado_en: string | null
+        }
+        ComputedFields: never
+        Insert: {
+          actuacion_id: number
+          creado_en?: string
+          direccion_anterior?: string | null
+          escenario_anterior: number
+          estado_anterior: Database['public']['Enums']['estado_actuacion']
+          id?: never
+          inicio_anterior: string
+          procesado_en?: string | null
+        }
+        Update: {
+          actuacion_id?: number
+          creado_en?: string
+          direccion_anterior?: string | null
+          escenario_anterior?: number
+          estado_anterior?: Database['public']['Enums']['estado_actuacion']
+          id?: never
+          inicio_anterior?: string
+          procesado_en?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'cambios_actuacion_actuacion_id_fkey'
+            columns: ['actuacion_id']
+            isOneToOne: false
+            referencedRelation: 'actuaciones'
+            referencedColumns: ['id']
+          },
+        ]
+      }
       conjunto_nombres: {
         Row: {
           conjunto_id: number
@@ -518,6 +594,7 @@ export type Database = {
           tipo: string
         }[]
       }
+      cerrar_avisos: { Args: { p_avisos: number[] }; Returns: undefined }
       es_admin: { Args: Record<PropertyKey, never>; Returns: boolean }
       escenarios_cercanos: {
         Args: { p_lat: number; p_lng: number; p_noche: string; p_radio_m: number }
@@ -569,6 +646,45 @@ export type Database = {
         }
         Returns: undefined
       }
+      tomar_avisos_de_cambios: {
+        Args: { p_hasta: string; p_noche: string }
+        Returns: {
+          actuacion_id: number
+          aviso_id: number
+          conjunto_id: number
+          conjunto_nombre: string
+          conjunto_slug: string
+          direccion: string
+          escenario_nombre: string
+          estado: Database['public']['Enums']['estado_actuacion']
+          estado_anterior: Database['public']['Enums']['estado_actuacion']
+          idioma: Database['public']['Enums']['idioma_app']
+          inicio: string
+          inicio_anterior: string
+          noche: string
+          plataforma: Database['public']['Enums']['plataforma_push']
+          token: string
+          usuario_id: string
+        }[]
+      }
+      tomar_avisos_del_dia: {
+        Args: { p_noche: string }
+        Returns: {
+          actuacion_id: number
+          aviso_id: number
+          conjunto_id: number
+          conjunto_nombre: string
+          conjunto_slug: string
+          direccion: string
+          escenario_nombre: string
+          idioma: Database['public']['Enums']['idioma_app']
+          inicio: string
+          noche: string
+          plataforma: Database['public']['Enums']['plataforma_push']
+          token: string
+          usuario_id: string
+        }[]
+      }
     }
     Enums: {
       categoria_conjunto:
@@ -578,6 +694,7 @@ export type Database = {
       idioma_app: 'es' | 'en'
       plataforma_push: 'ios' | 'android'
       rueda_concurso: 'primera' | 'segunda' | 'liguilla'
+      tipo_aviso: 'hoy' | 'cambio'
       tipo_escenario:
         'teatro_verano' | 'privado' | 'popular' | 'movil' | 'gratuito' | 'barrio_a_barrio'
       tipo_evento: 'inaugural' | 'samba' | 'llamadas' | 'corso' | 'admision' | 'concurso' | 'otro'
@@ -706,6 +823,7 @@ export const Constants = {
       idioma_app: ['es', 'en'],
       plataforma_push: ['ios', 'android'],
       rueda_concurso: ['primera', 'segunda', 'liguilla'],
+      tipo_aviso: ['hoy', 'cambio'],
       tipo_escenario: [
         'teatro_verano',
         'privado',

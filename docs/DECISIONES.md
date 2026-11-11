@@ -125,7 +125,7 @@ Registro de decisiones del proyecto. Si algo de `docs/PLAN.md` choca con este ar
     - En el proyecto remoto la despierta `pg_cron` cada minuto; el botón «suspender noche» de la Fase 7 puede llamarla directo.
 49. **Avisos, reglas comunes:**
     - Quién recibe qué lo deciden funciones SQL que sólo ejecuta la service role; el agrupado y los textos, un módulo puro de `@cuerda/shared`; las Edge Functions sólo juntan y mandan. Sin el secret de Firebase corren en simulacro: devuelven los avisos armados y no mandan nada.
-    - Sin duplicados: cada aviso se reclama en `avisos_enviados` (clave única por usuario y aviso) antes de mandarlo. Si el envío falla por un error transitorio se libera para la pasada siguiente, hasta tres intentos.
+    - Sin duplicados: cada aviso se reclama en `avisos_enviados` (clave única por usuario y aviso) antes de mandarlo, en la misma sentencia que lo calcula (`tomar_avisos_del_dia`, `tomar_avisos_de_cambios`). Si el envío falla por un error transitorio se reintenta hasta tres veces: el aviso del día, en las pasadas siguientes (lo reclamado y no enviado se puede volver a tomar a los 5 minutos); el de cambio, dentro de la misma corrida, porque su cola se cierra al tomarlo.
     - Textos en español o inglés según `dispositivos_push.idioma`, con las horas en Montevideo.
     - Un token que FCM rechaza como inexistente o inválido se borra de `dispositivos_push`; con un error transitorio no se borra nada.
     - Con la app abierta no se muestra notificación del sistema: se refresca la grilla.
