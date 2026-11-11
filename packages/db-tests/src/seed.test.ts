@@ -144,7 +144,7 @@ describe('seed: lo que hay en la base es lo que dicen los CSV', () => {
           estado: e.estado,
           fuente_url: list(e.fuente_url!, ' | '),
           recorrido: null,
-          info: null,
+          info: orNull(e.info!),
         })),
       ),
     )
@@ -225,7 +225,9 @@ describe('seed: se puede volver a correr', () => {
     const conLista = conjuntosCsv.find((c) => c.temporada_lista === String(TEMPORADA))!
     const sinLista = conjuntosCsv.find((c) => c.temporada_lista !== String(TEMPORADA))!
     const escenario = escenariosCsv[0]!
-    const evento = eventosCsv[0]!
+    // Un evento sin `info` en el calendario (ahí el seed no pisa la de la base) y otro con.
+    const evento = eventosCsv.find((e) => !e.info)!
+    const eventoConInfo = eventosCsv.find((e) => e.info)!
     const antes = await ids()
 
     try {
@@ -249,6 +251,13 @@ describe('seed: se puede volver a correr', () => {
           .from('eventos')
           .update({ info: 'Zz info de prueba' })
           .eq('slug', evento.slug!)
+          .select(),
+      )
+      ok(
+        await service
+          .from('eventos')
+          .update({ info: 'Zz info que el calendario corrige' })
+          .eq('slug', eventoConInfo.slug!)
           .select(),
       )
       // Lo que sí sale de los CSV: el seed lo vuelve a dejar como estaba.
@@ -307,6 +316,10 @@ describe('seed: se puede volver a correr', () => {
       expect(
         ok(await service.from('eventos').select('info').eq('slug', evento.slug!).single()),
       ).toEqual({ info: 'Zz info de prueba' })
+      // La info que trae el calendario sí manda sobre la de la base.
+      expect(
+        ok(await service.from('eventos').select('info').eq('slug', eventoConInfo.slug!).single()),
+      ).toEqual({ info: eventoConInfo.info })
     } finally {
       await service
         .from('conjuntos')

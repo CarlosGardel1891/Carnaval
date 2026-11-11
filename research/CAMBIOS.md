@@ -155,3 +155,24 @@ Archivo nuevo: `fixture_2027.csv`, con el fixture del Concurso en el Teatro de V
 - `pnpm gen:seed` lo carga como etapas y actuaciones del Teatro de Verano.
 - `python research/validate.py`: OK, sin errores, con las mismas 5 advertencias.
 
+## 2026-11-11 · Nombres cortos en el calendario
+
+En `calendario_2027.csv`, diez eventos tenían en el nombre una aclaración entre paréntesis. El nombre quedó corto y la aclaración pasó a una columna nueva, `info` (entre `estado` y `fuente_url`), con las mismas palabras y la frase completa:
+
+| Evento | Nombre nuevo | `info` |
+| --- | --- | --- |
+| `murga-joven-ensayos-abiertos-2027` | Ensayos abiertos de Murga Joven | 7 al 9, 14 al 16 y 21 y 22 de setiembre. |
+| `llamadas-admision-2027` | Llamadas de Admisión "Rafael Martínez Crosa" | Clasificatoria para las Llamadas 2027. |
+| `concurso-prueba-admision-2027` | Prueba de Admisión al Concurso Oficial 2027 | 34 conjuntos por 16 cupos. La IM indica del 10 al 18/11; el fixture de DAECPU, del 10 al 16/11. |
+| `llamadas-san-baltasar-2027` | Llamadas de San Baltasar | 6 de enero, Día de Reyes. |
+| `temporada-tablados-2027` | Temporada de tablados | Tablados privados, populares y gratuitos. |
+| `concurso-inicio-2027` | Inicio del Concurso Oficial de Agrupaciones Carnavalescas | 39 conjuntos previstos. |
+| `concurso-completo-2027` | Concurso Oficial, hasta la noche de fallos | En 2026 fue del 26/1 al 4/3. |
+| `corsos-barriales-2027` | Corsos barriales | Fueron 12 en 2026, organizados por la IM y los CCZ. |
+| `llamadas-noche-1-2027` | Desfile Oficial de Llamadas - noche 1 | Según el patrón de 2026: desfilan las 23 comparsas clasificadas por el desfile 2026. |
+| `llamadas-noche-2-2027` | Desfile Oficial de Llamadas - noche 2 | Según el patrón de 2026: desfilan las 23 comparsas clasificadas en las Llamadas de Admisión. |
+
+- Los otros nueve eventos no cambian y quedan con `info` vacía. No cambió ninguna fecha, lugar, estado ni fuente.
+- `validate.py` ahora rechaza un nombre de evento con paréntesis.
+- `python research/validate.py`: OK, sin errores, con las mismas 5 advertencias. Seed y fixture de `norm` regenerados.
+

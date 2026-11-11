@@ -30,7 +30,7 @@ COLUMNAS = {
                       "en_llamadas", "instagram_url", "facebook_url", "tipo_cuenta_ig", "verificado", "fuente_url"],
     "escenarios.csv": ["slug", "nombre", "alias", "tipo", "direccion", "barrio", "precio_texto", "gratis", "activo",
                        "itinerante", "temporada_referencia", "fuente_url"],
-    "calendario_2027.csv": ["slug", "evento", "tipo", "fecha_inicio", "fecha_fin", "lugar", "estado", "fuente_url"],
+    "calendario_2027.csv": ["slug", "evento", "tipo", "fecha_inicio", "fecha_fin", "lugar", "estado", "info", "fuente_url"],
 }
 
 # El fixture del Concurso Oficial: una fila por conjunto y noche. No es un catálogo como los
@@ -239,6 +239,9 @@ def chequeo_calendario(df):
                 err(a, fila_id(df, i), f"{c} no es una fecha válida: {v!r}")
         if len(fechas) == 2 and fechas["fecha_fin"] < fechas["fecha_inicio"]:
             err(a, fila_id(df, i), "fecha_fin anterior a fecha_inicio")
+        # El nombre es corto: las aclaraciones (cuántos conjuntos, de dónde sale la fecha) van en `info`.
+        if "(" in row["evento"] or ")" in row["evento"]:
+            err(a, fila_id(df, i), "el nombre del evento tiene una aclaración entre paréntesis: pasarla a 'info'")
         if row["tipo"] == "llamadas" and "fecha_inicio" in fechas and fechas["fecha_inicio"].month != 2:
             aviso(a, fila_id(df, i), "tipo=llamadas fuera de febrero (¿dispararía el modo Llamadas antes de tiempo?)")
 

@@ -4,7 +4,9 @@
 Antes de generar corre research/validate.py: si hay errores, no escribe nada.
 
 El SQL se puede correr más de una vez: inserta o actualiza por slug, y sólo toca las
-columnas que salen de los CSV (no pisa bio, foto, ubicación, recorrido ni info).
+columnas que salen de los CSV (no pisa bio, foto, ubicación, recorrido ni la venta de
+entradas). La `info` de un evento sale del calendario cuando la trae; si el CSV la deja vacía,
+se conserva la que haya en la base.
 
 Participación en la temporada (`conjunto_temporada`): sólo para las filas respaldadas por
 una lista oficial de esa temporada (`temporada_lista` igual al año). Las demás quedan en el
@@ -212,6 +214,7 @@ def sql_eventos(eventos):
             texto(e["fecha_fin"]) + "::date",
             texto(e["lugar"]),
             texto(e["estado"]),
+            texto(e["info"]),
             lista(e["fuente_url"], " | "),
         )
         for e in eventos
@@ -219,12 +222,12 @@ def sql_eventos(eventos):
     return f"""-- ---------------------------------------------------------------- eventos ({len(eventos)})
 
 insert into public.eventos
-  (temporada_id, slug, tipo, nombre, fecha_inicio, fecha_fin, lugar, estado, fuente_url)
+  (temporada_id, slug, tipo, nombre, fecha_inicio, fecha_fin, lugar, estado, info, fuente_url)
 select t.id, v.slug, v.tipo::public.tipo_evento, v.nombre, v.fecha_inicio, v.fecha_fin, v.lugar,
-       v.estado::public.estado_evento, v.fuente_url
+       v.estado::public.estado_evento, v.info, v.fuente_url
 from (values
 {valores}
-) as v (slug, tipo, nombre, fecha_inicio, fecha_fin, lugar, estado, fuente_url)
+) as v (slug, tipo, nombre, fecha_inicio, fecha_fin, lugar, estado, info, fuente_url)
 join public.temporadas t on t.anio = {TEMPORADA}
 on conflict (slug) do update set
   temporada_id = excluded.temporada_id,
@@ -234,6 +237,8 @@ on conflict (slug) do update set
   fecha_fin = excluded.fecha_fin,
   lugar = excluded.lugar,
   estado = excluded.estado,
+  -- Si el calendario no trae info, queda la que se haya cargado en la base.
+  info = coalesce(excluded.info, public.eventos.info),
   fuente_url = excluded.fuente_url;
 """
 

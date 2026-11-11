@@ -210,7 +210,7 @@ Son el resultado de la Fase 0 y la fuente de verdad para cargar la base. `python
 | --- | --- |
 | `conjuntos.csv` | 110 conjuntos: 47 comparsas, 35 murgas, 9 parodistas, 8 humoristas, 6 revistas, 1 samba y 4 «otro» |
 | `escenarios.csv` | 42 escenarios, 39 activos: 1 Teatro de Verano, 7 privados, 19 populares, 2 móviles, 8 Carnaval de a Pie, 1 Barrio a Barrio y 1 sin tipo |
-| `calendario_2027.csv` | 19 eventos: 14 confirmados y 5 estimados |
+| `calendario_2027.csv` | 19 eventos: 14 confirmados y 5 estimados. El nombre es corto; las aclaraciones van en `info` |
 | `informe_fase0.md` | Investigación: fuentes de la grilla, competencia, Llamadas, API de Instagram, borradores de contacto, recomendación |
 | `CAMBIOS.md` | Cómo se normalizaron los CSV y la lista de pendientes de datos |
 | `validate.py` | El validador |
@@ -262,7 +262,7 @@ Datos cargados por el seed: 110 conjuntos (98 con fila 2027), 42 escenarios sin 
 
 ## 10. Reglas y decisiones que hay que respetar
 
-Las 60 decisiones tomadas están en `docs/DECISIONES.md`. Las que más condicionan el trabajo:
+Las 61 decisiones tomadas están en `docs/DECISIONES.md`. Las que más condicionan el trabajo:
 
 - **Zona horaria:** siempre `America/Montevideo`, nunca la del teléfono. Se usan las funciones de `@cuerda/shared`.
 - **Noche lógica:** antes de las 06:00 es la noche anterior. Vale para «hoy», para la temporada vigente y para el modo Llamadas.
