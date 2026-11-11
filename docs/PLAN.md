@@ -156,6 +156,8 @@ Estado al 2026-11-10: los cinco puntos están hechos. La noche del 28/02/2026 se
 
 Listo cuando: seguir un conjunto en TestFlight y recibir la push de prueba en un teléfono real.
 
+Estado al 2026-11-11: el código de los siete puntos está hecho en la rama `conjuntos-push`, con los ajustes de las decisiones 43 a 49 (el paso 5 usa FCM en las dos plataformas; el 6 suma repasos hasta las 19:00; el 7 es un trigger que encola y una función que vacía la cola). Probado en el navegador y en el emulador de Android con la grilla ficticia; las dos Edge Functions corren en local en simulacro. **Todavía no se cumple el «Listo cuando»:** falta el proyecto de Firebase (y confirmar el identificador de la app), una Mac y la cuenta de Apple para TestFlight, y el proyecto remoto de Supabase para programar las funciones. Hasta entonces no salió ningún aviso real.
+
 ### Fase 5 · Calendario y Concurso (1 – 7 dic)
 
 1. Calendario de la temporada: desfiles, etapas del concurso y corsos, con vista por mes y por día. Los eventos estimados se marcan como tales.

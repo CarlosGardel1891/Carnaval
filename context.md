@@ -1,6 +1,6 @@
 # Cuerda · contexto completo del proyecto
 
-Documento para poner al día a alguien que llega de cero. Estado al **2026-11-10**. Repo: <https://github.com/Emiliano-Vanzini/Carnaval>, rama de trabajo `hoy-escenarios` (Fase 3); `develop` tiene hasta la Fase 2.
+Documento para poner al día a alguien que llega de cero. Estado al **2026-11-11**. Repo: <https://github.com/Emiliano-Vanzini/Carnaval>, rama de trabajo `conjuntos-push` (Fase 4); `develop` tiene hasta la Fase 3.
 
 Si algo de acá choca con los documentos del repo, mandan ellos, en este orden: `docs/DECISIONES.md`, `docs/PLAN.md`, `CLAUDE.md`.
 
@@ -38,7 +38,7 @@ Lo que va a ofrecer en su primera versión:
 | 2027-02-05 y 06 | Desfile de Llamadas |
 | 2027-03-07 | Fin de la temporada |
 
-Desde hoy quedan 56 días hasta el envío a revisión.
+Desde hoy quedan 55 días hasta el envío a revisión.
 
 ## 2. Vocabulario del dominio
 
@@ -97,15 +97,15 @@ El análisis completo está en `docs/competencia-carnaval-app.md`.
 | 0 · Investigación y validación | 23 oct – 2 nov | **Terminada** |
 | 1 · Setup técnico | 3 – 5 nov | **Código terminado** (2026-10-23); faltan dos verificaciones manuales |
 | 2 · Modelo de datos | 6 – 9 nov | **Terminada** (2026-11-10, un día tarde) |
-| 3 · Hoy y escenarios | 10 – 23 nov | **Código terminado** (2026-11-10) en `hoy-escenarios`; falta pasarla a `develop` |
-| 4 · Conjuntos, Seguir y push | 24 – 30 nov | **Es lo que sigue** |
-| 5 · Calendario y Concurso | 1 – 7 dic | Sin empezar |
+| 3 · Hoy y escenarios | 10 – 23 nov | **Terminada** (2026-11-10), ya en `develop` |
+| 4 · Conjuntos, Seguir y push | 24 – 30 nov | **Código terminado** (2026-11-11) en `conjuntos-push`; falta un aviso real (Firebase, Apple) y pasarla a `develop` |
+| 5 · Calendario y Concurso | 1 – 7 dic | **Es lo que sigue** |
 | 6 · Modo Llamadas | 8 – 13 dic | Sin empezar |
 | 7 · Datos y panel admin | 1 dic – 10 ene (en paralelo) | Sin empezar |
 | 8 · QA, beta y publicación | 14 dic – 20 ene | Sin empezar |
 | 9 · Operación en temporada | 21 ene – 7 mar | — |
 
-En una frase: **la app ya muestra la noche: pizarrón «Hoy», mapa y ficha de escenario, con «cerca mío» y lo último que cargó guardado en el teléfono.** Lo hace sobre datos de prueba (la grilla ficticia o la cartelera real del 28/02/2026): todavía no hay grilla real, los escenarios reales no tienen coordenadas y no existe nada de conjuntos, Seguir ni push.
+En una frase: **la app ya muestra la noche y los conjuntos, deja seguirlos sin registrarse y tiene armados los avisos push, que todavía no salieron nunca de verdad.** Lo hace sobre datos de prueba (la grilla ficticia o la cartelera real del 28/02/2026): todavía no hay grilla real, los escenarios reales no tienen coordenadas y falta Firebase para mandar un aviso real.
 
 Lo que falta confirmar de la Fase 1:
 
@@ -120,7 +120,8 @@ Android quedó confirmado el 2026-11-10: con JDK 21 (Temurin) el build de debug 
 | Capa | Con qué |
 | --- | --- |
 | App | React 19, TypeScript estricto, Vite 8, Tailwind 4, React Router, TanStack Query |
-| Empaquetado nativo | Capacitor 8 (Android: SDK mínimo 24; iOS: 15.0), con los plugins App, Geolocation, Preferences y Status Bar |
+| Empaquetado nativo | Capacitor 8 (Android: SDK mínimo 24; iOS: 15.0), con los plugins App, Geolocation, Preferences, Status Bar y Firebase Messaging |
+| Push | Firebase Cloud Messaging en Android e iOS, enviado desde Edge Functions (API HTTP v1) |
 | Backend | Supabase: Postgres 17 con PostGIS, auth anónima (ya habilitada), Edge Functions, Realtime |
 | Mapas | MapLibre GL con tiles de MapTiler |
 | Idiomas | react-i18next, español e inglés |
@@ -148,17 +149,20 @@ LEEME.md           Cómo arrancar
 
 ### Lo construido, pieza por pieza
 
-**`packages/shared`** — la parte más sólida, con 25 tests.
+**`packages/shared`** — la parte más sólida, con 79 tests.
 
 - `nocheLogica()`: devuelve la fecha de la «noche» en hora de Montevideo, con corte a las 06:00.
 - `calendarDateInMontevideo()`: la fecha calendario en Montevideo.
 - `modoLlamadasActivo()`: dice si la app debe estar en modo Llamadas según las fechas de la temporada.
 - `norm()`: normaliza nombres (minúsculas, sin tildes, espacios simples) para comparar conjuntos y escenarios. Vive en tres lugares (TypeScript, la `norm` de `research/validate.py` y `public.norm` en SQL) y los tres tienen que dar exactamente lo mismo; está comprobado contra un fixture de 420 casos con los nombres, alias y direcciones reales.
+- Avisos push, sin la base ni Firebase: los textos en español e inglés (`noticeTexts.ts`), el armado de una notificación por dispositivo (`notices.ts`), el envío (`delivery.ts`) y el cliente de FCM (`fcm.ts`). Las Edge Functions importan estos mismos archivos.
 - `database.types.ts`: tipos generados desde la base. No se edita a mano.
 
 **`supabase`**
 
-- Once migraciones: las 10 tablas del MVP, más dos tablas de claves de nombres (`conjunto_nombres` y `escenario_nombres`) que usan el matching y la búsqueda.
+- Doce migraciones: las 10 tablas del MVP, dos tablas de claves de nombres (`conjunto_nombres` y `escenario_nombres`) que usan el matching y la búsqueda, y las dos de los avisos: la cola de cambios (`cambios_actuacion`) y el registro de avisos (`avisos_enviados`).
+- Avisos: un trigger encola cada cambio de hora, lugar o estado de una actuación; `tomar_avisos_del_dia` y `tomar_avisos_de_cambios` deciden quién recibe qué y reclaman cada aviso para que no salga dos veces. Sólo las ejecuta la service role.
+- Dos Edge Functions, `avisos-del-dia` y `avisos-de-cambios`. Sin Firebase configurado corren en simulacro. No están desplegadas en ningún lado.
 - Permisos (RLS) en todas las tablas: cualquiera lee; sólo escribe un admin (`es_admin()`, que mira `app_metadata`) o el service role. `favoritos` y `dispositivos_push` son sólo de su dueño.
 - Auth anónima habilitada en el entorno local. En el proyecto remoto hay que activarla a mano.
 - Funciones de consulta: `actuaciones_de_la_noche`, `escenarios_cercanos`, `proximas_de_conjunto`, `buscar_por_nombre` y `registrar_dispositivo_push`. Las que dependen de la fecha reciben la noche como parámetro; ninguna usa la fecha del servidor.
@@ -170,7 +174,7 @@ LEEME.md           Cómo arrancar
 
 **`packages/db-tests`**
 
-- 146 tests contra el Supabase local: permisos tabla por tabla con usuarios anónimos, admin y falso admin; funciones; invariantes del esquema; seed contra los CSV; grilla ficticia y noche real.
+- 170 tests contra el Supabase local: permisos tabla por tabla con usuarios anónimos, admin y falso admin; funciones; invariantes del esquema; seed contra los CSV; grilla ficticia y noche real; y los avisos (quién recibe cada uno, sin repetidos).
 
 **`app`**
 
@@ -178,17 +182,20 @@ LEEME.md           Cómo arrancar
 - **Cerca mío** (`features/location/`): pide la ubicación sólo cuando se toca el filtro (precisa o aproximada, elige el usuario) y ordena por distancia. Con la aproximada, las distancias van redondeadas al kilómetro y un aviso lo explica. La posición no se guarda.
 - **Mapa** (`features/map/`): los escenarios de la noche que tienen ubicación, con forma y color por tipo, y las paradas de los itinerantes. Sin key de MapTiler muestra los marcadores sobre un fondo liso y lo avisa. MapLibre va en un archivo aparte, que se carga la primera vez que se abre `/mapa`: «Hoy» arranca sin él.
 - **Ficha de escenario** (`features/stages/`): tipo, barrio, precio, dirección, «Cómo llegar» (abre la app de mapas del teléfono) y la grilla de la noche; en un itinerante, cada parada.
+- **Conjuntos** (`features/groups/`): la lista de los que participan de la temporada, con buscador (por nombre y alias, sin tildes ni mayúsculas), filtro por categoría y marcas de «en concurso», «pendiente de la Prueba» y «en las Llamadas»; y la ficha, con redes y próximas actuaciones. Desde el pizarrón, tocar un conjunto abre su ficha.
+- **Seguir** (`features/follow/`): sin registro. El primer «Seguir» crea una sesión anónima que queda guardada en el teléfono; el cambio se ve en el momento y vuelve atrás si falla. El chip «Mis conjuntos» del pizarrón muestra sólo los seguidos. Si la sesión se pierde (reinstalación), la app sigue andando y los seguidos anteriores no se recuperan.
+- **Avisos** (`features/push/`): después de seguir un conjunto, una tarjeta pregunta si se quieren avisos; sólo al aceptar aparece el diálogo del sistema. Registra el teléfono con su idioma y, al tocar un aviso, abre la ficha o el pizarrón. Apagado hasta tener Firebase (`VITE_PUSH_ENABLED`).
 - **Caché** (`lib/queryCache.ts`): las consultas se guardan 24 horas en el teléfono; sin red, la app abre con lo último que cargó y lo avisa.
 - **Ciclo de vida** (`lib/lifecycle.ts`): la grilla se refresca cada 5 minutos sólo con la app al frente y al volver a ella; el botón «atrás» de Android vuelve o minimiza.
 - Todo lo que habla con Supabase está en `lib/api.ts`. En el emulador de Android, el cliente reescribe `127.0.0.1` a `10.0.2.2` para llegar al Supabase local.
 - Todo el texto sale de `src/locales/es.json` y `en.json`; un test controla que tengan las mismas claves.
-- 131 tests.
+- 191 tests.
 
 **`admin`**
 
 - Una pantalla de login que sólo muestra un aviso. No se conecta a nada todavía. 1 test.
 
-**Lo que no existe aún:** las fichas de conjuntos, «Seguir» y el filtro «mis conjuntos», la sesión anónima en la app, las push, el calendario, el modo Llamadas, las Edge Functions, el panel de carga, la grilla real y las coordenadas de los escenarios.
+**Lo que no existe aún:** un aviso push real (falta Firebase), el calendario, el modo Llamadas, el panel de carga, la grilla real y las coordenadas de los escenarios.
 
 ## 8. Datos semilla (`research/`)
 
@@ -250,7 +257,7 @@ Datos cargados por el seed: 110 conjuntos (98 con fila 2027), 42 escenarios sin 
 
 ## 10. Reglas y decisiones que hay que respetar
 
-Las 42 decisiones tomadas están en `docs/DECISIONES.md`. Las que más condicionan el trabajo:
+Las 49 decisiones tomadas están en `docs/DECISIONES.md`. Las que más condicionan el trabajo:
 
 - **Zona horaria:** siempre `America/Montevideo`, nunca la del teléfono. Se usan las funciones de `@cuerda/shared`.
 - **Noche lógica:** antes de las 06:00 es la noche anterior. Vale para «hoy», para la temporada vigente y para el modo Llamadas.
@@ -270,6 +277,8 @@ Las 42 decisiones tomadas están en `docs/DECISIONES.md`. Las que más condicion
 - **Ubicación del usuario:** sólo cuando la pide «cerca mío», en memoria y nunca guardada. Se piden la precisa y la aproximada y el usuario elige; con la aproximada las distancias se muestran redondeadas. El mapa no la pide.
 - **Caché en el teléfono:** 24 horas. Si cambia la forma de lo que devuelve una consulta, hay que subir `CACHE_VERSION`; una consulta que lleve la posición del usuario va con `meta: { persist: false }`.
 - **Coordenadas:** no se inventan. Un escenario sin ubicación aparece en la lista y en su ficha, y el mapa dice cuántos faltan.
+- **Seguir sin registro:** la sesión anónima se crea con el primer «Seguir», nunca antes, y no se piden datos personales.
+- **Avisos:** el permiso se pide después de seguir un conjunto, nunca al abrir. Un aviso por dispositivo, agrupado; el del día sale entre las 12:00 y las 19:00 de Montevideo; ningún aviso sale dos veces; los textos van en los dos idiomas.
 - **Forma de trabajo:** un paso numerado del plan es una tarea; se planifica antes de tocar código y se hace un commit al terminar. Un paso no está hecho hasta cumplir el «Listo cuando» de su fase.
 
 ## 11. Cómo correrlo
@@ -330,7 +339,9 @@ Nativo: `pnpm --filter app android` (o `android:local` para usar el Supabase loc
 - **Supabase remoto** (São Paulo), si todavía no está creado.
 - **Key de MapTiler:** ponerla en `app/.env` y restringirla por origen en MapTiler Cloud (los orígenes están en `CLAUDE.md`). Con una key real todavía no se probó el mapa.
 - **GitHub Actions:** quien administra la cuenta dueña del repo tiene que resolver el pago fallido o subir el límite de gasto (Settings → Billing & plans) para que el CI arranque.
-- **iOS:** probar en una Mac y localizar el texto del permiso de ubicación.
+- **Firebase:** crear el proyecto, confirmar el identificador de la app y bajar `google-services.json`; con eso se prueba un aviso real en el emulador (pasos en `CLAUDE.md`, «Avisos push»).
+- **iOS:** probar en una Mac, localizar el texto del permiso de ubicación y configurar las push (plist, capability y key de APNs).
+- **Avisos en el proyecto remoto:** desplegar las dos Edge Functions y programarlas con `pg_cron`.
 - **17/11:** cargar el resultado de la Prueba de Admisión en `research/conjuntos.csv`, correr `python research/validate.py --post-prueba` y regenerar el seed con `pnpm gen:seed --post-prueba`.
 - **Coordenadas de los escenarios** y las cinco direcciones que faltan.
 - **Decisiones abiertas:** nombre final de la app y monetización en la primera temporada (gratis sin anuncios, o un sponsor).

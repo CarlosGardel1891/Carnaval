@@ -17,8 +17,8 @@ React 19 + TypeScript (strict) + Vite + Capacitor 8 + Tailwind 4, Supabase (Post
 
 - `app/` — app móvil (Vite + Capacitor). `app/android/` y `app/ios/` son los proyectos nativos generados por Capacitor.
 - `admin/` — panel web de carga de datos (por ahora, login placeholder).
-- `supabase/` — `config.toml`, `migrations/`, `seeds/` (`01_temporadas.sql` y `02_research.sql`, generado: no editar a mano), `local/` (grilla ficticia y noche real del 28/02/2026; sólo para el Supabase local) y, más adelante, Edge Functions.
-- `packages/shared/` (`@cuerda/shared`) — tipos de la base (`database.types.ts`, generado), fechas (`nocheLogica`, `modoLlamadasActivo`, `calendarDateInMontevideo`) y `norm` para matching de nombres.
+- `supabase/` — `config.toml`, `migrations/`, `seeds/` (`01_temporadas.sql` y `02_research.sql`, generado: no editar a mano), `local/` (grilla ficticia y noche real del 28/02/2026; sólo para el Supabase local) y `functions/` (las Edge Functions de avisos: `avisos-del-dia`, `avisos-de-cambios` y lo común en `_shared/`).
+- `packages/shared/` (`@cuerda/shared`) — tipos de la base (`database.types.ts`, generado), fechas (`nocheLogica`, `modoLlamadasActivo`, `calendarDateInMontevideo`), `norm` para matching de nombres y los avisos push sin la base ni Firebase: textos (`noticeTexts.ts`), agrupado (`notices.ts`), envío (`delivery.ts`) y FCM (`fcm.ts`).
 - `packages/db-tests/` (`@cuerda/db-tests`) — tests de integración de la base (RLS, funciones, invariantes del esquema) contra el Supabase local. Corren con `pnpm test:db`, aparte de `pnpm test`.
 - `scripts/` — generadores: `gen_seed.py` (el seed, desde los CSV de `research/`), `gen-norm-marks.mjs` (migración de `public.norm`) y `gen_norm_cases.py` (fixture de casos de `norm`); y `db-grilla.mjs`, que carga la grilla ficticia y la noche real de prueba. `norm` vive en tres lugares (TypeScript, Python y SQL) y tienen que dar lo mismo (decisión 22).
 - `research/` — datos semilla de la Fase 0. **No editar a mano sin correr `python research/validate.py` después.** Si cambia un CSV, regenerar también el seed (`pnpm gen:seed`) y el fixture de `norm` (`python scripts/gen_norm_cases.py`); el CI falla si quedaron viejos.
@@ -63,6 +63,7 @@ pnpm db:grilla               # carga la grilla ficticia (tres noches desde el 20
 pnpm db:grilla hoy           # ídem, desde la noche de hoy (o desde una fecha: YYYY-MM-DD)
 pnpm db:grilla --quitar      # la borra
 pnpm db:noche-real           # carga la noche real del 2026-02-28 (admite hoy, una fecha y --quitar)
+pnpm supabase functions serve  # sirve las Edge Functions en http://127.0.0.1:55321/functions/v1/
 pnpm supabase stop
 ```
 
@@ -94,7 +95,10 @@ En el emulador Android, la app reescribe `127.0.0.1`/`localhost` a `10.0.2.2` pa
 
 ## App
 
-- Pantallas en `app/src/features/`: `today/` (pizarrón «Hoy»), `map/` (mapa de la noche), `stages/` (ficha de escenario), `location/` («cerca mío») y `season/`. Todo lo que habla con Supabase está en `app/src/lib/api.ts`.
+- Pantallas en `app/src/features/`: `today/` (pizarrón «Hoy»), `map/` (mapa de la noche), `stages/` (ficha de escenario), `groups/` (lista y ficha de conjuntos), `follow/` (Seguir y la sesión), `push/` (avisos), `location/` («cerca mío») y `season/`. Todo lo que habla con Supabase está en `app/src/lib/api.ts`; todo lo que habla con el plugin de push, en `app/src/lib/push.ts`.
+- Los tests de pantallas usan `vi.mock('…/lib/api')`, que toma el doble de `app/src/lib/__mocks__/api.ts`. Al agregar una función a `api.ts` hay que sumarla ahí.
+- La sesión es anónima y se crea recién con el primer «Seguir» (decisión 44). Se guarda con `@capacitor/preferences` (`lib/preferencesStorage.ts`). La app tiene que andar igual sin sesión: `fetchFollowed` devuelve vacío y «mis conjuntos» muestra su estado vacío.
+- «Mis conjuntos» es `?mios=1` y lo filtra la base (`p_solo_favoritos`). Esa consulta no se guarda en el teléfono y se vuelve a pedir cuando cambian los seguidos.
 - La noche que se muestra sale de `nocheLogica()` o de `?noche=YYYY-MM-DD`; los filtros viven en la URL.
 - `/mapa` se carga aparte (`features/map/LazyMapPage.tsx`), así «Hoy» arranca sin MapLibre. Fuera de `features/map/`, nadie importa `MapPage` ni `MontevideoMap`.
 - Las consultas se guardan en el teléfono 24 horas (`app/src/lib/queryCache.ts`, decisión 37). Si cambia la forma de lo que devuelve una consulta, subir `CACHE_VERSION`. Una consulta que lleve la posición del usuario va con `meta: { persist: false }`.
@@ -104,9 +108,41 @@ En el emulador Android, la app reescribe `127.0.0.1`/`localhost` a `10.0.2.2` pa
 
 ## Variables de entorno
 
-Copiar `app/.env.example` a `app/.env`: `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` (publishable key) y `VITE_MAPTILER_KEY`. Nunca subir `.env` al repo; mantener `.env.example` al día.
+Copiar `app/.env.example` a `app/.env`: `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` (publishable key), `VITE_MAPTILER_KEY` y `VITE_PUSH_ENABLED` (vacío hasta tener Firebase; ver «Avisos push»). Nunca subir `.env` al repo; mantener `.env.example` al día.
 
 La key de MapTiler queda dentro de la app, así que hay que restringirla por origen en MapTiler Cloud (Account → API keys → Allowed HTTP origins). Los orígenes de la app son: `http://localhost:5173` (desarrollo), `https://localhost` (Android) y `capacitor://localhost` (iOS). Sin key, el mapa muestra los marcadores sobre un fondo liso y avisa que falta.
+
+## Avisos push
+
+Decisiones 45 a 49. Tres piezas, cada una con sus tests:
+
+- **Quién recibe qué: la base.** Un trigger en `actuaciones` encola los cambios de hora, lugar o estado en `cambios_actuacion` (las altas no encolan). `tomar_avisos_del_dia(noche)` y `tomar_avisos_de_cambios(noche, hasta)` devuelven las filas ya reclamadas en `avisos_enviados`, así el mismo aviso no sale dos veces; `cerrar_avisos(ids)` marca los que salieron. Sólo las ejecuta la service role. Tests: `packages/db-tests/src/avisos.test.ts`.
+- **Textos y envío: `@cuerda/shared`.** `buildDailyNotices` y `buildChangeNotices` arman una notificación por dispositivo, en su idioma y con las horas de Montevideo; los textos están en `noticeTexts.ts` (es y en, mismas claves). `deliver` manda con un `Sender`: `createFcmSender` (FCM HTTP v1) o `dryRunSender`.
+- **Edge Functions: sólo juntan y mandan.** Importan los archivos de `packages/shared/src/` por ruta relativa y con extensión `.ts` (Deno); por eso `notices.ts`, `delivery.ts`, `fcm.ts`, `dates.ts` y `noticeTexts.ts` sólo pueden tener imports relativos con `.ts` (lo controla `denoImports.test.ts`).
+
+Probarlas en local, sin Firebase (simulacro: devuelven los avisos armados y no mandan nada):
+
+```bash
+pnpm supabase functions serve
+# La service role key sale de `pnpm supabase status`.
+curl -X POST http://127.0.0.1:55321/functions/v1/avisos-del-dia \
+  -H "Authorization: Bearer <SERVICE_ROLE_KEY>" -d '{"forzar": true}'
+curl -X POST http://127.0.0.1:55321/functions/v1/avisos-de-cambios \
+  -H "Authorization: Bearer <SERVICE_ROLE_KEY>" -d '{"sin_espera": true}'
+```
+
+- `avisos-del-dia` sólo manda entre las 12:00 y las 19:00 de Montevideo; `forzar` saltea el horario.
+- `avisos-de-cambios` espera a que una actuación lleve un minuto sin tocarse; `sin_espera` lo saltea.
+- Para que haya a quién avisar hace falta un usuario que siga un conjunto (desde la app) y una fila suya en `dispositivos_push`. Tomar los avisos los reclama: el del día vuelve a salir a los 5 minutos (hasta tres veces) si no se envió; el de cambio, no.
+- Las funciones no se despliegan en ningún proyecto remoto desde acá.
+
+**Firebase (pendiente: falta crear el proyecto y confirmar el identificador de la app, decisión 46).** Nada de esto va al repo; `.gitignore` ya lo excluye.
+
+- Firebase Console → crear el proyecto → agregar la app Android con el identificador de `app/capacitor.config.ts` → bajar `google-services.json` a `app/android/app/`. Con ese archivo presente, `app/android/app/build.gradle` aplica solo el plugin de Google Services.
+- iOS (hace falta una Mac): agregar la app iOS, bajar `GoogleService-Info.plist`, sumarlo al target desde Xcode, activar la capability Push Notifications y subir la key de APNs a Firebase (Project settings → Cloud Messaging).
+- Cuenta de servicio para mandar: Project settings → Service accounts → Generate new private key. El JSON entero va como secret `FIREBASE_SERVICE_ACCOUNT`: en local, en `supabase/functions/.env` (una línea, `FIREBASE_SERVICE_ACCOUNT='{…}'`) y `pnpm supabase functions serve --env-file supabase/functions/.env`; en remoto, `pnpm supabase secrets set`.
+- En la app: `VITE_PUSH_ENABLED=1` en `app/.env`. Sin `google-services.json`, dejarlo vacío: el plugin se instala igual y la app arranca, pero pedir el token falla.
+- En el proyecto remoto falta programar las funciones con `pg_cron` y `pg_net`: `avisos-del-dia` cada 30 minutos y `avisos-de-cambios` cada minuto, con la service role key guardada en Vault.
 
 ## Bundle ID
 
@@ -118,7 +154,8 @@ Provisional: `uy.cuerda.app`. Para cambiarlo antes de publicar: `appId` en `app/
 - Tablas y columnas en español snake_case; código en inglés; commits en español.
 - Nada de texto hardcodeado en la UI: todo por i18n (`src/locales/{es,en}.json`, mismas claves; hay un test que lo controla).
 - RLS en todas las tablas: lectura pública de lo publicado, escritura sólo service role o admin. Los usuarios anónimos tienen el rol `authenticated`: las policies de escritura exigen `es_admin()`, nunca sólo el rol. En el MVP todo lo que está en las tablas públicas está publicado (decisión 24).
-- Nunca subir keys al repo: usar `.env` y mantener `.env.example`.
+- Nunca subir keys al repo: usar `.env` y mantener `.env.example`. Tampoco `google-services.json`, `GoogleService-Info.plist` ni la cuenta de servicio de Firebase.
+- Ningún texto de un aviso push va escrito en la lógica: sale de `packages/shared/src/noticeTexts.ts`, en los dos idiomas.
 - `packages/shared/src/database.types.ts` y `supabase/seeds/02_research.sql` son generados: se regeneran con `pnpm gen:types` y `pnpm gen:seed`, nunca a mano.
 - Las funciones SQL reciben la noche lógica como parámetro (la app la calcula con `nocheLogica()`); nada de `current_date`, `now()::date` ni el `TimeZone` de la sesión en las migraciones.
 - Plan mode antes de cada paso grande; commit al terminar cada paso.
