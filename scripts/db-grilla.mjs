@@ -18,6 +18,13 @@
 // Al cargarla lista los nombres de la cartelera que no coinciden con ningún nombre ni
 // alias del seed (esas líneas no se cargan).
 //
+// El fixture ficticio del Concurso Oficial (fixture_ficticio.sql):
+//
+//   pnpm db:fixture               las tres ruedas desde el 2027-01-25
+//   pnpm db:fixture hoy           desde la noche lógica de hoy
+//   pnpm db:fixture 2027-02-01    desde esa fecha
+//   pnpm db:fixture --quitar      lo borra
+//
 // Entra por `docker exec` al contenedor de la base local: no usa URL ni keys, así que no
 // puede llegar a un proyecto remoto.
 import { spawnSync } from 'node:child_process'
@@ -36,6 +43,16 @@ const DATASETS = {
       delete from public.escenarios where slug like 'ficticio-%';
     `,
   },
+  fixture: {
+    command: 'db:fixture',
+    label: 'fixture ficticio del Concurso',
+    file: 'fixture_ficticio.sql',
+    // Primero las actuaciones: sin ellas, borrar la etapa no deja ninguna con la etapa en null.
+    removeSql: `
+      delete from public.actuaciones where fuente = 'fixture-ficticio';
+      delete from public.etapas_concurso where fuente = 'fixture-ficticio';
+    `,
+  },
   real: {
     command: 'db:noche-real',
     label: 'noche real del 28/02/2026',
@@ -45,7 +62,11 @@ const DATASETS = {
 }
 
 const args = process.argv.slice(2)
-const dataset = args.includes('--real') ? DATASETS.real : DATASETS.ficticia
+const dataset = args.includes('--real')
+  ? DATASETS.real
+  : args.includes('--fixture')
+    ? DATASETS.fixture
+    : DATASETS.ficticia
 const sqlFile = path.join(root, 'supabase', 'local', dataset.file)
 
 function fail(message) {
@@ -54,7 +75,7 @@ function fail(message) {
 }
 
 const remove = args.includes('--quitar')
-const rest = args.filter((a) => a !== '--quitar' && a !== '--real')
+const rest = args.filter((a) => a !== '--quitar' && a !== '--real' && a !== '--fixture')
 if (rest.length > 1 || (remove && rest.length > 0)) {
   fail(`uso: pnpm ${dataset.command} [hoy | YYYY-MM-DD] | pnpm ${dataset.command} --quitar`)
 }
@@ -105,4 +126,4 @@ if (result.error || result.status !== 0) {
       : 'no se cargó. ¿Está levantado el Supabase local? Corré `pnpm supabase start`.',
   )
 }
-console.log(`${dataset.command}: ${dataset.label} ${remove ? 'borrada' : 'cargada'}.`)
+console.log(`${dataset.command}: ${dataset.label}: ${remove ? 'se borró' : 'se cargó'}.`)
