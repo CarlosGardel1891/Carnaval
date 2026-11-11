@@ -5,6 +5,7 @@
 import { createClient, type SupabaseClient } from 'npm:@supabase/supabase-js@2'
 import type { Database } from '../../../packages/shared/src/database.types.ts'
 import { deliver, dryRunSender, type Sender } from '../../../packages/shared/src/delivery.ts'
+import { createFcmSender, parseServiceAccount } from '../../../packages/shared/src/fcm.ts'
 import type { Notice } from '../../../packages/shared/src/notices.ts'
 
 export type Db = SupabaseClient<Database>
@@ -32,7 +33,8 @@ const json = (body: unknown, status = 200) =>
 
 /** Con Firebase configurado manda de verdad; sin él, simulacro (decisión 49). */
 function pickSender(): Sender {
-  return dryRunSender
+  const account = Deno.env.get('FIREBASE_SERVICE_ACCOUNT')
+  return account ? createFcmSender(parseServiceAccount(account)) : dryRunSender
 }
 
 /** Para la respuesta del simulacro: el token no se muestra entero. */
