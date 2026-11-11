@@ -139,7 +139,21 @@
     "estimatedAt": "Estimated time: {{time}}",
     "estimateNote": "The first comparsa sets off at {{start}} and each one follows {{interval}} minutes and {{gap}} metres behind the one before. The real parade usually runs late.",
     "delay_one": "The parade is running {{count}} minute late: the times already include it.",
-    "delay_other": "The parade is running {{count}} minutes late: the times already include it."
+    "delay_other": "The parade is running {{count}} minutes late: the times already include it.",
+    "routeError": "We couldn't load the route.",
+    "noRoute": "The parade route hasn't been added yet.",
+    "routeEstimated": "This is the route expected from previous years: it isn't official yet.",
+    "block": {
+      "title": "When it passes your block",
+      "label": "Block",
+      "choose": "Pick a block",
+      "option": "{{number}}. From {{from}} to {{to}}",
+      "name": "{{street}}, from {{from}} to {{to}}",
+      "nearest": "It's the nearest block: you're {{distance}} away.",
+      "middle": "Times are for the middle of the block.",
+      "noOrder": "The parade line-up hasn't been published yet.",
+      "first": "The first comparsa should pass here"
+    }
   },
   "follow": {
     "follow": "Follow",

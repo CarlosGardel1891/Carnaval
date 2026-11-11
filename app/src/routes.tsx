@@ -5,6 +5,7 @@ import { EventPage } from './features/calendar/EventPage'
 import { ContestPage } from './features/contest/ContestPage'
 import { GroupPage } from './features/groups/GroupPage'
 import { GroupsPage } from './features/groups/GroupsPage'
+import { BlockView } from './features/llamadas/BlockView'
 import { LlamadasLayout } from './features/llamadas/LlamadasLayout'
 import { OrderView } from './features/llamadas/OrderView'
 import { LazyMapPage } from './features/map/LazyMapPage'
@@ -32,7 +33,10 @@ export const routes: RouteObject[] = [
       {
         path: 'llamadas',
         element: <LlamadasLayout />,
-        children: [{ index: true, element: <OrderView /> }],
+        children: [
+          { index: true, element: <OrderView /> },
+          { path: 'cuadra', element: <BlockView /> },
+        ],
       },
       { path: '*', element: <Navigate to="/" replace /> },
     ],

@@ -139,7 +139,21 @@
     "estimatedAt": "Hora estimada: {{time}}",
     "estimateNote": "La primera comparsa sale a las {{start}} y cada una larga {{interval}} minutos y {{gap}} metros después de la anterior. El desfile de verdad suele atrasarse.",
     "delay_one": "El desfile lleva {{count}} minuto de atraso: las horas ya lo cuentan.",
-    "delay_other": "El desfile lleva {{count}} minutos de atraso: las horas ya lo cuentan."
+    "delay_other": "El desfile lleva {{count}} minutos de atraso: las horas ya lo cuentan.",
+    "routeError": "No pudimos cargar el recorrido.",
+    "noRoute": "Todavía no está cargado el recorrido del desfile.",
+    "routeEstimated": "El recorrido es el esperado según años anteriores: todavía no es oficial.",
+    "block": {
+      "title": "A qué hora pasa por tu cuadra",
+      "label": "Cuadra",
+      "choose": "Elegí una cuadra",
+      "option": "{{number}}. De {{from}} a {{to}}",
+      "name": "{{street}}, de {{from}} a {{to}}",
+      "nearest": "Es la cuadra más cercana: estás a {{distance}}.",
+      "middle": "Las horas son para la mitad de la cuadra.",
+      "noOrder": "El orden de desfile todavía no se publicó.",
+      "first": "La primera comparsa pasaría por acá"
+    }
   },
   "follow": {
     "follow": "Seguir",
