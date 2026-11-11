@@ -99,7 +99,11 @@
     "startsAround": "El Concurso empezaría alrededor del {{date}}: la fecha todavía es estimada.",
     "sample": "Fixture de prueba: las noches, el orden y las horas son inventados.",
     "night": "Etapa {{number}}",
-    "noActs": "Todavía no están cargados los conjuntos de esta noche."
+    "noActs": "Todavía no están cargados los conjuntos de esta noche.",
+    "inContest": "En el Concurso",
+    "groupNight": "{{round}} · etapa {{number}}",
+    "seeFixture": "Ver el fixture del Concurso",
+    "groupNotPublished": "Está en el Concurso Oficial. El fixture todavía no se publicó: cuando salga, acá van a estar sus noches."
   },
   "follow": {
     "follow": "Seguir",

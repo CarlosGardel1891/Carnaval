@@ -8,6 +8,7 @@ import { formatNight, formatTime } from '../../lib/format'
 import { joinParts } from '../../lib/labels'
 import { useLocale } from '../../lib/useLocale'
 import { useNow } from '../../lib/useNow'
+import { GroupContest } from '../contest/GroupContest'
 import { FollowButton } from '../follow/FollowButton'
 import { useCurrentSeason } from '../season/useCurrentSeason'
 import { GroupBadges } from './GroupBadges'
@@ -159,6 +160,8 @@ export function GroupPage() {
           </ul>
         </section>
       )}
+
+      <GroupContest groupId={group.id} inContest={participation?.en_concurso === true} />
 
       <section aria-labelledby="proximas" className="space-y-3">
         <h2 id="proximas" className="text-xl font-bold">

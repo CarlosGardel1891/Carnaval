@@ -8,6 +8,7 @@ import { formatIsoDate, formatNight } from '../../lib/format'
 import { useLocale } from '../../lib/useLocale'
 import { useNow } from '../../lib/useNow'
 import { useCurrentSeason } from '../season/useCurrentSeason'
+import { CONTEST_PATH } from '../contest/contest'
 import { isMultiDay, isPreseason } from './calendar'
 
 const action =
@@ -139,10 +140,18 @@ export function EventPage() {
 
       {event.info && <p className="text-lg whitespace-pre-line">{event.info}</p>}
 
-      <p>
+      <p className="flex flex-wrap gap-3">
         <Link to={`/?noche=${night}`} className={action}>
           {ongoing ? t('event.seeTonight') : t('event.seeNight')}
         </Link>
+        {event.tipo === 'concurso' && (
+          <Link
+            to={CONTEST_PATH}
+            className="bg-raised text-ink border-line inline-flex min-h-12 items-center rounded-xl border px-5 font-semibold"
+          >
+            {t('contest.seeFixture')}
+          </Link>
+        )}
       </p>
 
       <section aria-labelledby="fuente" className="space-y-2">

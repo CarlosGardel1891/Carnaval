@@ -99,7 +99,11 @@
     "startsAround": "The Contest should start around {{date}}: the date is still an estimate.",
     "sample": "Sample fixture: the nights, the order and the times are made up.",
     "night": "Night {{number}}",
-    "noActs": "This night's groups haven't been added yet."
+    "noActs": "This night's groups haven't been added yet.",
+    "inContest": "In the Contest",
+    "groupNight": "{{round}} · night {{number}}",
+    "seeFixture": "See the Contest fixture",
+    "groupNotPublished": "It's in the Official Contest. The fixture hasn't been published yet: once it's out, its nights will be listed here."
   },
   "follow": {
     "follow": "Follow",
