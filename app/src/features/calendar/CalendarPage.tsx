@@ -12,6 +12,11 @@ import { eventPath, useSeasonEvents } from './useEvents'
 
 const badge = 'rounded-md border px-2 py-0.5 text-sm font-semibold'
 
+/** Lleva la fila de hoy a la vista cuando aparece (en los tests, jsdom no sabe scrollear). */
+function scrollToToday(row: HTMLLIElement | null): void {
+  if (row && typeof row.scrollIntoView === 'function') row.scrollIntoView({ block: 'center' })
+}
+
 interface EventRowProps {
   event: CalendarEvent
   today: string
@@ -79,6 +84,8 @@ function DayRow({
 
   return (
     <li
+      // El calendario abre en hoy: la pretemporada queda arriba, a un scroll de distancia.
+      ref={day.isToday ? scrollToToday : undefined}
       aria-current={day.isToday ? 'date' : undefined}
       className={`flex gap-3 py-2 ${day.isToday ? 'border-accent -mx-2 rounded-xl border px-2' : ''}`}
     >
@@ -86,7 +93,7 @@ function DayRow({
       <Link
         to={`/?noche=${day.date}`}
         aria-label={t('calendar.openNight', { date: formatNight(day.date, locale) })}
-        className={`flex min-h-12 w-16 shrink-0 flex-col items-center justify-center rounded-xl border py-1 ${
+        className={`flex min-h-12 w-16 shrink-0 flex-col items-center justify-center self-start rounded-xl border py-1 ${
           day.isToday ? 'bg-accent text-accent-ink border-accent' : 'bg-raised border-line'
         } ${past ? 'opacity-60' : ''}`}
       >

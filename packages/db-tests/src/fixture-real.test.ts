@@ -92,6 +92,14 @@ async function conFixture<T>(
 
 beforeAll(() => {
   dir = mkdtempSync(path.join(tmpdir(), 'fixture-'))
+  // El fixture real no se mezcla con el de prueba: si quedó cargado en la base local, se quita
+  // (como el test de la grilla ficticia, deja la base sin datos de prueba).
+  const quitar = spawnSync(
+    process.execPath,
+    [repoPath('scripts', 'db-grilla.mjs'), '--fixture', '--quitar'],
+    { encoding: 'utf8' },
+  )
+  expect(quitar.status, quitar.stderr).toBe(0)
 })
 afterAll(() => {
   rmSync(dir, { recursive: true, force: true })
