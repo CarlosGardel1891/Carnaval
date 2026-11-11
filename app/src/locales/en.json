@@ -157,6 +157,7 @@
     "route": {
       "title": "Route",
       "mapLabel": "Map of the parade route",
+      "missingKey": "MapTiler key missing (VITE_MAPTILER_KEY): the route is shown, but not the streets.",
       "noStreets": "We couldn't load the map's streets: the route is shown on a plain background.",
       "start": "Start",
       "end": "Finish",

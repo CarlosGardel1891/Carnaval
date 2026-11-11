@@ -22,6 +22,14 @@ export function now(): Date {
   return new Date(Date.now() + offsetMs)
 }
 
+/**
+ * Cuánto está corrido el reloj, en milisegundos (0 si no lo está). Lo que guarda horas del
+ * reloj de verdad, como cuándo se bajó una consulta, se compara restando esto.
+ */
+export function clockOffsetMs(): number {
+  return offsetMs
+}
+
 /** Si el reloj está corrido: la app lo avisa en pantalla. */
 export function isClockSimulated(): boolean {
   return offsetMs !== 0

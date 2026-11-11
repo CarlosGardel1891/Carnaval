@@ -184,7 +184,7 @@ export function ParadeMap({ corners, closures }: ParadeMapProps) {
       />
       {blank && (
         <p className="bg-surface/90 text-soft border-line absolute inset-x-3 bottom-3 rounded-xl border p-2 text-center text-sm">
-          {t(blank === 'no-key' ? 'map.missingKey' : 'llamadas.route.noStreets')}
+          {t(blank === 'no-key' ? 'llamadas.route.missingKey' : 'llamadas.route.noStreets')}
         </p>
       )}
     </div>

@@ -157,6 +157,7 @@
     "route": {
       "title": "Recorrido",
       "mapLabel": "Mapa del recorrido del desfile",
+      "missingKey": "Falta la key de MapTiler (VITE_MAPTILER_KEY): se ve el recorrido, pero no las calles.",
       "noStreets": "No pudimos cargar las calles del mapa: se ve el recorrido sobre fondo liso.",
       "start": "Salida",
       "end": "Llegada",

@@ -26,8 +26,11 @@ export function useOpenInLlamadas(): void {
   useEffect(() => {
     if (decided.current) return
     // `key` es `default` sólo en la primera pantalla: después de navegar, ya no.
+    // `?ahora=` (el reloj simulado de desarrollo) no cuenta como parámetro de la pantalla.
+    const params = new URLSearchParams(location.search)
+    params.delete('ahora')
     const justOpened =
-      location.key === 'default' && location.pathname === '/' && location.search === ''
+      location.key === 'default' && location.pathname === '/' && params.toString() === ''
     if (!justOpened || season.isError) {
       decided.current = true
       return

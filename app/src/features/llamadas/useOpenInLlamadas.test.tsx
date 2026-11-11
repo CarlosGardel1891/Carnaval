@@ -94,6 +94,11 @@ describe('con el modo Llamadas activo la app abre en Llamadas', () => {
     expect(second.router.state.location.search).toBe('?noche=2027-02-05&mios=1')
   })
 
+  it('abrir con el reloj simulado en la dirección (?ahora=) también entra a Llamadas', async () => {
+    const { router } = await openAt('/?ahora=2027-02-05T21:00', '2027-02-05T21:00')
+    await waitFor(() => expect(router.state.location.pathname).toBe('/llamadas'))
+  })
+
   it('una temporada sin fechas de Llamadas nunca activa el modo, haya o no eventos de Llamadas', async () => {
     vi.mocked(fetchCurrentSeason).mockResolvedValue({
       ...SEASON,

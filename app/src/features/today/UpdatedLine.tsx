@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next'
+import { clockOffsetMs } from '../../lib/clock'
 import { formatAgo } from '../../lib/format'
 import { useLocale } from '../../lib/useLocale'
 
@@ -16,7 +17,8 @@ interface UpdatedLineProps {
 export function UpdatedLine({ updatedAt, now, isFetching, failed, onRefresh }: UpdatedLineProps) {
   const { t } = useTranslation()
   const locale = useLocale()
-  const ago = formatAgo(now.getTime() - updatedAt, locale)
+  // `updatedAt` es del reloj de verdad; `now`, del de la app, que en desarrollo puede estar corrido.
+  const ago = formatAgo(now.getTime() - clockOffsetMs() - updatedAt, locale)
 
   return (
     <div>
