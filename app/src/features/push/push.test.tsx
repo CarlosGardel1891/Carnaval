@@ -122,7 +122,9 @@ describe('avisos push en la app', () => {
       renderApp('/conjuntos/la-gran-muneca')
       await userEvent.click(await screen.findByRole('button', { name: 'Sí, avisame' }))
 
-      expect(await screen.findByText(/permití las notificaciones de Cuerda/)).toBeInTheDocument()
+      expect(
+        await screen.findByText(/permití las notificaciones de Carnavalero/),
+      ).toBeInTheDocument()
       expect(registerPushDevice).not.toHaveBeenCalled()
       expect(getPushToken).not.toHaveBeenCalled()
       expect(screen.getByRole('button', { name: /^Siguiendo a La Gran Muñeca/ })).toHaveAttribute(

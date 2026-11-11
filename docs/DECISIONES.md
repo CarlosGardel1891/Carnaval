@@ -19,7 +19,7 @@ Registro de decisiones del proyecto. Si algo de `docs/PLAN.md` choca con este ar
 
 ## 2026-10-23 · Tomadas en la Fase 1 (setup técnico)
 
-13. **Bundle ID provisional:** `uy.cuerda.app` hasta tener el nombre final. Se cambia antes de crear las fichas en las tiendas (pasos en `CLAUDE.md`).
+13. **Bundle ID provisional:** `uy.cuerda.app` hasta tener el nombre final. Se cambia antes de crear las fichas en las tiendas (pasos en `CLAUDE.md`). Reemplazado el 2026-11-11 por `uy.carnavalero.app` (decisión 54).
 14. **Herramientas:** pnpm vía corepack (versión fijada en `package.json`); Supabase CLI como devDependency (`pnpm supabase …`); TypeScript 6.0 (typescript-eslint todavía no soporta 7); Tailwind 4 con `@tailwindcss/vite`.
 15. **Zona horaria sin librerías:** `Intl.DateTimeFormat` con `timeZone: 'America/Montevideo'`, nunca un offset fijo ni la zona del dispositivo. Las fechas puras (`YYYY-MM-DD`) se comparan como texto y se muestran formateadas en UTC.
 16. **Modo Llamadas por noche lógica:** `modoLlamadasActivo` compara la noche lógica del instante con `[modo_llamadas_desde, modo_llamadas_hasta]` (ambas inclusive). La madrugada después de la última noche sigue en modo Llamadas hasta las 06:00.
@@ -140,4 +140,15 @@ Registro de decisiones del proyecto. Si algo de `docs/PLAN.md` choca con este ar
     - Los resultados de la temporada, durante el carnaval.
     - El historial de resultados de años anteriores, después.
     - Pencas y comentarios siguen afuera, igual que las reseñas: la app informa, no es una comunidad.
-    - Posicionamiento: ya no vale «Carnaval App es la app del Concurso y Cuerda la de salir a ver carnaval». La app cubre también el Concurso como información (fixture, resultados, historial) y deja a Carnaval App la parte social. Los diferenciales siguen siendo los de la decisión 9, más el alcance nacional.
+    - Posicionamiento: ya no vale «Carnaval App es la app del Concurso y la nuestra, la de salir a ver carnaval». La app cubre también el Concurso como información (fixture, resultados, historial) y deja a Carnaval App la parte social. Los diferenciales siguen siendo los de la decisión 9, más el alcance nacional.
+
+## 2026-11-11 · Nombre, identificador y logo
+
+54. **La app se llama Carnavalero** y su identificador es `uy.carnavalero.app` (reemplaza la decisión 13 y cierra la decisión abierta del nombre):
+    - **Nombre visible:** «Carnavalero» en Capacitor, Android, iOS, los textos de la app en los dos idiomas, el título de la web de desarrollo y el panel de carga. No queda «Cuerda» en nada que vea el público.
+    - **Identificador:** `uy.carnavalero.app` en Capacitor, Android (`applicationId`, `namespace` y el paquete Java) e iOS (`PRODUCT_BUNDLE_IDENTIFIER`, la única línea de `project.pbxproj` que se tocó a mano). Para el teléfono es otra app: la instalada con el identificador viejo hay que desinstalarla. Firebase se registra con este identificador (decisión 46).
+    - **Nombres internos:** siguen siendo «cuerda», a propósito: los paquetes `@cuerda/shared` y `@cuerda/db-tests`, el `project_id` de Supabase y sus contenedores, los parámetros de sesión de los datos de prueba y las claves de lo guardado en el teléfono. Cambiarlos no le aporta nada al público y rompe imports y entornos locales. La lista está en `CLAUDE.md`.
+    - **Logo:** una ilustración en azules (una cara de carnaval, un tambor, una luna y un farol). Las imágenes de origen están en `app/assets/` y son la única fuente: `icon-only.png`, las dos capas del ícono adaptativo de Android (`icon-foreground.png` sobre `icon-background.png`, `#0448a7`) y `notificacion.svg`, un tambor blanco para los avisos. Los íconos y las pantallas de inicio de Android e iOS, y los favicons, se generan con `pnpm gen:assets`; no se editan a mano.
+    - **Pantalla de inicio:** el logo al centro sobre el color de fondo de la app (`--color-ground`), que sigue teniendo un solo tema, oscuro (decisión 41). Desde Android 12 la arma el sistema con el ícono de la app sobre ese mismo color.
+    - **Avisos en Android:** el ícono es el tambor, teñido con el azul del logo.
+

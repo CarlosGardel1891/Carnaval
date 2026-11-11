@@ -19,6 +19,10 @@
 
 
     <style name="AppTheme.NoActionBarLaunch" parent="Theme.SplashScreen">
+        <!-- Hasta Android 11, la pantalla de inicio es esta imagen: el logo al centro sobre el
+             fondo de la app. Desde Android 12 la arma el sistema con el ícono de la app, sobre
+             el color de abajo. -->
         <item name="android:background">@drawable/splash</item>
+        <item name="windowSplashScreenBackground">@color/ground</item>
     </style>
 </resources>

@@ -1,4 +1,4 @@
-# Cuerda · contexto completo del proyecto
+# Carnavalero · contexto completo del proyecto
 
 Documento para poner al día a alguien que llega de cero. Estado al **2026-11-11**. Repo: <https://github.com/Emiliano-Vanzini/Carnaval>, rama de trabajo `conjuntos-push` (Fase 4); `develop` tiene hasta la Fase 3.
 
@@ -6,7 +6,7 @@ Si algo de acá choca con los documentos del repo, mandan ellos, en este orden: 
 
 ## 1. Qué es
 
-**Cuerda** (nombre de trabajo, todavía no definitivo) es una app sólo para iPhone y Android, sin versión web para el público, sobre el carnaval en Uruguay. Se lanza con Montevideo y el área metropolitana; el interior se suma después del lanzamiento. Responde una pregunta: **«¿qué hay hoy de carnaval, dónde y a qué hora?»**. Su sello son las **Llamadas**, el desfile de comparsas de candombe, para el que tiene un modo especial.
+**Carnavalero** es una app sólo para iPhone y Android, sin versión web para el público, sobre el carnaval en Uruguay. Se lanza con Montevideo y el área metropolitana; el interior se suma después del lanzamiento. Responde una pregunta: **«¿qué hay hoy de carnaval, dónde y a qué hora?»**. Su sello son las **Llamadas**, el desfile de comparsas de candombe, para el que tiene un modo especial.
 
 Lo que va a ofrecer en su primera versión:
 
@@ -48,7 +48,7 @@ Quien no conozca el carnaval uruguayo necesita estos términos para leer el cód
 | --- | --- |
 | **Conjunto** | Cada agrupación que actúa. Categorías: murga, parodistas, humoristas, revista, comparsa (candombe), samba y «otro» |
 | **Comparsa** | Conjunto de candombe: tambores, bailarines y personajes típicos. Son las que desfilan en las Llamadas |
-| **Cuerda** | El grupo de tambores de una comparsa. De ahí el nombre de la app |
+| **Cuerda** | El grupo de tambores de una comparsa. Fue el nombre de trabajo de la app, y sigue en los nombres internos del repo (`@cuerda/shared`) |
 | **Tablado / escenario** | Lugar donde actúan los conjuntos cada noche. Hay privados (pagos), populares (entrada barata), gratuitos e itinerantes |
 | **Teatro de Verano** | Sede del Concurso Oficial |
 | **Concurso Oficial** | La competencia entre conjuntos, por ruedas: primera, segunda y liguilla |
@@ -65,7 +65,7 @@ Quien no conozca el carnaval uruguayo necesita estos términos para leer el cód
 
 Existe una app activa, **Carnaval App** (un desarrollador solo, más de 5.000 descargas en Android), centrada en el Concurso Oficial, las pencas y los comentarios. Tiene programación de tablados y, desde 2024, la programación de las Llamadas.
 
-Cuerda no compite en lo social (pencas, comentarios), pero sí cubre el Concurso completo como información: el fixture del Teatro de Verano desde el lanzamiento, los resultados durante el carnaval y el historial después (decisión 53). La definición es: **Cuerda es la app con toda la información del carnaval: qué hay esta noche, el Concurso y las Llamadas. La comunidad queda para Carnaval App.**
+Carnavalero no compite en lo social (pencas, comentarios), pero sí cubre el Concurso completo como información: el fixture del Teatro de Verano desde el lanzamiento, los resultados durante el carnaval y el historial después (decisión 53). La definición es: **Carnavalero es la app con toda la información del carnaval: qué hay esta noche, el Concurso y las Llamadas. La comunidad queda para Carnaval App.**
 
 Dónde se diferencia:
 
@@ -131,7 +131,7 @@ Android quedó confirmado el 2026-11-10: con JDK 21 (Temurin) el build de debug 
 | Repo | Monorepo con pnpm workspaces (pnpm vía corepack), Node 24 |
 | CI | GitHub Actions: lint, formato, typecheck, tests, build y validación de los datos semilla; un segundo job levanta Supabase y corre los tests de la base |
 
-Identificador provisional de la app: `uy.cuerda.app`. Se cambia cuando esté el nombre final; los pasos están en `CLAUDE.md`.
+La app se llama Carnavalero y su identificador es `uy.carnavalero.app` (decisión 54). Los nombres internos del repo (`@cuerda/shared`, el proyecto local de Supabase) siguen siendo «cuerda», a propósito; el detalle está en `CLAUDE.md`.
 
 ## 7. Qué hay en el repo
 
@@ -259,7 +259,7 @@ Datos cargados por el seed: 110 conjuntos (98 con fila 2027), 42 escenarios sin 
 
 ## 10. Reglas y decisiones que hay que respetar
 
-Las 53 decisiones tomadas están en `docs/DECISIONES.md`. Las que más condicionan el trabajo:
+Las 54 decisiones tomadas están en `docs/DECISIONES.md`. Las que más condicionan el trabajo:
 
 - **Zona horaria:** siempre `America/Montevideo`, nunca la del teléfono. Se usan las funciones de `@cuerda/shared`.
 - **Noche lógica:** antes de las 06:00 es la noche anterior. Vale para «hoy», para la temporada vigente y para el modo Llamadas.
@@ -348,7 +348,7 @@ Nativo: `pnpm --filter app android` (o `android:local` para usar el Supabase loc
 - **Avisos en el proyecto remoto:** desplegar las dos Edge Functions y programarlas con `pg_cron`.
 - **17/11:** cargar el resultado de la Prueba de Admisión en `research/conjuntos.csv`, correr `python research/validate.py --post-prueba` y regenerar el seed con `pnpm gen:seed --post-prueba`.
 - **Coordenadas de los escenarios** y las cinco direcciones que faltan.
-- **Decisiones abiertas:** nombre final de la app y monetización en la primera temporada (gratis sin anuncios, o un sponsor).
+- **Decisión abierta:** monetización en la primera temporada (gratis sin anuncios, o un sponsor).
 
 ## 14. Por dónde seguir leyendo
 

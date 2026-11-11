@@ -2,4 +2,6 @@
 <resources>
     <!-- El fondo de la app: el color «ground» de app/src/index.css. -->
     <color name="ground">#0a0f1c</color>
+    <!-- El azul del logo (el fondo de app/assets/icon-background.png): tiñe el ícono de los avisos. -->
+    <color name="brand">#0448a7</color>
 </resources>

@@ -1,6 +1,6 @@
 {
   "app": {
-    "name": "Cuerda",
+    "name": "Carnavalero",
     "tagline": "Montevideo's carnival, night by night"
   },
   "map": {
@@ -76,7 +76,7 @@
     "on": "Notifications on: we'll let you know on the day they perform and if anything changes.",
     "off": "Notifications are off.",
     "enable": "Turn on notifications",
-    "denied": "Notifications are off for Cuerda. To get them, allow notifications for Cuerda in your phone's settings.",
+    "denied": "Notifications are off for Carnavalero. To get them, allow notifications for Carnavalero in your phone's settings.",
     "error": "We couldn't turn on notifications. Try again.",
     "channel": "Updates from your groups"
   },
@@ -158,10 +158,10 @@
   "nearby": {
     "label": "Near me",
     "locating": "Finding your location…",
-    "denied": "We don't have permission to use your location, so we can't sort by distance. If you want to use it, allow location for Cuerda in your phone's settings and tap “Near me” again.",
+    "denied": "We don't have permission to use your location, so we can't sort by distance. If you want to use it, allow location for Carnavalero in your phone's settings and tap “Near me” again.",
     "unavailable": "We couldn't get your location. Check that your phone's location is turned on.",
     "retry": "Try again",
-    "approximate": "Your location is approximate: distances are estimates and the order of nearby stages may be off. To improve it, turn on precise location for Cuerda in your phone's settings.",
+    "approximate": "Your location is approximate: distances are estimates and the order of nearby stages may be off. To improve it, turn on precise location for Carnavalero in your phone's settings.",
     "underDistance": "under {{distance}}",
     "aboutDistance": "about {{distance}}",
     "hidden_one": "{{count}} stage with no location on file is not shown in “Near me”.",

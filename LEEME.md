@@ -1,6 +1,6 @@
-# Cuerda · cómo arrancar
+# Carnavalero · cómo arrancar
 
-Repo de Cuerda, la app del Carnaval de Montevideo y las Llamadas. El trabajo va en la rama `develop`; `main` queda para lo estable.
+Repo de Carnavalero, la app del carnaval en Uruguay. El trabajo va en la rama `develop`; `main` queda para lo estable.
 
 ## Dónde estamos
 

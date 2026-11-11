@@ -4,9 +4,9 @@ Actualizado: 2026-11-11 (posicionamiento y tabla ajustados a las decisiones 50 a
 
 ## Veredicto
 
-Carnaval App es un competidor real pero chico: un desarrollador solo, 5K+ descargas en Android y una app centrada en el Concurso Oficial, las pencas y la comunidad. Cuerda no le pelea las pencas ni la comunidad. Sí cubre el Concurso completo como información (fixture, resultados e historial; decisión 53) y le gana en lo que la app no muestra: alertas por conjunto, escenarios gratuitos, mapa, hora estimada en Llamadas, inglés para turistas, alcance nacional y uso fuera de temporada.
+Carnaval App es un competidor real pero chico: un desarrollador solo, 5K+ descargas en Android y una app centrada en el Concurso Oficial, las pencas y la comunidad. Carnavalero no le pelea las pencas ni la comunidad. Sí cubre el Concurso completo como información (fixture, resultados e historial; decisión 53) y le gana en lo que la app no muestra: alertas por conjunto, escenarios gratuitos, mapa, hora estimada en Llamadas, inglés para turistas, alcance nacional y uso fuera de temporada.
 
-**Corrección al informe de la Fase 0:** Carnaval App sí tiene algo de Llamadas. La versión 10.4.0 (5 feb 2024) agregó la programación del Desfile de Llamadas. No hay rastro de hora estimada, recorrido ni cortes, así que el diferencial de Cuerda en Llamadas sigue en pie, pero es más angosto.
+**Corrección al informe de la Fase 0:** Carnaval App sí tiene algo de Llamadas. La versión 10.4.0 (5 feb 2024) agregó la programación del Desfile de Llamadas. No hay rastro de hora estimada, recorrido ni cortes, así que el diferencial de Carnavalero en Llamadas sigue en pie, pero es más angosto.
 
 Lo marcado como «no visto» falta verificarlo con la app instalada.
 
@@ -28,7 +28,7 @@ Lo marcado como «no visto» falta verificarlo con la app instalada.
 
 ## Funcionalidades
 
-| Funcionalidad | Carnaval App | Cuerda (plan) |
+| Funcionalidad | Carnaval App | Carnavalero (plan) |
 | --- | --- | --- |
 | Programación diaria de tablados | Sí | MVP |
 | Búsqueda y filtros de escenarios | Sí (v10.3.0) | MVP |
@@ -56,9 +56,9 @@ Lo marcado como «no visto» falta verificarlo con la app instalada.
 
 ## Posicionamiento
 
-Cuerda es la app con toda la información del carnaval en Uruguay: qué hay esta noche y dónde, el Concurso completo y las Llamadas. Carnaval App es la del Concurso vivido en comunidad: pencas, reseñas y comentarios.
+Carnavalero es la app con toda la información del carnaval en Uruguay: qué hay esta noche y dónde, el Concurso completo y las Llamadas. Carnaval App es la del Concurso vivido en comunidad: pencas, reseñas y comentarios.
 
-Las dos se cruzan en el Concurso: fixture, resultados e historial. Ahí Cuerda no busca ganar por tener más, sino por tenerlo junto con todo lo demás (la grilla de los tablados, las alertas y el mapa), sin registro y sin anuncios.
+Las dos se cruzan en el Concurso: fixture, resultados e historial. Ahí Carnavalero no busca ganar por tener más, sino por tenerlo junto con todo lo demás (la grilla de los tablados, las alertas y el mapa), sin registro y sin anuncios.
 
 Dónde ganar:
 

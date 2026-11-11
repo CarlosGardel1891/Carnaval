@@ -24,6 +24,18 @@
 
         </activity>
 
+        <!-- Avisos push: el ícono (un tambor blanco, teñido con el azul del logo) y el canal en
+             el que caen si el aviso no trae uno. El canal lo crea la app (lib/push.ts). -->
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@drawable/ic_stat_notificacion" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_color"
+            android:resource="@color/brand" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="avisos" />
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"

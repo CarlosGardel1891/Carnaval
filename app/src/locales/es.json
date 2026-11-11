@@ -1,6 +1,6 @@
 {
   "app": {
-    "name": "Cuerda",
+    "name": "Carnavalero",
     "tagline": "El carnaval de Montevideo, noche a noche"
   },
   "map": {
@@ -76,7 +76,7 @@
     "on": "Avisos activados: te avisamos el día que actúe y si hay cambios.",
     "off": "Los avisos están apagados.",
     "enable": "Activar avisos",
-    "denied": "Los avisos están apagados para Cuerda. Para recibirlos, permití las notificaciones de Cuerda en los ajustes del teléfono.",
+    "denied": "Los avisos están apagados para Carnavalero. Para recibirlos, permití las notificaciones de Carnavalero en los ajustes del teléfono.",
     "error": "No pudimos activar los avisos. Probá de nuevo.",
     "channel": "Avisos de tus conjuntos"
   },
@@ -158,10 +158,10 @@
   "nearby": {
     "label": "Cerca mío",
     "locating": "Buscando tu ubicación…",
-    "denied": "No tenemos permiso para usar tu ubicación, así que no podemos ordenar por cercanía. Si querés usarlo, permití la ubicación para Cuerda en los ajustes del teléfono y volvé a tocar «Cerca mío».",
+    "denied": "No tenemos permiso para usar tu ubicación, así que no podemos ordenar por cercanía. Si querés usarlo, permití la ubicación para Carnavalero en los ajustes del teléfono y volvé a tocar «Cerca mío».",
     "unavailable": "No pudimos obtener tu ubicación. Fijate que la ubicación del teléfono esté prendida.",
     "retry": "Reintentar",
-    "approximate": "Tu ubicación es aproximada: las distancias son estimadas y el orden entre escenarios cercanos puede no ser exacto. Para afinarlo, activá la ubicación precisa para Cuerda en los ajustes del teléfono.",
+    "approximate": "Tu ubicación es aproximada: las distancias son estimadas y el orden entre escenarios cercanos puede no ser exacto. Para afinarlo, activá la ubicación precisa para Carnavalero en los ajustes del teléfono.",
     "underDistance": "menos de {{distance}}",
     "aboutDistance": "aprox. {{distance}}",
     "hidden_one": "{{count}} escenario sin ubicación cargada no aparece en «Cerca mío».",

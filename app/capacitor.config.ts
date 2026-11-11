@@ -1,8 +1,9 @@
 /// <reference types="@capacitor/status-bar" />
 import type { CapacitorConfig } from '@capacitor/cli'
 
-// Bundle ID provisional: cambiarlo antes de crear las fichas en las tiendas (ver CLAUDE.md).
-const APP_ID = 'uy.cuerda.app'
+// El identificador de la app en las tiendas (decisión 54). Está también en Android
+// (build.gradle, strings.xml y el paquete de MainActivity) y en iOS (project.pbxproj).
+const APP_ID = 'uy.carnavalero.app'
 
 // El fondo de la app (`--color-ground` en src/index.css). En Android, el mismo color está
 // en android/app/src/main/res/values/colors.xml: si cambia uno, cambia el otro.
@@ -13,7 +14,7 @@ const localBackend = process.env.CUERDA_LOCAL === '1'
 
 const config: CapacitorConfig = {
   appId: APP_ID,
-  appName: 'Cuerda',
+  appName: 'Carnavalero',
   webDir: 'dist',
   // Lo que se ve hasta que carga la página: oscuro, no un destello blanco.
   backgroundColor: GROUND,

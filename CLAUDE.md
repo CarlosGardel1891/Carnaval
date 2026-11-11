@@ -1,6 +1,6 @@
-# Cuerda
+# Carnavalero
 
-App móvil del Carnaval de Montevideo con foco en las Llamadas y el candombe: qué conjunto actúa hoy, en qué escenario y a qué hora, más un modo especial para el Desfile de Llamadas. Objetivo: publicada antes del Desfile Inaugural del 2027-01-21; envío a revisión de tiendas antes del 2027-01-05.
+App para iPhone y Android con la información del carnaval en Uruguay, con foco en las Llamadas y el candombe: qué conjunto actúa hoy, en qué escenario y a qué hora, más un modo especial para el Desfile de Llamadas. Objetivo: publicada antes del Desfile Inaugural del 2027-01-21; envío a revisión de tiendas antes del 2027-01-05.
 
 ## Leé primero
 
@@ -144,9 +144,23 @@ curl -X POST http://127.0.0.1:55321/functions/v1/avisos-de-cambios \
 - En la app: `VITE_PUSH_ENABLED=1` en `app/.env`. Sin `google-services.json`, dejarlo vacío: el plugin se instala igual y la app arranca, pero pedir el token falla.
 - En el proyecto remoto falta programar las funciones con `pg_cron` y `pg_net`: `avisos-del-dia` cada 30 minutos y `avisos-de-cambios` cada minuto, con la service role key guardada en Vault.
 
-## Bundle ID
+## Nombre e identificador
 
-Provisional: `uy.cuerda.app`. Para cambiarlo antes de publicar: `appId` en `app/capacitor.config.ts`, `namespace` y `applicationId` en `app/android/app/build.gradle` (y el paquete Java de `MainActivity`), `PRODUCT_BUNDLE_IDENTIFIER` en Xcode; después `pnpm --filter app cap:sync`.
+La app se llama **Carnavalero** y su identificador es `uy.carnavalero.app` (decisión 54). El identificador está en cuatro lugares que tienen que coincidir: `appId` en `app/capacitor.config.ts`; `namespace` y `applicationId` en `app/android/app/build.gradle`; `package_name` y `custom_url_scheme` en `strings.xml`, más el paquete Java de `MainActivity` (`app/android/app/src/main/java/uy/carnavalero/app/`); y `PRODUCT_BUNDLE_IDENTIFIER` en `project.pbxproj`. El nombre visible está en `appName` (Capacitor), `strings.xml`, `Info.plist`, `app.name` de los locales y el `<title>` de `app/index.html` y `admin/index.html`.
+
+**Los nombres internos siguen siendo «cuerda», a propósito:** el paquete `@cuerda/shared` y `@cuerda/db-tests`, el `name` del `package.json` raíz, el `project_id` de Supabase (`supabase/config.toml`) y por eso los contenedores (`supabase_db_cuerda`…), los parámetros de sesión `cuerda.grilla_ficticia` y `cuerda.grilla_desde`, y las claves de lo que se guarda en el teléfono (`cuerda-cache`, `cuerda-push-asked`). Nada de eso lo ve el público, y cambiarlo rompería imports, la base local de cada uno y lo ya guardado. «Cuerda» sigue apareciendo también como palabra del candombe (el grupo de tambores de una comparsa), y en `prompts/`, `research/informe_fase0.md` y las decisiones viejas, que son registro histórico.
+
+## Logo e íconos
+
+Las imágenes de origen están en `app/assets/` y se dibujan a mano: `icon-only.png` (el logo, 1024×1024), `icon-foreground.png` e `icon-background.png` (las capas del ícono adaptativo de Android; el logo ya ocupa la zona visible de 72 dp, sobre `#0448a7`) y `notificacion.svg` (el ícono de los avisos). Todo lo demás se genera:
+
+```bash
+pnpm gen:assets   # necesita Python 3 + Pillow
+```
+
+Hace tres cosas, en orden: `scripts/gen_splash.py` arma la pantalla de inicio (`splash.png` y `splash-dark.png`: el logo al centro sobre `--color-ground`) y los favicons (`app/public/` y `admin/public/`); `@capacitor/assets` genera los íconos y las pantallas de inicio de Android e iOS; y `scripts/gen_splash.py --android-layers` vuelve a escribir las capas del ícono adaptativo a 108 dp y sin el margen de 16,7 % que `@capacitor/assets` les agrega. Después de correrlo, mirar el diff: `@capacitor/assets` también reescribe el formato de `AndroidManifest.xml` (descartar ese cambio con `git checkout`).
+
+El ícono de los avisos de Android es `app/android/app/src/main/res/drawable/ic_stat_notificacion.xml`, el SVG pasado a vector drawable a mano; `AndroidManifest.xml` lo declara como ícono por defecto de Firebase Messaging, teñido con `@color/brand`. Desde Android 12, la pantalla de inicio la arma el sistema con el ícono de la app sobre `@color/ground`; la imagen `splash.png` se ve hasta Android 11 y en iOS.
 
 ## Reglas
 

@@ -230,7 +230,7 @@ El endpoint `/{ig-user-id}/stories` sólo devuelve las historias de **tu propia*
 
 > Hola, ¿cómo andan?
 >
-> Soy Emiliano, desarrollador uruguayo. Estoy armando **Cuerda**, una app gratuita para seguir el carnaval día a día: qué conjunto actúa, en qué escenario y a qué hora, con foco en las Llamadas y en los escenarios gratuitos.
+> Soy Emiliano, desarrollador uruguayo. Estoy armando **Carnavalero**, una app gratuita para seguir el carnaval día a día: qué conjunto actúa, en qué escenario y a qué hora, con foco en las Llamadas y en los escenarios gratuitos.
 >
 > «Seguí a tu conjunto» es la grilla más completa que existe y la quiero usar como fuente oficial, citando a DAECPU en cada pantalla.
 >
@@ -247,7 +247,7 @@ El endpoint `/{ig-user-id}/stories` sólo devuelve las historias de **tu propia*
 
 > Hola, ¿qué tal?
 >
-> Soy Emiliano y estoy armando **Cuerda**, una app gratuita del carnaval con un modo especial para las Llamadas del 5 y 6 de febrero: orden de salida, hora estimada de paso de cada comparsa, recorrido, cortes y dónde sacar entradas.
+> Soy Emiliano y estoy armando **Carnavalero**, una app gratuita del carnaval con un modo especial para las Llamadas del 5 y 6 de febrero: orden de salida, hora estimada de paso de cada comparsa, recorrido, cortes y dónde sacar entradas.
 >
 > Les quería consultar dos cosas:
 > 1. ¿Cuándo y por qué canal se publica el orden oficial de desfile? Lo quiero cargar apenas salga y sin errores.
@@ -260,7 +260,7 @@ El endpoint `/{ig-user-id}/stories` sólo devuelve las historias de **tu propia*
 
 ### 8.3 DM genérico de Instagram (conjuntos y comparsas)
 
-> ¡Hola! Soy Emiliano y estoy armando **Cuerda**, una app gratis para seguir el carnaval y las Llamadas: dónde actúa cada conjunto y cuándo salen las comparsas. Quiero que [NOMBRE] aparezca bien:
+> ¡Hola! Soy Emiliano y estoy armando **Carnavalero**, una app gratis para seguir el carnaval y las Llamadas: dónde actúa cada conjunto y cuándo salen las comparsas. Quiero que [NOMBRE] aparezca bien:
 > • ¿Me confirman el barrio y, si tienen, días y lugar de ensayo o salida?
 > • ¿Les parece bien que linkee su Instagram y muestre sus publicaciones en la ficha?
 > No tiene costo ni compromiso. ¡Gracias y nos vemos en febrero! 🥁

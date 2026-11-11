@@ -1,4 +1,4 @@
-package uy.cuerda.app;
+package uy.carnavalero.app;
 
 import com.getcapacitor.BridgeActivity;
 

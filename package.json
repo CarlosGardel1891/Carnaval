@@ -16,6 +16,7 @@
     "test": "pnpm -r test",
     "test:db": "pnpm --filter @cuerda/db-tests test:db",
     "gen:seed": "python scripts/gen_seed.py",
+    "gen:assets": "python scripts/gen_splash.py && pnpm --filter app exec capacitor-assets generate --ios --android --assetPath assets && python scripts/gen_splash.py --android-layers",
     "db:grilla": "node scripts/db-grilla.mjs",
     "db:noche-real": "node scripts/db-grilla.mjs --real",
     "gen:types": "supabase gen types typescript --local --schema public > packages/shared/src/database.types.ts && prettier --write packages/shared/src/database.types.ts"

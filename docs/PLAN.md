@@ -1,4 +1,4 @@
-# Plan: Cuerda, la app del Carnaval y las Llamadas
+# Plan: Carnavalero, la app del carnaval en Uruguay
 
 Actualizado: 2026-10-22. Versión editable: <https://claude.ai/artifact/BaEsAAZw8mWdyUjJ7VSM2C>
 
@@ -7,13 +7,13 @@ Actualizado: 2026-10-22. Versión editable: <https://claude.ai/artifact/BaEsAAZw
 
 ## Resumen
 
-Objetivo: tener publicada en App Store y Google Play, antes del Desfile Inaugural del Carnaval 2027 (jueves 2027-01-21), una app que responda «¿qué hay hoy de carnaval, dónde y a qué hora?», con las Llamadas (5 y 6 de febrero de 2027) como sello. Nombre de trabajo: **Cuerda**.
+Objetivo: tener publicada en App Store y Google Play, antes del Desfile Inaugural del Carnaval 2027 (jueves 2027-01-21), una app que responda «¿qué hay hoy de carnaval, dónde y a qué hora?», con las Llamadas (5 y 6 de febrero de 2027) como sello. La app se llama **Carnavalero** (decisión 54; hasta el 2026-11-11 el nombre de trabajo fue Cuerda).
 
 - **Qué es:** la guía del carnaval en Uruguay, sólo para iPhone y Android: no hay versión web para el público (decisión 50). Pizarrón diario de tablados, Concurso Oficial del Teatro de Verano, desfiles y un modo especial para las Llamadas. Fuera de temporada, mapa de salidas de tambores.
 - **Alcance:** toda la información del carnaval en Uruguay. Se lanza con Montevideo y el área metropolitana; el interior se suma después del lanzamiento (decisión 52).
 - **Para quién:** el carnavalero local (uso diario), el turista (pico de descargas en temporada) y los conjuntos (generan y validan la información).
 - **Stack:** React + TypeScript + Vite + Capacitor + Supabase + Tailwind (el mismo de Travel).
-- **Competencia:** existe Carnaval App (Pedro Franco), centrada en el Concurso, pencas y comunidad. Cuerda también cubre el Concurso completo como información (fixture, resultados e historial; decisión 53), sin pencas ni comentarios, y se diferencia por alertas por conjunto, escenarios gratuitos, mapa, hora estimada en Llamadas, inglés, alcance nacional y uso todo el año. Ver `docs/competencia-carnaval-app.md`.
+- **Competencia:** existe Carnaval App (Pedro Franco), centrada en el Concurso, pencas y comunidad. Carnavalero también cubre el Concurso completo como información (fixture, resultados e historial; decisión 53), sin pencas ni comentarios, y se diferencia por alertas por conjunto, escenarios gratuitos, mapa, hora estimada en Llamadas, inglés, alcance nacional y uso todo el año. Ver `docs/competencia-carnaval-app.md`.
 - **Plazo:** enviar a revisión de Apple y Google antes del 2027-01-05.
 
 ## Alcance por versión
@@ -257,5 +257,5 @@ Oportunidad: el 3 de diciembre es el Día Nacional del Candombe. Sirve para most
 
 **Decisiones abiertas**
 
-- [ ] Nombre final de la app.
+- [x] Nombre final de la app: Carnavalero (decisión 54).
 - [ ] Monetización en la primera temporada: gratis sin anuncios, o un sponsor.
