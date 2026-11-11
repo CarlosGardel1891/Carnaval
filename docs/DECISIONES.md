@@ -184,3 +184,30 @@ Registro de decisiones del proyecto. Si algo de `docs/PLAN.md` choca con este ar
     - **Referencia de 2026, que no es dato de 2027:** se vendió por Abitab (web y locales) y en la boletería del Teatro de Verano, desde tres días antes del Concurso. No se carga para 2027 hasta que se anuncie.
 61. **Nombres cortos en el calendario** (ajusta la decisión 26 para `eventos.info`): en `research/calendario_2027.csv` el nombre del evento es sólo el nombre; las aclaraciones que venían entre paréntesis (cuántos conjuntos, de dónde sale la fecha, qué pasó en 2026) pasaron a una columna nueva, `info`, con las mismas palabras. `validate.py` rechaza un nombre con paréntesis. El seed carga esa `info`; si el CSV la deja vacía, conserva la que se haya cargado en la base, así que la regla de «no pisar» sigue valiendo para los eventos que no traen info.
 
+## 2026-11-11 · Tomadas al arrancar la Fase 6 (Modo Llamadas)
+
+62. **Navegación del modo Llamadas:**
+    - Quinta pestaña, «Llamadas», visible siempre: Hoy · Llamadas · Mapa · Conjuntos · Calendario. Fuera de fecha muestra las dos noches con lo que haya cargado.
+    - Con el modo activo (`modoLlamadasActivo()`, por las fechas de la temporada; decisiones 7 y 16), la app abre en `/llamadas` en vez de en Hoy. Vale sólo para el arranque: tocar «Hoy» lleva al pizarrón y no rebota. Un aviso push que trae su ruta manda sobre esto.
+    - Cuatro vistas con un selector de noche (por defecto la de hoy o la próxima): el orden de desfile, la hora de paso por cuadra, el recorrido en el mapa y el glosario.
+63. **Hora estimada** (completa la decisión 7):
+    - La comparsa en la posición `n` sale a `inicio + (n − 1) × intervalo`. Por defecto, 20:00 de Montevideo y 10 minutos.
+    - Para saber cuándo pasa por un punto hace falta una velocidad, que la decisión 7 no daba: sale de la misma regla. Si cada comparsa larga 10 minutos y 150 metros después de la anterior, marchan a 15 metros por minuto. Cierra con el reglamento 2026, que da 66 minutos como máximo para un recorrido de unos 1.000 metros. La hora de paso es la de salida más `distancia ÷ 15 m/min`.
+    - El cálculo es una función pura de `@cuerda/shared` (`llamadas.ts`) y se hace en el teléfono: no pide nada a la red.
+    - Los tres números (hora de la primera, intervalo y separación) son datos de cada evento; si faltan valen los de la decisión 7. `eventos.desfile_atraso_min` corre todas las horas: es el ajuste manual del panel (Fase 7) y la entrada de «¿por dónde va el desfile?» (v2).
+    - **Siempre se muestra como estimación:** con «≈» adelante, el rótulo «Hora estimada» y una línea que explica la regla y que el desfile real suele atrasarse. Lo que cae después de medianoche sigue siendo de esa noche.
+64. **Datos del desfile, todos en la base y por evento** (cada noche puede tener lo suyo; nada de esto va en el código):
+    - **Orden:** `orden_desfile`, que suma `fuente` y `fuente_url`. Sin orden cargado, la app dice que todavía no se publicó y lista las comparsas clasificadas (`conjunto_temporada.en_llamadas`), sin número ni hora.
+    - **Recorrido:** `desfile_esquinas`, las esquinas en orden. Dos esquinas seguidas son una cuadra; la línea del recorrido y la distancia de cada esquina a la salida se calculan a partir de ellas. `eventos.recorrido_estado` dice si es estimado o confirmado, con su fuente. `eventos.recorrido` (decisión 26) queda sin uso: una sola fuente para el recorrido.
+    - **Cortes de calle:** `cortes_calle`, con su tramo, su horario, su estado y su fuente.
+    - **Hasta que la IM publique 2027:** el recorrido y los cortes van como estimados, con las coordenadas de OpenStreetMap y la prensa de 2025 como fuente, en `research/` y por `pnpm gen:seed`. El seed no toca un recorrido que ya esté confirmado.
+    - **Orden ficticio, sólo local:** `supabase/local/orden_ficticio.sql`, con `pnpm db:llamadas` y las barreras de la decisión 27. Comparsas reales en un orden inventado, con `fuente = 'orden-ficticio'`; la app avisa que es de prueba.
+65. **El modo Llamadas anda sin señal** (ajusta la decisión 37 sólo para estos datos): en el desfile la red de celular se satura.
+    - Al abrir la app en temporada se descargan los datos de las dos noches (eventos, orden, recorrido, cortes y clasificadas), aunque no se entre a la pestaña.
+    - Esos datos se guardan 7 días, no 24 horas: vale más un orden de ayer, con su «actualizado hace…», que nada.
+    - Las horas y la cuadra se calculan en el teléfono; el glosario y los textos van en la app.
+    - El mapa no depende de la red: si no hay key de MapTiler o el estilo no carga, dibuja el recorrido, las esquinas y los cortes sobre el fondo liso de la decisión 35, y avisa que faltan las calles.
+66. **Simular la fecha, sólo para probar:** `?ahora=AAAA-MM-DDTHH:MM` (hora de Montevideo) fija el reloj de la app, que después sigue corriendo. Vale en `pnpm dev` y cuando la app apunta al Supabase local, que es como se instala en el emulador con `android:local`. Una versión que apunta a un proyecto remoto lo ignora.
+67. **Glosario:** veinte términos del candombe y de las Llamadas, pensados para el turista, en español y en inglés. Son textos de la app (`es.json` y `en.json`), no datos: van dentro de la app y andan sin señal.
+68. **El aviso del día incluye las Llamadas:** si una comparsa que se sigue desfila esa noche, el aviso «tu conjunto actúa hoy» (decisión 47) la suma con su hora estimada de salida, calculada con la misma función que usa la app.
+
