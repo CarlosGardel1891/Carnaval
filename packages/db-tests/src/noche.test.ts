@@ -105,6 +105,7 @@ beforeAll(async () => {
         rueda: 'primera',
         numero: 95,
         fecha: NOCHE,
+        fuente: 'test',
       })
       .select('id')
       .single(),

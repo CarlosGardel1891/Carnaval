@@ -393,6 +393,8 @@ export type Database = {
       etapas_concurso: {
         Row: {
           fecha: string
+          fuente: string
+          fuente_url: string | null
           id: number
           numero: number
           rueda: Database['public']['Enums']['rueda_concurso']
@@ -401,6 +403,8 @@ export type Database = {
         ComputedFields: never
         Insert: {
           fecha: string
+          fuente: string
+          fuente_url?: string | null
           id?: never
           numero: number
           rueda: Database['public']['Enums']['rueda_concurso']
@@ -408,6 +412,8 @@ export type Database = {
         }
         Update: {
           fecha?: string
+          fuente?: string
+          fuente_url?: string | null
           id?: never
           numero?: number
           rueda?: Database['public']['Enums']['rueda_concurso']
@@ -632,6 +638,23 @@ export type Database = {
           precio_texto: string
           slug: string
           tipo: Database['public']['Enums']['tipo_escenario']
+        }[]
+      }
+      fixture_del_concurso: {
+        Args: { p_anio: number }
+        Returns: {
+          actuacion_id: number
+          conjunto_categoria: Database['public']['Enums']['categoria_conjunto']
+          conjunto_id: number
+          conjunto_nombre: string
+          conjunto_slug: string
+          estado: Database['public']['Enums']['estado_actuacion']
+          etapa_id: number
+          fecha: string
+          fuente: string
+          inicio: string
+          numero: number
+          rueda: Database['public']['Enums']['rueda_concurso']
         }[]
       }
       mis_favoritos: { Args: Record<PropertyKey, never>; Returns: number[] }

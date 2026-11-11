@@ -227,19 +227,37 @@ describe('etapas del Concurso', () => {
     const etapa = ok(
       await service
         .from('etapas_concurso')
-        .insert({ temporada_id: temporadaId, rueda: 'primera', numero: 90, fecha: '2027-02-12' })
+        .insert({
+          temporada_id: temporadaId,
+          rueda: 'primera',
+          numero: 90,
+          fecha: '2027-02-12',
+          fuente: 'test',
+        })
         .select()
         .single(),
     )
     const repetida = await service
       .from('etapas_concurso')
-      .insert({ temporada_id: temporadaId, rueda: 'primera', numero: 90, fecha: '2027-02-13' })
+      .insert({
+        temporada_id: temporadaId,
+        rueda: 'primera',
+        numero: 90,
+        fecha: '2027-02-13',
+        fuente: 'test',
+      })
     expect(repetida.error?.code).toBe('23505')
     // Mismo número en otra rueda: sí.
     ok(
       await service
         .from('etapas_concurso')
-        .insert({ temporada_id: temporadaId, rueda: 'segunda', numero: 90, fecha: '2027-02-25' })
+        .insert({
+          temporada_id: temporadaId,
+          rueda: 'segunda',
+          numero: 90,
+          fecha: '2027-02-25',
+          fuente: 'test',
+        })
         .select(),
     )
 
@@ -286,7 +304,13 @@ describe('actuaciones y etapas: RLS', () => {
     etapaId = ok(
       await service
         .from('etapas_concurso')
-        .insert({ temporada_id: temporadaId, rueda: 'liguilla', numero: 91, fecha: '2027-03-02' })
+        .insert({
+          temporada_id: temporadaId,
+          rueda: 'liguilla',
+          numero: 91,
+          fecha: '2027-03-02',
+          fuente: 'test',
+        })
         .select('id')
         .single(),
     ).id
@@ -322,7 +346,13 @@ describe('actuaciones y etapas: RLS', () => {
     expectRechazo(
       await db
         .from('etapas_concurso')
-        .insert({ temporada_id: temporadaId, rueda: 'liguilla', numero: 92, fecha: '2027-03-03' })
+        .insert({
+          temporada_id: temporadaId,
+          rueda: 'liguilla',
+          numero: 92,
+          fecha: '2027-03-03',
+          fuente: 'test',
+        })
         .select(),
     )
     expectRechazo(
@@ -346,7 +376,13 @@ describe('actuaciones y etapas: RLS', () => {
     const etapa = ok(
       await db
         .from('etapas_concurso')
-        .insert({ temporada_id: temporadaId, rueda: 'primera', numero: 93, fecha: '2027-02-17' })
+        .insert({
+          temporada_id: temporadaId,
+          rueda: 'primera',
+          numero: 93,
+          fecha: '2027-02-17',
+          fuente: 'test',
+        })
         .select()
         .single(),
     )
