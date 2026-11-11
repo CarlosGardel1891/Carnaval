@@ -133,7 +133,7 @@ curl -X POST http://127.0.0.1:55321/functions/v1/avisos-de-cambios \
 
 - `avisos-del-dia` sólo manda entre las 12:00 y las 19:00 de Montevideo; `forzar` saltea el horario.
 - `avisos-de-cambios` espera a que una actuación lleve un minuto sin tocarse; `sin_espera` lo saltea.
-- Para que haya a quién avisar hace falta un usuario que siga un conjunto (desde la app) y una fila suya en `dispositivos_push`. Tomar los avisos los reclama: el del día vuelve a salir a los 5 minutos (hasta tres veces) si no se envió; el de cambio, no.
+- Para que haya a quién avisar hace falta un usuario que siga un conjunto (desde la app) y una fila suya en `dispositivos_push`. Tomar los avisos los reclama. Si no se enviaron (en simulacro nunca se envían), vuelven a salir: el del día, a los 5 minutos y hasta tres veces; el de cambio, al minuto y después cada vez más espaciado, hasta que la actuación empieza. Si empieza sin que haya salido queda en `avisos_enviados.fallido_en` y la respuesta lo cuenta en `perdidos`.
 - Las funciones no se despliegan en ningún proyecto remoto desde acá.
 
 **Firebase (pendiente: falta crear el proyecto y confirmar el identificador de la app, decisión 46).** Nada de esto va al repo; `.gitignore` ya lo excluye.

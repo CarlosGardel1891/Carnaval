@@ -23,14 +23,48 @@ const delDia = async (noche = NOCHE) =>
     f.conjunto_slug.startsWith('zz-'),
   )
 
-/** Sin ventana de calma: toma todo lo encolado hasta dentro de un minuto. */
-const deCambios = async (noche = NOCHE, hasta = new Date(Date.now() + 60_000)) =>
+/** Sin ventana de calma: toma todo lo encolado hasta dentro de un minuto. No cierra nada. */
+const tomarCambios = async (noche = NOCHE, hasta = new Date(Date.now() + 60_000)) =>
   ok(
     await service().rpc('tomar_avisos_de_cambios', {
       p_noche: noche,
       p_hasta: hasta.toISOString(),
     }),
   ).filter((f) => f.conjunto_slug.startsWith('zz-'))
+
+/**
+ * Como una pasada en la que todos los envíos salen bien: toma los avisos de cambio y los
+ * cierra. (Los que no se cierran se vuelven a entregar más tarde: ver «reintentos».)
+ */
+const deCambios = async (noche = NOCHE, hasta?: Date) => {
+  const filas = await tomarCambios(noche, hasta)
+  if (filas.length > 0) await cerrar({ p_avisos: filas.map((f) => f.aviso_id) })
+  return filas
+}
+
+/** Hace como si el último reclamo de los avisos de cambio sin enviar hubiera sido hace rato. */
+const atrasarCambios = (minutos: number) =>
+  withSql((sql) =>
+    sql.query(
+      `update public.avisos_enviados
+          set reclamado_en = now() - make_interval(secs => $1::float8 * 60)
+        where tipo = 'cambio' and enviado_en is null and noche >= '2031-01-01'`,
+      [minutos],
+    ),
+  )
+
+const avisosDeCambio = async (actuacion: number) =>
+  (
+    await withSql((sql) =>
+      sql.query<{ id: string; intentos: number; enviado: boolean; fallido: boolean }>(
+        `select id, intentos, enviado_en is not null as enviado, fallido_en is not null as fallido
+           from public.avisos_enviados
+          where tipo = 'cambio' and actuacion_id = $1
+          order by id`,
+        [actuacion],
+      ),
+    )
+  ).rows
 
 const pendientes = async () =>
   (
@@ -442,6 +476,141 @@ describe('tomar_avisos_de_cambios', () => {
   })
 })
 
+describe('reintentos de los avisos de cambio', () => {
+  // Un conjunto y una actuación propios, para no mezclarse con los casos de arriba. B lo sigue.
+  let futura: number
+
+  beforeAll(async () => {
+    await vaciarCola()
+    const conjunto = ok(
+      await service()
+        .from('conjuntos')
+        .insert({ slug: 'zz-av-cinco', nombre: 'ZZ zz-av-cinco', categoria: 'murga' })
+        .select('id')
+        .single(),
+    )
+    ids['zz-av-cinco'] = conjunto.id
+    const actuacion = ok(
+      await service()
+        .from('actuaciones')
+        .insert({
+          escenario_id: ids['zz-av-norte']!,
+          conjunto_id: conjunto.id,
+          inicio: '2031-03-12T21:00:00-03:00',
+          fuente: 'test',
+        })
+        .select('id')
+        .single(),
+    )
+    futura = actuacion.id
+    acts['cinco-norte'] = futura
+    ok(await b().from('favoritos').insert({ conjunto_id: conjunto.id }).select())
+  })
+
+  it('un aviso que no salió se vuelve a entregar en una pasada siguiente', async () => {
+    await cambiar('cinco-norte', { estado: 'suspendida' })
+    const primera = await tomarCambios()
+    expect(primera).toHaveLength(1)
+    // El envío falló: no se cierra. Enseguida no se insiste…
+    expect(await tomarCambios()).toEqual([])
+    // …pero pasado el minuto de espera vuelve a salir, el mismo aviso.
+    await atrasarCambios(2)
+    const segunda = await tomarCambios()
+    expect(segunda).toHaveLength(1)
+    expect(segunda[0]).toMatchObject({
+      aviso_id: primera[0]!.aviso_id,
+      token: TOKEN_B,
+      actuacion_id: futura,
+      estado: 'suspendida',
+      estado_anterior: 'programada',
+    })
+    expect(await avisosDeCambio(futura)).toMatchObject([
+      { intentos: 2, enviado: false, fallido: false },
+    ])
+  })
+
+  it('la espera crece con cada intento', async () => {
+    // Después del segundo intento hay que esperar dos minutos, no uno.
+    await atrasarCambios(1.5)
+    expect(await tomarCambios()).toEqual([])
+    await atrasarCambios(2.5)
+    expect(await tomarCambios()).toHaveLength(1)
+    expect(await avisosDeCambio(futura)).toMatchObject([{ intentos: 3 }])
+  })
+
+  it('no hay tope de intentos mientras la actuación no haya empezado', async () => {
+    for (let intento = 4; intento <= 6; intento++) {
+      await atrasarCambios(15)
+      expect(await tomarCambios()).toHaveLength(1)
+    }
+    expect(await avisosDeCambio(futura)).toMatchObject([{ intentos: 6, fallido: false }])
+  })
+
+  it('cuando por fin sale, no se vuelve a entregar', async () => {
+    await atrasarCambios(15)
+    const filas = await tomarCambios()
+    await cerrar({ p_avisos: filas.map((f) => f.aviso_id) })
+    await atrasarCambios(15)
+    expect(await tomarCambios()).toEqual([])
+    expect(await avisosDeCambio(futura)).toMatchObject([{ enviado: true, fallido: false }])
+  })
+
+  it('si la actuación vuelve a cambiar, manda el aviso nuevo y el viejo no se reintenta', async () => {
+    await cambiar('cinco-norte', { estado: 'programada' })
+    const viejo = await tomarCambios()
+    expect(viejo).toHaveLength(1)
+
+    await cambiar('cinco-norte', { inicio: '2031-03-12T22:00:00-03:00' })
+    await atrasarCambios(15)
+    const nuevo = await tomarCambios()
+    // Una sola fila: la del cambio nuevo, no también el reintento del anterior.
+    expect(nuevo).toHaveLength(1)
+    expect(nuevo[0]!.aviso_id).not.toBe(viejo[0]!.aviso_id)
+    await cerrar({ p_avisos: nuevo.map((f) => f.aviso_id) })
+
+    await atrasarCambios(15)
+    expect(await tomarCambios()).toEqual([])
+  })
+
+  it('si la actuación empieza sin que el aviso haya salido, queda registrado como fallido', async () => {
+    const antes = new Date()
+    await cambiar('cinco-norte', { estado: 'suspendida' })
+    expect(await tomarCambios()).toHaveLength(1)
+
+    // La actuación «ya empezó»: se le pone una hora pasada sin pasar por el trigger.
+    await withSql(async (sql) => {
+      await sql.query(`alter table public.actuaciones disable trigger actuaciones_encolar_cambio`)
+      await sql.query(
+        `update public.actuaciones set inicio = now() - interval '1 hour' where id = $1`,
+        [futura],
+      )
+      await sql.query(`alter table public.actuaciones enable trigger actuaciones_encolar_cambio`)
+    })
+    await atrasarCambios(15)
+    expect(await tomarCambios()).toEqual([])
+
+    const avisos = await avisosDeCambio(futura)
+    expect(avisos.at(-1)).toMatchObject({ enviado: false, fallido: true })
+    // Y la función que usa la Edge Function para informarlo lo cuenta.
+    const { data, error } = await service().rpc('avisos_fallidos_desde', {
+      p_desde: antes.toISOString(),
+    })
+    expect(error).toBeNull()
+    expect(data).toBeGreaterThanOrEqual(1)
+
+    // Ya fallido, no se vuelve a tocar.
+    await atrasarCambios(15)
+    expect(await tomarCambios()).toEqual([])
+  })
+
+  it('sólo la service role consulta los avisos fallidos', async () => {
+    for (const db of [anonClient(), a(), admin()]) {
+      const { error } = await db.rpc('avisos_fallidos_desde', { p_desde: new Date().toISOString() })
+      expect(error?.code).toBe('42501')
+    }
+  })
+})
+
 describe('registro de avisos', () => {
   it('cerrar_avisos marca cuándo salió y no toca lo ya cerrado', async () => {
     const { rows } = await withSql((sql) =>
@@ -452,7 +621,9 @@ describe('registro de avisos', () => {
       ),
     )
     const aviso = rows[0]!
-    expect(aviso.enviado_en).toBeNull()
+    await withSql((sql) =>
+      sql.query(`update public.avisos_enviados set enviado_en = null where id = $1`, [aviso.id]),
+    )
     await cerrar({ p_avisos: [Number(aviso.id)] })
     const leer = async () =>
       (
@@ -476,6 +647,7 @@ describe('registro de avisos', () => {
           where conrelid = 'public.avisos_enviados'::regclass and contype = 'f'`,
       ),
     )
-    expect(rows.map((r) => r.confdeltype)).toEqual(['c'])
+    // Dos FK, al usuario y a la actuación del aviso de cambio: las dos en cascada.
+    expect(rows.map((r) => r.confdeltype)).toEqual(['c', 'c'])
   })
 })

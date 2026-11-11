@@ -76,9 +76,13 @@ export type Database = {
       }
       avisos_enviados: {
         Row: {
+          actuacion_id: number | null
           clave: string
           enviado_en: string | null
+          estado_anterior: Database['public']['Enums']['estado_actuacion'] | null
+          fallido_en: string | null
           id: number
+          inicio_anterior: string | null
           intentos: number
           noche: string
           reclamado_en: string
@@ -87,9 +91,13 @@ export type Database = {
         }
         ComputedFields: never
         Insert: {
+          actuacion_id?: number | null
           clave: string
           enviado_en?: string | null
+          estado_anterior?: Database['public']['Enums']['estado_actuacion'] | null
+          fallido_en?: string | null
           id?: never
+          inicio_anterior?: string | null
           intentos?: number
           noche: string
           reclamado_en?: string
@@ -97,16 +105,28 @@ export type Database = {
           usuario_id: string
         }
         Update: {
+          actuacion_id?: number | null
           clave?: string
           enviado_en?: string | null
+          estado_anterior?: Database['public']['Enums']['estado_actuacion'] | null
+          fallido_en?: string | null
           id?: never
+          inicio_anterior?: string | null
           intentos?: number
           noche?: string
           reclamado_en?: string
           tipo?: Database['public']['Enums']['tipo_aviso']
           usuario_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: 'avisos_enviados_actuacion_id_fkey'
+            columns: ['actuacion_id']
+            isOneToOne: false
+            referencedRelation: 'actuaciones'
+            referencedColumns: ['id']
+          },
+        ]
       }
       cambios_actuacion: {
         Row: {
@@ -585,6 +605,7 @@ export type Database = {
           precio_texto: string
         }[]
       }
+      avisos_fallidos_desde: { Args: { p_desde: string }; Returns: number }
       buscar_por_nombre: {
         Args: { p_texto: string }
         Returns: {

@@ -73,7 +73,8 @@ export async function handle(
   })
 
   try {
-    const { noche, notices, info } = await build({ db, now: new Date(), options })
+    const startedAt = new Date()
+    const { noche, notices, info } = await build({ db, now: startedAt, options })
     const sender = pickSender()
     const report = await deliver(notices, sender)
 
@@ -89,6 +90,14 @@ export async function handle(
       if (error) throw error
     }
 
+    // Avisos de cambio que se dieron por perdidos en esta pasada: la actuación empezó y
+    // nunca salieron. Quedan en `avisos_enviados.fallido_en`; acá se dejan en el log.
+    const { data: lost, error: lostError } = await db.rpc('avisos_fallidos_desde', {
+      p_desde: startedAt.toISOString(),
+    })
+    if (lostError) throw lostError
+    if (lost > 0) console.error(`Avisos de cambio que no salieron antes de la actuación: ${lost}`)
+
     return json({
       noche,
       simulacro: sender.dryRun,
@@ -96,6 +105,7 @@ export async function handle(
       avisos: notices.length,
       enviados: report.sent,
       fallidos: report.failed,
+      perdidos: lost,
       tokens_borrados: report.invalidTokens.length,
       // En simulacro se devuelve lo que se habría mandado, para poder mirarlo.
       ...(sender.dryRun

@@ -162,8 +162,8 @@ LEEME.md           Cómo arrancar
 
 **`supabase`**
 
-- Doce migraciones: las 10 tablas del MVP, dos tablas de claves de nombres (`conjunto_nombres` y `escenario_nombres`) que usan el matching y la búsqueda, y las dos de los avisos: la cola de cambios (`cambios_actuacion`) y el registro de avisos (`avisos_enviados`).
-- Avisos: un trigger encola cada cambio de hora, lugar o estado de una actuación; `tomar_avisos_del_dia` y `tomar_avisos_de_cambios` deciden quién recibe qué y reclaman cada aviso para que no salga dos veces. Sólo las ejecuta la service role.
+- Trece migraciones: las 10 tablas del MVP, dos tablas de claves de nombres (`conjunto_nombres` y `escenario_nombres`) que usan el matching y la búsqueda, y las dos de los avisos: la cola de cambios (`cambios_actuacion`) y el registro de avisos (`avisos_enviados`).
+- Avisos: un trigger encola cada cambio de hora, lugar o estado de una actuación; `tomar_avisos_del_dia` y `tomar_avisos_de_cambios` deciden quién recibe qué y reclaman cada aviso para que no salga dos veces. Un aviso de cambio que no sale se reintenta hasta que la actuación empieza; si no llega a salir, queda registrado. Sólo las ejecuta la service role.
 - Dos Edge Functions, `avisos-del-dia` y `avisos-de-cambios`. Sin Firebase configurado corren en simulacro. No están desplegadas en ningún lado.
 - Permisos (RLS) en todas las tablas: cualquiera lee; sólo escribe un admin (`es_admin()`, que mira `app_metadata`) o el service role. `favoritos` y `dispositivos_push` son sólo de su dueño.
 - Auth anónima habilitada en el entorno local. En el proyecto remoto hay que activarla a mano.
