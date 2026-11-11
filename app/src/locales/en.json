@@ -29,7 +29,8 @@
     "today": "Today",
     "map": "Map",
     "groups": "Groups",
-    "calendar": "Calendar"
+    "calendar": "Calendar",
+    "llamadas": "Llamadas"
   },
   "groups": {
     "title": "Groups",
@@ -109,6 +110,36 @@
     "groupNight": "{{round}} · night {{number}}",
     "seeFixture": "See the Contest fixture",
     "groupNotPublished": "It's in the Official Contest. The fixture hasn't been published yet: once it's out, its nights will be listed here."
+  },
+  "llamadas": {
+    "title": "Llamadas",
+    "views": "Llamadas views",
+    "view": {
+      "order": "Line-up",
+      "block": "By block",
+      "route": "Route",
+      "glossary": "Glossary"
+    },
+    "nights": "Parade night",
+    "night": "Night {{number}}",
+    "loading": "Loading the Llamadas…",
+    "error": "We couldn't load the Llamadas.",
+    "noNights": "The Llamadas parade nights haven't been added yet.",
+    "order": "Parade line-up",
+    "orderError": "We couldn't load the parade line-up.",
+    "position": "Position {{number}}",
+    "following": "Following",
+    "notPublished": "Tonight's parade line-up hasn't been published yet.",
+    "notPublishedHint": "It usually comes out a couple of days before. Once it's out, you'll see here when each comparsa sets off.",
+    "qualified_one": "{{count}} qualified comparsa",
+    "qualified_other": "{{count}} qualified comparsas",
+    "qualifiedNote": "These are the comparsas that qualified for this season's Llamadas, across both nights.",
+    "sample": "Sample line-up: which comparsa goes each night, and in what position, is made up.",
+    "estimated": "Estimated time",
+    "estimatedAt": "Estimated time: {{time}}",
+    "estimateNote": "The first comparsa sets off at {{start}} and each one follows {{interval}} minutes and {{gap}} metres behind the one before. The real parade usually runs late.",
+    "delay_one": "The parade is running {{count}} minute late: the times already include it.",
+    "delay_other": "The parade is running {{count}} minutes late: the times already include it."
   },
   "follow": {
     "follow": "Follow",

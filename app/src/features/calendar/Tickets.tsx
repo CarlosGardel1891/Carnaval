@@ -1,15 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import type { CalendarEvent } from '../../lib/api'
-
-/** Sólo se enlaza una dirección web de verdad. */
-function webUrl(value: string | null): string | null {
-  return value && /^https?:\/\//i.test(value) ? value : null
-}
-
-/** Si el evento tiene algo cargado sobre la venta de entradas. */
-export function hasTickets(event: Pick<CalendarEvent, 'entradas_url' | 'entradas_texto'>): boolean {
-  return webUrl(event.entradas_url) !== null || Boolean(event.entradas_texto)
-}
+import { hasTickets, ticketsUrl } from './ticketSale'
 
 /**
  * Dónde se compran las entradas de un evento (decisión 60). La app no vende: lleva a la
@@ -22,7 +13,7 @@ export function Tickets({
   event: Pick<CalendarEvent, 'entradas_url' | 'entradas_texto'>
 }) {
   const { t } = useTranslation()
-  const url = webUrl(event.entradas_url)
+  const url = ticketsUrl(event)
   if (!hasTickets(event)) return null
 
   return (

@@ -263,6 +263,81 @@ export async function fetchContestFixture(year: number): Promise<FixtureRow[]> {
   return data
 }
 
+// ---------------------------------------------------------------- Llamadas
+
+/** Una noche del Desfile de Llamadas: el evento, con su horario y el estado de su recorrido. */
+export type ParadeEvent = Pick<
+  Tables<'eventos'>,
+  | 'id'
+  | 'temporada_id'
+  | 'slug'
+  | 'nombre'
+  | 'fecha_inicio'
+  | 'lugar'
+  | 'desfile_inicio'
+  | 'desfile_intervalo_min'
+  | 'desfile_separacion_m'
+  | 'desfile_atraso_min'
+  | 'recorrido_estado'
+  | 'recorrido_fuente_url'
+>
+
+/** Las noches del Desfile de Llamadas de una temporada, por fecha. */
+export async function fetchParadeEvents(seasonId: number): Promise<ParadeEvent[]> {
+  const { data, error } = await supabase
+    .from('eventos')
+    .select(
+      'id, temporada_id, slug, nombre, fecha_inicio, lugar, desfile_inicio, desfile_intervalo_min, desfile_separacion_m, desfile_atraso_min, recorrido_estado, recorrido_fuente_url',
+    )
+    .eq('temporada_id', seasonId)
+    .eq('tipo', 'llamadas')
+    .order('fecha_inicio')
+    .order('slug')
+  if (error) throw error
+  return data
+}
+
+/** Un lugar del orden de desfile. */
+export type ParadeSlot = Nullable<
+  Functions['orden_del_desfile']['Returns'][number],
+  'conjunto_barrio'
+>
+
+/** El orden de desfile de una noche, por posición. Vacío si todavía no se publicó. */
+export async function fetchParadeOrder(eventId: number): Promise<ParadeSlot[]> {
+  const { data, error } = await supabase.rpc('orden_del_desfile', { p_evento_id: eventId })
+  if (error) throw error
+  return data
+}
+
+/** Una esquina del recorrido, con los metros que lleva el desfile desde la salida. */
+export type RouteCorner = Functions['recorrido_del_desfile']['Returns'][number]
+
+/** Las esquinas del recorrido de una noche, de la salida a la llegada. */
+export async function fetchParadeRoute(eventId: number): Promise<RouteCorner[]> {
+  const { data, error } = await supabase.rpc('recorrido_del_desfile', { p_evento_id: eventId })
+  if (error) throw error
+  return data
+}
+
+/** Un corte de calle o una prohibición de estacionar. El tramo y el horario pueden faltar. */
+export type StreetClosure = Omit<
+  Functions['cortes_del_desfile']['Returns'][number],
+  'desde' | 'hasta' | 'puntos'
+> & {
+  desde: string | null
+  hasta: string | null
+  /** El tramo, como lista de [longitud, latitud]. */
+  puntos: [number, number][] | null
+}
+
+/** Los cortes de calle de una noche. */
+export async function fetchStreetClosures(eventId: number): Promise<StreetClosure[]> {
+  const { data, error } = await supabase.rpc('cortes_del_desfile', { p_evento_id: eventId })
+  if (error) throw error
+  return data as StreetClosure[]
+}
+
 // ---------------------------------------------------------------- sesión y Seguir
 
 /** El usuario de la sesión guardada en el teléfono, o null si no hay (o ya no sirve). */

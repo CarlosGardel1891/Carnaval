@@ -29,7 +29,8 @@
     "today": "Hoy",
     "map": "Mapa",
     "groups": "Conjuntos",
-    "calendar": "Calendario"
+    "calendar": "Calendario",
+    "llamadas": "Llamadas"
   },
   "groups": {
     "title": "Conjuntos",
@@ -109,6 +110,36 @@
     "groupNight": "{{round}} · etapa {{number}}",
     "seeFixture": "Ver el fixture del Concurso",
     "groupNotPublished": "Está en el Concurso Oficial. El fixture todavía no se publicó: cuando salga, acá van a estar sus noches."
+  },
+  "llamadas": {
+    "title": "Llamadas",
+    "views": "Vistas de las Llamadas",
+    "view": {
+      "order": "Orden",
+      "block": "Por cuadra",
+      "route": "Recorrido",
+      "glossary": "Glosario"
+    },
+    "nights": "Noche del desfile",
+    "night": "Noche {{number}}",
+    "loading": "Cargando las Llamadas…",
+    "error": "No pudimos cargar las Llamadas.",
+    "noNights": "Todavía no están cargadas las noches del Desfile de Llamadas.",
+    "order": "Orden de desfile",
+    "orderError": "No pudimos cargar el orden de desfile.",
+    "position": "Lugar {{number}}",
+    "following": "La seguís",
+    "notPublished": "El orden de desfile de esta noche todavía no se publicó.",
+    "notPublishedHint": "Suele conocerse un par de días antes. Cuando salga, vas a ver acá a qué hora sale cada comparsa.",
+    "qualified_one": "{{count}} comparsa clasificada",
+    "qualified_other": "{{count}} comparsas clasificadas",
+    "qualifiedNote": "Son las clasificadas a las Llamadas de esta temporada, entre las dos noches.",
+    "sample": "Orden de prueba: qué comparsa va cada noche y en qué lugar es inventado.",
+    "estimated": "Hora estimada",
+    "estimatedAt": "Hora estimada: {{time}}",
+    "estimateNote": "La primera comparsa sale a las {{start}} y cada una larga {{interval}} minutos y {{gap}} metros después de la anterior. El desfile de verdad suele atrasarse.",
+    "delay_one": "El desfile lleva {{count}} minuto de atraso: las horas ya lo cuentan.",
+    "delay_other": "El desfile lleva {{count}} minutos de atraso: las horas ya lo cuentan."
   },
   "follow": {
     "follow": "Seguir",

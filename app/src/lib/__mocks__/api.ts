@@ -18,6 +18,10 @@ export const fetchGroup = vi.fn<typeof Api.fetchGroup>(() => Promise.resolve(nul
 export const fetchContestFixture = vi.fn<typeof Api.fetchContestFixture>(() => Promise.resolve([]))
 export const fetchEvent = vi.fn<typeof Api.fetchEvent>(() => Promise.resolve(null))
 export const fetchEvents = vi.fn<typeof Api.fetchEvents>(() => Promise.resolve([]))
+export const fetchParadeEvents = vi.fn<typeof Api.fetchParadeEvents>(() => Promise.resolve([]))
+export const fetchParadeOrder = vi.fn<typeof Api.fetchParadeOrder>(() => Promise.resolve([]))
+export const fetchParadeRoute = vi.fn<typeof Api.fetchParadeRoute>(() => Promise.resolve([]))
+export const fetchStreetClosures = vi.fn<typeof Api.fetchStreetClosures>(() => Promise.resolve([]))
 export const fetchUpcomingActs = vi.fn<typeof Api.fetchUpcomingActs>(() => Promise.resolve([]))
 
 export const getUserId = vi.fn<typeof Api.getUserId>(() => Promise.resolve(null))

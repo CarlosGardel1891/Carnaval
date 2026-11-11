@@ -5,6 +5,8 @@ import { EventPage } from './features/calendar/EventPage'
 import { ContestPage } from './features/contest/ContestPage'
 import { GroupPage } from './features/groups/GroupPage'
 import { GroupsPage } from './features/groups/GroupsPage'
+import { LlamadasLayout } from './features/llamadas/LlamadasLayout'
+import { OrderView } from './features/llamadas/OrderView'
 import { LazyMapPage } from './features/map/LazyMapPage'
 import { StagePage } from './features/stages/StagePage'
 import { TodayPage } from './features/today/TodayPage'
@@ -27,6 +29,11 @@ export const routes: RouteObject[] = [
       // Antes que la ficha de evento: «concurso» no es el slug de ningún evento.
       { path: 'calendario/concurso', element: <ContestPage /> },
       { path: 'calendario/:slug', element: <EventPage /> },
+      {
+        path: 'llamadas',
+        element: <LlamadasLayout />,
+        children: [{ index: true, element: <OrderView /> }],
+      },
       { path: '*', element: <Navigate to="/" replace /> },
     ],
   },

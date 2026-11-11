@@ -38,6 +38,16 @@ function CalendarIcon() {
   )
 }
 
+function DrumIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="2">
+      <path d="M6 2.5 13.5 8.6M18 2.5 10.5 8.6" strokeLinecap="round" />
+      <ellipse cx="12" cy="11.5" rx="8" ry="3" />
+      <path d="M4 11.5V18c0 1.7 3.6 3 8 3s8-1.3 8-3v-6.5" strokeLinecap="round" />
+    </svg>
+  )
+}
+
 interface TabProps {
   to: string
   label: string
@@ -55,7 +65,7 @@ function Tab({ to, label, icon, withChildren = false }: TabProps) {
         // Las pestañas no apilan historial: «atrás» desde una pestaña no recorre las otras.
         replace
         className={({ isActive }) =>
-          `flex min-h-14 flex-col items-center justify-center gap-0.5 text-sm font-semibold ${
+          `flex min-h-14 flex-col items-center justify-center gap-0.5 text-xs font-semibold ${
             isActive ? 'text-accent' : 'text-soft'
           }`
         }
@@ -67,7 +77,7 @@ function Tab({ to, label, icon, withChildren = false }: TabProps) {
   )
 }
 
-/** Barra inferior. Hoy tiene cuatro pestañas; la Fase 6 suma la quinta. */
+/** Barra inferior, con cinco pestañas: las etiquetas van un punto más chicas para que entren. */
 export function TabBar() {
   const { t } = useTranslation()
   return (
@@ -77,6 +87,7 @@ export function TabBar() {
     >
       <ul className="flex">
         <Tab to="/" label={t('nav.today')} icon={<TodayIcon />} />
+        <Tab to="/llamadas" label={t('nav.llamadas')} icon={<DrumIcon />} withChildren />
         <Tab to="/mapa" label={t('nav.map')} icon={<MapIcon />} />
         <Tab to="/conjuntos" label={t('nav.groups')} icon={<GroupsIcon />} withChildren />
         <Tab to="/calendario" label={t('nav.calendar')} icon={<CalendarIcon />} withChildren />
