@@ -237,15 +237,13 @@ describe('etapas del Concurso', () => {
         .select()
         .single(),
     )
-    const repetida = await service
-      .from('etapas_concurso')
-      .insert({
-        temporada_id: temporadaId,
-        rueda: 'primera',
-        numero: 90,
-        fecha: '2027-02-13',
-        fuente: 'test',
-      })
+    const repetida = await service.from('etapas_concurso').insert({
+      temporada_id: temporadaId,
+      rueda: 'primera',
+      numero: 90,
+      fecha: '2027-02-13',
+      fuente: 'test',
+    })
     expect(repetida.error?.code).toBe('23505')
     // Mismo número en otra rueda: sí.
     ok(
