@@ -866,6 +866,11 @@ export type Database = {
           conjunto_id: number
           conjunto_nombre: string
           conjunto_slug: string
+          desfile_atraso_min: number
+          desfile_inicio: string
+          desfile_intervalo_min: number
+          desfile_posicion: number
+          desfile_separacion_m: number
           direccion: string
           escenario_nombre: string
           idioma: Database['public']['Enums']['idioma_app']

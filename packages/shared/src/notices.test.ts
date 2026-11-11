@@ -30,9 +30,28 @@ function daily(overrides: Partial<DailyRow> = {}): DailyRow {
   }
 }
 
+/** Una comparsa en el orden de desfile de esa noche: sin actuación ni hora. */
+function parade(position: number, overrides: Partial<DailyRow> = {}): DailyRow {
+  return daily({
+    conjunto_id: 40,
+    conjunto_slug: 'c-1080',
+    conjunto_nombre: 'C 1080',
+    noche: '2027-02-05',
+    actuacion_id: null,
+    inicio: null,
+    escenario_nombre: 'Desfile Oficial de Llamadas - noche 1',
+    desfile_posicion: position,
+    desfile_inicio: null,
+    desfile_intervalo_min: null,
+    desfile_separacion_m: null,
+    desfile_atraso_min: 0,
+    ...overrides,
+  })
+}
+
 function change(overrides: Partial<ChangeRow> = {}): ChangeRow {
   return {
-    ...daily(),
+    ...(daily() as ChangeRow),
     estado: 'cambiada',
     estado_anterior: 'programada',
     inicio_anterior: mvd('2027-01-28T22:50:00'),
@@ -185,6 +204,99 @@ describe('aviso del día', () => {
       )
     },
   )
+})
+
+describe('aviso del día con el Desfile de Llamadas', () => {
+  it('una comparsa que desfila: la hora estimada de salida, dicha como estimada, y abre Llamadas', () => {
+    process.env.TZ = 'Asia/Tokyo'
+    // La quinta sale 40 minutos después de la primera.
+    expect(buildDailyNotices([parade(5)])).toEqual([
+      {
+        token: 'tok-a',
+        language: 'es',
+        title: 'Hoy desfila C 1080 en las Llamadas',
+        body: 'Sale a eso de las 20:40 (hora estimada).',
+        route: '/llamadas?noche=2027-02-05',
+        noticeIds: [500],
+      },
+    ])
+  })
+
+  it('en inglés', () => {
+    const [notice] = buildDailyNotices([parade(1, { idioma: 'en' })])
+    expect(notice).toMatchObject({
+      title: 'C 1080 parades in the Llamadas tonight',
+      body: 'Sets off around 8:00 PM (estimated).',
+    })
+  })
+
+  it('la que sale pasada la medianoche sigue siendo de esa noche', () => {
+    const [notice] = buildDailyNotices([parade(26)])
+    expect(notice!.body).toBe('Sale a eso de las 00:10 (hora estimada).')
+    expect(notice!.route).toBe('/llamadas?noche=2027-02-05')
+  })
+
+  it('usa el horario del evento y su atraso, si los trae', () => {
+    const [notice] = buildDailyNotices([
+      parade(3, {
+        desfile_inicio: '20:30:00',
+        desfile_intervalo_min: 12,
+        desfile_separacion_m: 150,
+        desfile_atraso_min: 20,
+      }),
+    ])
+    // 20:30 + 20 de atraso + 2 × 12.
+    expect(notice!.body).toBe('Sale a eso de las 21:14 (hora estimada).')
+  })
+
+  it('varias comparsas que desfilan: un resumen por orden de salida, que abre Llamadas', () => {
+    const [notice] = buildDailyNotices([
+      parade(12, { aviso_id: 501, conjunto_id: 41, conjunto_nombre: 'Valores de Ansina' }),
+      parade(2, { aviso_id: 502 }),
+    ])
+    expect(notice).toEqual({
+      token: 'tok-a',
+      language: 'es',
+      title: 'Hoy desfilan 2 de tus comparsas',
+      body: 'C 1080: ≈ 20:10 en las Llamadas\nValores de Ansina: ≈ 21:50 en las Llamadas',
+      route: '/llamadas?noche=2027-02-05',
+      noticeIds: [501, 502],
+    })
+  })
+
+  it('una noche con tablado y desfile: un resumen con las dos cosas, que abre «mis conjuntos»', () => {
+    const [notice] = buildDailyNotices([
+      daily({
+        aviso_id: 503,
+        noche: '2027-02-05',
+        inicio: mvd('2027-02-05T21:30:00'),
+      }),
+      parade(2, { aviso_id: 502 }),
+    ])
+    expect(notice).toMatchObject({
+      title: 'Hoy actúan 2 de tus conjuntos',
+      body: 'C 1080: ≈ 20:10 en las Llamadas\nLa Gran Muñeca: 21:30 en Tablado del Centro',
+      route: '/?noche=2027-02-05&mios=1',
+    })
+  })
+
+  it('una comparsa que esa noche actúa en un tablado y además desfila: un aviso con las dos horas', () => {
+    const [notice] = buildDailyNotices([
+      parade(4),
+      daily({
+        conjunto_id: 40,
+        conjunto_slug: 'c-1080',
+        conjunto_nombre: 'C 1080',
+        noche: '2027-02-05',
+        inicio: mvd('2027-02-05T23:15:00'),
+      }),
+    ])
+    expect(notice).toMatchObject({
+      title: 'Hoy actúa C 1080',
+      body: '≈ 20:30 en las Llamadas · 23:15 en Tablado del Centro',
+      route: '/conjuntos/c-1080',
+    })
+  })
 })
 
 describe('avisos de cambio y suspensión', () => {

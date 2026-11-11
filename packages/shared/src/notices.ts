@@ -1,4 +1,5 @@
 import { MONTEVIDEO_TZ, minutesOfDayInMontevideo } from './dates.ts'
+import { departureTime, paradeRules } from './llamadas.ts'
 import { noticeTexts, type NoticeLanguage, type NoticeTexts } from './noticeTexts.ts'
 
 /**
@@ -20,22 +21,39 @@ export interface Notice {
   noticeIds: number[]
 }
 
-/** Una fila de `tomar_avisos_del_dia`. */
-export interface DailyRow {
+/** Lo que traen todas las filas: a quién va el aviso y de qué conjunto habla. */
+interface NoticeRow {
   aviso_id: number
   token: string
   idioma: NoticeLanguage
   conjunto_id: number
   conjunto_slug: string
   conjunto_nombre: string
-  actuacion_id: number
   noche: string
-  inicio: string
-  escenario_nombre: string
+}
+
+/**
+ * Una fila de `tomar_avisos_del_dia`: una actuación en un escenario o, si trae
+ * `desfile_posicion`, el lugar de una comparsa en el Desfile de Llamadas de esa noche. Las
+ * filas de desfile no tienen actuación ni hora: la hora se estima acá, con la regla del
+ * desfile y lo que el evento diga de su horario (decisión 68).
+ */
+export interface DailyRow extends NoticeRow {
+  actuacion_id: number | null
+  inicio: string | null
+  escenario_nombre: string | null
+  desfile_posicion?: number | null
+  desfile_inicio?: string | null
+  desfile_intervalo_min?: number | null
+  desfile_separacion_m?: number | null
+  desfile_atraso_min?: number | null
 }
 
 /** Una fila de `tomar_avisos_de_cambios`. */
-export interface ChangeRow extends DailyRow {
+export interface ChangeRow extends NoticeRow {
+  actuacion_id: number
+  inicio: string
+  escenario_nombre: string
   estado: 'programada' | 'cambiada' | 'suspendida'
   estado_anterior: 'programada' | 'cambiada' | 'suspendida'
   inicio_anterior: string
@@ -107,65 +125,110 @@ function groupBy<T, K>(items: T[], keyOf: (item: T) => K): Map<K, T[]> {
   return groups
 }
 
-const byStart = <T extends DailyRow>(rows: T[]): T[] =>
+const byStart = <T extends { inicio: string; actuacion_id: number }>(rows: T[]): T[] =>
   [...rows].sort(
     (a, b) =>
       new Date(a.inicio).getTime() - new Date(b.inicio).getTime() ||
       a.actuacion_id - b.actuacion_id,
   )
 
-const uniqueIds = (rows: DailyRow[]): number[] => [...new Set(rows.map((row) => row.aviso_id))]
+const uniqueIds = (rows: NoticeRow[]): number[] => [...new Set(rows.map((row) => row.aviso_id))]
 
 const groupRoute = (slug: string) => `/conjuntos/${encodeURIComponent(slug)}`
 const mineRoute = (noche: string) => `/?noche=${noche}&mios=1`
+const paradeRoute = (noche: string) => `/llamadas?noche=${noche}`
+
+/** Una fila del aviso del día con su hora: la de la actuación o la estimada del desfile. */
+interface Slot {
+  row: DailyRow
+  at: Date
+  parade: boolean
+}
+
+function slotOf(row: DailyRow): Slot {
+  if (row.desfile_posicion != null) {
+    return {
+      row,
+      parade: true,
+      at: departureTime(row.noche, row.desfile_posicion, paradeRules(row)),
+    }
+  }
+  return { row, parade: false, at: new Date(row.inicio ?? `${row.noche}T00:00:00Z`) }
+}
+
+const byTime = (slots: Slot[]): Slot[] =>
+  [...slots].sort(
+    (a, b) =>
+      a.at.getTime() - b.at.getTime() || (a.row.actuacion_id ?? 0) - (b.row.actuacion_id ?? 0),
+  )
 
 /**
  * «Tu conjunto actúa hoy»: una notificación por dispositivo.
  *
  * - Un conjunto en un escenario: hora y lugar.
  * - Un conjunto en varios escenarios esa noche: una sola, con todas sus horas.
+ * - Una comparsa que desfila en las Llamadas: la hora estimada de salida, dicha como
+ *   estimada, y abre el modo Llamadas en esa noche.
  * - Varios conjuntos: un resumen, un renglón por conjunto.
  */
 export function buildDailyNotices(rows: DailyRow[]): Notice[] {
   return [...groupBy(rows, (row) => row.token)].map(([token, deviceRows]) => {
     const language = deviceRows[0]!.idioma
     const texts: NoticeTexts = noticeTexts[language]
-    const groups = [...groupBy(byStart(deviceRows), (row) => row.conjunto_id).values()]
-    const slots = (acts: DailyRow[]) =>
+    const time = (slot: Slot) => formatTime(slot.at.toISOString(), texts)
+    const groups = [
+      ...groupBy(byTime(deviceRows.map(slotOf)), (slot) => slot.row.conjunto_id).values(),
+    ]
+    const slots = (acts: Slot[]) =>
       acts
         .map((act) =>
-          fill(texts.slot, { time: formatTime(act.inicio, texts), stage: act.escenario_nombre }),
+          act.parade
+            ? fill(texts.paradeSlot, { time: time(act) })
+            : fill(texts.slot, { time: time(act), stage: act.row.escenario_nombre ?? '' }),
         )
         .join(texts.slotSeparator)
     const base = { token, language, noticeIds: uniqueIds(deviceRows) }
+    const noche = deviceRows[0]!.noche
 
     if (groups.length === 1) {
       const acts = groups[0]!
       const first = acts[0]!
+      if (acts.length === 1 && first.parade) {
+        return {
+          ...base,
+          title: fill(texts.paradeOneTitle, { group: first.row.conjunto_nombre }),
+          body: fill(texts.paradeOneBody, { time: time(first) }),
+          route: paradeRoute(noche),
+        }
+      }
       return {
         ...base,
-        title: fill(texts.dailyOneTitle, { group: first.conjunto_nombre }),
+        title: fill(texts.dailyOneTitle, { group: first.row.conjunto_nombre }),
         body:
           acts.length === 1
             ? fill(texts.dailyOneBody, {
-                time: formatTime(first.inicio, texts),
-                stage: first.escenario_nombre,
+                time: time(first),
+                stage: first.row.escenario_nombre ?? '',
               })
             : slots(acts),
-        route: groupRoute(first.conjunto_slug),
+        route: groupRoute(first.row.conjunto_slug),
       }
     }
 
+    // Si todo lo de esa noche es el desfile, el resumen habla de comparsas y abre Llamadas.
+    const allParade = groups.every((acts) => acts.every((act) => act.parade))
     return {
       ...base,
-      title: fill(texts.dailyManyTitle, { count: groups.length }),
+      title: fill(allParade ? texts.paradeManyTitle : texts.dailyManyTitle, {
+        count: groups.length,
+      }),
       body: joinLines(
         groups.map((acts) =>
-          fill(texts.groupLine, { group: acts[0]!.conjunto_nombre, detail: slots(acts) }),
+          fill(texts.groupLine, { group: acts[0]!.row.conjunto_nombre, detail: slots(acts) }),
         ),
         texts,
       ),
-      route: mineRoute(deviceRows[0]!.noche),
+      route: allParade ? paradeRoute(noche) : mineRoute(noche),
     }
   })
 }

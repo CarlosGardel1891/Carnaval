@@ -19,6 +19,12 @@ export const noticeTexts = {
     dailyOneBody: 'A las {{time}} en {{stage}}.',
     dailyManyTitle: 'Hoy actúan {{count}} de tus conjuntos',
 
+    // El Desfile de Llamadas: la hora es siempre estimada, y se dice (decisión 63).
+    paradeSlot: '≈ {{time}} en las Llamadas',
+    paradeOneTitle: 'Hoy desfila {{group}} en las Llamadas',
+    paradeOneBody: 'Sale a eso de las {{time}} (hora estimada).',
+    paradeManyTitle: 'Hoy desfilan {{count}} de tus comparsas',
+
     suspendedTitle: '{{group}}: actuación suspendida',
     suspendedBody: 'Era {{when}} a las {{time}} en {{stage}}.',
     changedTitle: '{{group}}: cambió la actuación',
@@ -43,6 +49,11 @@ export const noticeTexts = {
     dailyOneTitle: '{{group}} performs tonight',
     dailyOneBody: 'At {{time}} at {{stage}}.',
     dailyManyTitle: '{{count}} of your groups perform tonight',
+
+    paradeSlot: '≈ {{time}} in the Llamadas parade',
+    paradeOneTitle: '{{group}} parades in the Llamadas tonight',
+    paradeOneBody: 'Sets off around {{time}} (estimated).',
+    paradeManyTitle: '{{count}} of your comparsas parade tonight',
 
     suspendedTitle: '{{group}}: show cancelled',
     suspendedBody: 'It was {{when}} at {{time}} at {{stage}}.',
@@ -69,6 +80,10 @@ type NoticeTextKey =
   | 'dailyOneTitle'
   | 'dailyOneBody'
   | 'dailyManyTitle'
+  | 'paradeSlot'
+  | 'paradeOneTitle'
+  | 'paradeOneBody'
+  | 'paradeManyTitle'
   | 'suspendedTitle'
   | 'suspendedBody'
   | 'changedTitle'

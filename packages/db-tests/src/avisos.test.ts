@@ -269,6 +269,7 @@ describe('tomar_avisos_del_dia', () => {
       direccion: 'Calle Norte 1',
     })
     expect(new Date(deB.inicio).toISOString()).toBe('2031-03-11T01:00:00.000Z')
+    expect(deB.desfile_posicion).toBeNull()
     expect(primera.filter((f) => f.token === TOKEN_A).every((f) => f.idioma === 'es')).toBe(true)
   })
 
@@ -326,6 +327,126 @@ describe('tomar_avisos_del_dia', () => {
     expect(resumen(await delDia(OTRA_NOCHE))).toEqual([
       `${TOKEN_A} zz-av-cuatro @ ZZ Tablado Norte`,
     ])
+  })
+})
+
+describe('tomar_avisos_del_dia con el Desfile de Llamadas', () => {
+  // Una noche propia, con un desfile en el que van «uno» (2.º) y «dos» (1.º), y un evento de
+  // otro tipo con orden cargado, que no cuenta.
+  const DESFILE = '2031-03-14'
+  let evento: number
+
+  beforeAll(async () => {
+    const temporada = ok(
+      await service().from('temporadas').select('id').order('anio').limit(1).single(),
+    ).id
+    const base = {
+      temporada_id: temporada,
+      estado: 'confirmado' as const,
+      fecha_inicio: DESFILE,
+      fecha_fin: DESFILE,
+    }
+    const eventos = ok(
+      await service()
+        .from('eventos')
+        .insert(
+          [
+            {
+              ...base,
+              slug: 'zz-av-llamadas',
+              tipo: 'llamadas' as const,
+              nombre: 'Zz Llamadas',
+              lugar: 'Zz Isla de Flores',
+              desfile_inicio: '20:30',
+              desfile_intervalo_min: 12,
+              desfile_atraso_min: 15,
+            },
+            { ...base, slug: 'zz-av-corso', tipo: 'corso' as const, nombre: 'Zz Corso' },
+          ],
+          { defaultToNull: false },
+        )
+        .select('id, slug'),
+    )
+    evento = eventos.find((e) => e.slug === 'zz-av-llamadas')!.id
+    const corso = eventos.find((e) => e.slug === 'zz-av-corso')!.id
+    ok(
+      await service()
+        .from('orden_desfile')
+        .insert([
+          { evento_id: evento, conjunto_id: ids['zz-av-dos']!, posicion: 1, fuente: 'test' },
+          { evento_id: evento, conjunto_id: ids['zz-av-uno']!, posicion: 2, fuente: 'test' },
+          { evento_id: corso, conjunto_id: ids['zz-av-cuatro']!, posicion: 1, fuente: 'test' },
+        ])
+        .select(),
+    )
+    // «uno», además de desfilar, actúa esa noche en un tablado.
+    ok(
+      await service()
+        .from('actuaciones')
+        .insert({
+          escenario_id: ids['zz-av-norte']!,
+          conjunto_id: ids['zz-av-uno']!,
+          inicio: '2031-03-14T23:00:00-03:00',
+          fuente: 'test',
+        })
+        .select('id'),
+    )
+    // A ya sigue a «cuatro» (de «cada noche tiene sus avisos»), que va en el orden del corso.
+  })
+
+  let filas: Awaited<ReturnType<typeof delDia>>
+
+  it('a quien sigue a una comparsa que desfila esa noche le llega, con su posición y el horario del evento', async () => {
+    filas = await delDia(DESFILE)
+    const deB = filas.filter((f) => f.token === TOKEN_B && f.conjunto_slug === 'zz-av-dos')
+    expect(deB).toHaveLength(1)
+    expect(deB[0]).toMatchObject({
+      idioma: 'en',
+      noche: DESFILE,
+      actuacion_id: null,
+      inicio: null,
+      escenario_nombre: 'Zz Llamadas',
+      direccion: 'Zz Isla de Flores',
+      desfile_posicion: 1,
+      desfile_inicio: '20:30:00',
+      desfile_intervalo_min: 12,
+      desfile_separacion_m: null,
+      desfile_atraso_min: 15,
+    })
+  })
+
+  it('una comparsa que desfila y además actúa es un solo aviso, con las dos filas', () => {
+    const deUno = filas.filter((f) => f.token === TOKEN_A && f.conjunto_slug === 'zz-av-uno')
+    expect(deUno).toHaveLength(2)
+    expect(new Set(deUno.map((f) => f.aviso_id)).size).toBe(1)
+    expect(deUno.map((f) => f.desfile_posicion)).toEqual([null, 2])
+    expect(deUno[0]!.escenario_nombre).toBe('ZZ Tablado Norte')
+  })
+
+  it('el orden cargado en un evento que no es de Llamadas no avisa', () => {
+    expect(filas.some((f) => f.conjunto_slug === 'zz-av-cuatro')).toBe(false)
+  })
+
+  it('no sale dos veces, y el desfile de otra noche no cuenta', async () => {
+    expect(await delDia(DESFILE)).toEqual([])
+    expect((await delDia('2031-03-15')).some((f) => f.desfile_posicion !== null)).toBe(false)
+  })
+
+  it('si la comparsa sale del orden antes de que se arme el aviso, no le llega', async () => {
+    await withSql((sql) =>
+      sql.query(`delete from public.avisos_enviados where tipo = 'hoy' and noche = $1`, [DESFILE]),
+    )
+    ok(
+      await service()
+        .from('orden_desfile')
+        .delete()
+        .eq('evento_id', evento)
+        .eq('conjunto_id', ids['zz-av-dos']!)
+        .select(),
+    )
+    const otra = await delDia(DESFILE)
+    expect(otra.some((f) => f.conjunto_slug === 'zz-av-dos')).toBe(false)
+    expect(otra.some((f) => f.conjunto_slug === 'zz-av-uno' && f.desfile_posicion === 2)).toBe(true)
   })
 })
 
