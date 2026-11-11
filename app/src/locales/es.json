@@ -68,6 +68,18 @@
     "noneTonight": "Ninguno de tus conjuntos actúa esta noche.",
     "noneThatNight": "Ninguno de tus conjuntos actúa esa noche."
   },
+  "push": {
+    "askTitle": "¿Te avisamos cuando actúe?",
+    "askBody": "Te mandamos un aviso el día que actúa un conjunto que seguís, y otro si la actuación se suspende o cambia de hora.",
+    "accept": "Sí, avisame",
+    "later": "Ahora no",
+    "on": "Avisos activados: te avisamos el día que actúe y si hay cambios.",
+    "off": "Los avisos están apagados.",
+    "enable": "Activar avisos",
+    "denied": "Los avisos están apagados para Cuerda. Para recibirlos, permití las notificaciones de Cuerda en los ajustes del teléfono.",
+    "error": "No pudimos activar los avisos. Probá de nuevo.",
+    "channel": "Avisos de tus conjuntos"
+  },
   "today": {
     "title": "Hoy",
     "otherNight": "Otra noche",

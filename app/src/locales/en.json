@@ -68,6 +68,18 @@
     "noneTonight": "None of your groups are performing tonight.",
     "noneThatNight": "None of your groups are performing that night."
   },
+  "push": {
+    "askTitle": "Want a heads-up when they perform?",
+    "askBody": "We'll notify you on the day a group you follow performs, and again if the show is cancelled or its time changes.",
+    "accept": "Yes, notify me",
+    "later": "Not now",
+    "on": "Notifications on: we'll let you know on the day they perform and if anything changes.",
+    "off": "Notifications are off.",
+    "enable": "Turn on notifications",
+    "denied": "Notifications are off for Cuerda. To get them, allow notifications for Cuerda in your phone's settings.",
+    "error": "We couldn't turn on notifications. Try again.",
+    "channel": "Updates from your groups"
+  },
   "today": {
     "title": "Today",
     "otherNight": "Another night",

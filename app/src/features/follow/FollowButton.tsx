@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { isRateLimited } from '../../lib/api'
+import { PushPrompt } from '../push/PushPrompt'
 import { useFollowed, useToggleFollow } from './useFollow'
 
 interface FollowButtonProps {
@@ -36,6 +37,8 @@ export function FollowButton({ groupId, groupName }: FollowButtonProps) {
           {t(isRateLimited(toggle.error) ? 'follow.rateLimited' : 'follow.error')}
         </p>
       )}
+      {/* Los avisos se ofrecen recién cuando el «Seguir» quedó guardado, nunca antes. */}
+      {following && !toggle.isPending && <PushPrompt />}
     </div>
   )
 }

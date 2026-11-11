@@ -18,3 +18,10 @@ app/android/local.properties
 app/ios/App/build/
 app/ios/DerivedData/
 .idea/
+# Firebase: los archivos de configuración y la cuenta de servicio no van al repo.
+google-services.json
+GoogleService-Info.plist
+*service-account*.json
+*firebase-adminsdk*.json
+supabase/functions/.env
+supabase/.env

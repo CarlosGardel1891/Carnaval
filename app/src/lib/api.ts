@@ -265,6 +265,23 @@ export async function unfollowGroup(groupId: number): Promise<void> {
   if (error) throw error
 }
 
+/**
+ * Registra el token de push de este teléfono para el usuario de la sesión, o lo reasigna
+ * si era de otro (reinstalación). Hace falta sesión.
+ */
+export async function registerPushDevice(
+  token: string,
+  platform: Database['public']['Enums']['plataforma_push'],
+  language: Database['public']['Enums']['idioma_app'],
+): Promise<void> {
+  const { error } = await supabase.rpc('registrar_dispositivo_push', {
+    p_token: token,
+    p_plataforma: platform,
+    p_idioma: language,
+  })
+  if (error) throw error
+}
+
 // ---------------------------------------------------------------- escenarios
 
 /** Un escenario por su slug, o null si no existe. */
