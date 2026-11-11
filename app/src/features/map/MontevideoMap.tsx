@@ -11,6 +11,7 @@ import {
 import 'maplibre-gl/dist/maplibre-gl.css'
 import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?url'
 import { MONTEVIDEO_CENTER, type Coords } from '../../lib/api'
+import { BLANK_STYLE, streetsStyleUrl } from './mapStyle'
 import { MARKER_STROKE, markerShape, type MapMarker } from './markers'
 
 // MapLibre busca su worker al lado de su propio módulo, y en el bundle ya no está ahí:
@@ -22,15 +23,8 @@ const INITIAL_ZOOM = 12
 const NOTICE_SPACE = 72
 const SVG_NS = 'http://www.w3.org/2000/svg'
 
-/** Sin key de MapTiler no hay calles: queda un fondo liso donde igual se ven los marcadores. */
-const BLANK_STYLE: StyleSpecification = {
-  version: 8,
-  sources: {},
-  layers: [{ id: 'fondo', type: 'background', paint: { 'background-color': '#141b2d' } }],
-}
-
 const mapStyle = (apiKey: string | undefined): StyleSpecification | string =>
-  apiKey ? `https://api.maptiler.com/maps/streets-v2-dark/style.json?key=${apiKey}` : BLANK_STYLE
+  apiKey ? streetsStyleUrl(apiKey) : BLANK_STYLE
 
 /** El botón de un marcador: la forma del tipo de escenario, con un área de toque de 48 px. */
 function markerButton(marker: MapMarker, label: string, onOpen: () => void): HTMLButtonElement {

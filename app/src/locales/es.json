@@ -153,6 +153,30 @@
       "middle": "Las horas son para la mitad de la cuadra.",
       "noOrder": "El orden de desfile todavía no se publicó.",
       "first": "La primera comparsa pasaría por acá"
+    },
+    "route": {
+      "title": "Recorrido",
+      "mapLabel": "Mapa del recorrido del desfile",
+      "noStreets": "No pudimos cargar las calles del mapa: se ve el recorrido sobre fondo liso.",
+      "start": "Salida",
+      "end": "Llegada",
+      "corner": "{{street}} y {{cross}}",
+      "length": "{{blocks}} cuadras, {{distance}} de la salida a la llegada.",
+      "legend": {
+        "recorrido": "Recorrido",
+        "corte": "Calle cortada",
+        "estacionamiento": "No estacionar"
+      },
+      "closures": "Cortes de calle",
+      "kind": {
+        "corte": "Calles cortadas y desvíos",
+        "estacionamiento": "No estacionar"
+      },
+      "noClosures": "Todavía no hay cortes de calle cargados para esta noche.",
+      "from": "desde el {{when}}",
+      "until": "hasta el {{when}}",
+      "estimated": "Estimado según años anteriores",
+      "osm": "Coordenadas: © colaboradores de OpenStreetMap."
     }
   },
   "follow": {

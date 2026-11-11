@@ -8,6 +8,7 @@ import { GroupsPage } from './features/groups/GroupsPage'
 import { BlockView } from './features/llamadas/BlockView'
 import { LlamadasLayout } from './features/llamadas/LlamadasLayout'
 import { OrderView } from './features/llamadas/OrderView'
+import { RouteView } from './features/llamadas/RouteView'
 import { LazyMapPage } from './features/map/LazyMapPage'
 import { StagePage } from './features/stages/StagePage'
 import { TodayPage } from './features/today/TodayPage'
@@ -36,6 +37,7 @@ export const routes: RouteObject[] = [
         children: [
           { index: true, element: <OrderView /> },
           { path: 'cuadra', element: <BlockView /> },
+          { path: 'recorrido', element: <RouteView /> },
         ],
       },
       { path: '*', element: <Navigate to="/" replace /> },

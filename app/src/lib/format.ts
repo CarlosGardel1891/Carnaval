@@ -82,6 +82,17 @@ export function formatTime(instant: string, locale: string): string {
   return timeFormatter(locale).format(new Date(instant))
 }
 
+/** El día y la hora de un instante en Montevideo: «vie 5 feb, 12:00». */
+export function formatDateTime(instant: string, locale: string): string {
+  const day = new Intl.DateTimeFormat(locale, {
+    weekday: 'short',
+    day: 'numeric',
+    month: 'short',
+    timeZone: MONTEVIDEO_TZ,
+  }).format(new Date(instant))
+  return `${day}, ${formatTime(instant, locale)}`
+}
+
 /**
  * «hace 5 minutos» para un lapso en milisegundos. Devuelve null si pasó menos de un
  * minuto: quien llama decide cómo decir «recién».
