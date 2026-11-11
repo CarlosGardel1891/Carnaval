@@ -59,7 +59,7 @@ function fill(template: string, values: Record<string, string | number>): string
 }
 
 /** `Intl` separa «10:50» de «PM» con un espacio angosto que algunos teléfonos no muestran. */
-const plainSpaces = (text: string) => text.replace(/[  ]/g, ' ')
+const plainSpaces = (text: string) => text.replace(/[\u00a0\u202f]/g, ' ')
 
 function formatTime(instant: string, texts: NoticeTexts): string {
   return plainSpaces(
