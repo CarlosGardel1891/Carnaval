@@ -11,6 +11,7 @@ interface FilterBarProps {
   locating: boolean
   onToggleNearby: () => void
   onToggleFree: () => void
+  onToggleMine: () => void
   onToggleCategory: (category: CategoriaConjunto) => void
   onView: (view: BoardView) => void
 }
@@ -21,6 +22,7 @@ export function FilterBar({
   locating,
   onToggleNearby,
   onToggleFree,
+  onToggleMine,
   onToggleCategory,
   onView,
 }: FilterBarProps) {
@@ -38,6 +40,9 @@ export function FilterBar({
         </Chip>
         <Chip pressed={filters.onlyFree} onClick={onToggleFree}>
           {t('filters.free')}
+        </Chip>
+        <Chip pressed={filters.mine} onClick={onToggleMine}>
+          {t('filters.mine')}
         </Chip>
         {categories.map((category) => (
           <Chip

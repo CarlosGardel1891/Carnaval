@@ -1,10 +1,18 @@
 import { useEffect, useMemo } from 'react'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient, type QueryClient } from '@tanstack/react-query'
 import { fetchFollowed, followGroup, onUserChange, unfollowGroup } from '../../lib/api'
+import { isFollowedActsKey } from '../today/useNightActs'
 
 const FOLLOWED_KEY = ['favoritos'] as const
 const FOLLOW_MUTATION = ['seguir'] as const
 const NOBODY: ReadonlySet<number> = new Set()
+
+/** Vuelve a pedir los seguidos y lo que depende de ellos: el pizarrón con «mis conjuntos». */
+function refreshFollowed(queryClient: QueryClient): Promise<void> {
+  return queryClient.invalidateQueries({
+    predicate: ({ queryKey }) => queryKey[0] === FOLLOWED_KEY[0] || isFollowedActsKey(queryKey),
+  })
+}
 
 /**
  * Los conjuntos que sigue este teléfono. Sin sesión (nunca se siguió nada, o se perdió
@@ -36,7 +44,7 @@ export function useSessionSync(): void {
       // Mientras un «Seguir» está en curso (el que crea la sesión), lo que se ve es su
       // cambio optimista: al terminar, él mismo vuelve a pedir la lista.
       if (changed && queryClient.isMutating({ mutationKey: FOLLOW_MUTATION }) === 0) {
-        void queryClient.invalidateQueries({ queryKey: FOLLOWED_KEY })
+        void refreshFollowed(queryClient)
       }
     })
   }, [queryClient])
@@ -69,6 +77,6 @@ export function useToggleFollow() {
     onError: (_error, _change, context) => {
       queryClient.setQueryData(FOLLOWED_KEY, context?.previous)
     },
-    onSettled: () => queryClient.invalidateQueries({ queryKey: FOLLOWED_KEY }),
+    onSettled: () => refreshFollowed(queryClient),
   })
 }

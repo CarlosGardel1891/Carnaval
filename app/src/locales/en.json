@@ -62,6 +62,12 @@
     "error": "We couldn't save the change. Try again.",
     "rateLimited": "Too many people are connecting from your network. Try again in a while."
   },
+  "mine": {
+    "none": "You're not following any groups yet. Open a group's page and tap “Follow”: they'll show up here.",
+    "browse": "Browse groups",
+    "noneTonight": "None of your groups are performing tonight.",
+    "noneThatNight": "None of your groups are performing that night."
+  },
   "today": {
     "title": "Today",
     "otherNight": "Another night",
@@ -130,6 +136,7 @@
   "filters": {
     "label": "Filters",
     "free": "Free",
+    "mine": "My groups",
     "view": "View",
     "byStage": "By stage",
     "byTime": "By time",

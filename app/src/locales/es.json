@@ -62,6 +62,12 @@
     "error": "No pudimos guardar el cambio. Probá de nuevo.",
     "rateLimited": "Hay muchas personas conectadas desde tu misma red. Probá de nuevo en un rato."
   },
+  "mine": {
+    "none": "Todavía no seguís ningún conjunto. Abrí la ficha de uno y tocá «Seguir»: después los vas a ver acá.",
+    "browse": "Ver conjuntos",
+    "noneTonight": "Ninguno de tus conjuntos actúa esta noche.",
+    "noneThatNight": "Ninguno de tus conjuntos actúa esa noche."
+  },
   "today": {
     "title": "Hoy",
     "otherNight": "Otra noche",
@@ -130,6 +136,7 @@
   "filters": {
     "label": "Filtros",
     "free": "Gratis",
+    "mine": "Mis conjuntos",
     "view": "Vista",
     "byStage": "Por escenario",
     "byTime": "Por hora",

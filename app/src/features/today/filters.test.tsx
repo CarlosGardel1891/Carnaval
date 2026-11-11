@@ -65,7 +65,14 @@ describe('filtros del pizarrón', () => {
     const chips = within(screen.getByRole('group', { name: 'Filtros' }))
       .getAllByRole('button')
       .map((button) => button.textContent)
-    expect(chips).toEqual(['Cerca mío', 'Gratis', 'Murga', 'Parodistas', 'Comparsa'])
+    expect(chips).toEqual([
+      'Cerca mío',
+      'Gratis',
+      'Mis conjuntos',
+      'Murga',
+      'Parodistas',
+      'Comparsa',
+    ])
   })
 
   it('la categoría se filtra en la app, sin volver a la base', async () => {
@@ -158,6 +165,7 @@ describe('filtros en la URL', () => {
     expect(filters).toEqual({
       nearby: false,
       onlyFree: false,
+      mine: false,
       categories: ['murga'],
       view: 'stage',
     })
@@ -167,6 +175,7 @@ describe('filtros en la URL', () => {
     const params = writeFilters(new URLSearchParams('noche=2027-01-28&gratis=1'), {
       nearby: true,
       onlyFree: false,
+      mine: false,
       categories: ['murga', 'comparsa'],
       view: 'time',
     })

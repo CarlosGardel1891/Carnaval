@@ -5,12 +5,15 @@ import { Constants, type CategoriaConjunto } from '@cuerda/shared'
 export type BoardView = 'stage' | 'time'
 
 /**
- * Los filtros del pizarrón. Viven en la URL: `?cerca=1&gratis=1&cat=murga,comparsa&vista=hora`.
+ * Los filtros del pizarrón. Viven en la URL:
+ * `?cerca=1&gratis=1&mios=1&cat=murga,comparsa&vista=hora`.
  * De «cerca mío» va sólo que está prendido; la posición, nunca.
  */
 export interface BoardFilters {
   nearby: boolean
   onlyFree: boolean
+  /** «Mis conjuntos»: sólo los que sigue el usuario. */
+  mine: boolean
   categories: CategoriaConjunto[]
   view: BoardView
 }
@@ -22,6 +25,7 @@ export function parseFilters(params: URLSearchParams): BoardFilters {
   return {
     nearby: params.get('cerca') === '1',
     onlyFree: params.get('gratis') === '1',
+    mine: params.get('mios') === '1',
     // En el orden de la base y sin valores que no existan.
     categories: ALL_CATEGORIES.filter((category) => requested.includes(category)),
     view: params.get('vista') === 'hora' ? 'time' : 'stage',
@@ -35,6 +39,8 @@ export function writeFilters(params: URLSearchParams, filters: BoardFilters): UR
   else next.delete('cerca')
   if (filters.onlyFree) next.set('gratis', '1')
   else next.delete('gratis')
+  if (filters.mine) next.set('mios', '1')
+  else next.delete('mios')
   if (filters.categories.length > 0) next.set('cat', filters.categories.join(','))
   else next.delete('cat')
   if (filters.view === 'time') next.set('vista', 'hora')
@@ -74,14 +80,14 @@ export function useBoardFilters() {
 
   /** Saca los filtros; la vista (por escenario o por hora) no es un filtro y queda. */
   const clear = useCallback(
-    () => update({ nearby: false, onlyFree: false, categories: [] }),
+    () => update({ nearby: false, onlyFree: false, mine: false, categories: [] }),
     [update],
   )
 
   return {
     filters,
     /** Si hay algún filtro que pueda estar dejando cosas afuera. */
-    active: filters.nearby || filters.onlyFree || filters.categories.length > 0,
+    active: filters.nearby || filters.onlyFree || filters.mine || filters.categories.length > 0,
     update,
     toggleCategory,
     clear,

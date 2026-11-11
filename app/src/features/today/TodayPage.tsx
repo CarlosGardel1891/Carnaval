@@ -5,6 +5,7 @@ import { Constants } from '@cuerda/shared'
 import { Button } from '../../components/Button'
 import { formatNight } from '../../lib/format'
 import { useLocale } from '../../lib/useLocale'
+import { useFollowed } from '../follow/useFollow'
 import { useUserLocation } from '../location/locationContext'
 import {
   categoriesPresent,
@@ -13,6 +14,7 @@ import {
   onlyLocatedStages,
   onStageNow,
 } from './board'
+import { EmptyMine } from './EmptyMine'
 import { EmptyNight } from './EmptyNight'
 import { FilterBar } from './FilterBar'
 import { NearbyNotice } from './NearbyNotice'
@@ -34,7 +36,12 @@ export function TodayPage() {
   // «Gratis» lo filtra la base; la categoría, la app. Con «cerca mío», la base además
   // devuelve la distancia a cada escenario.
   const origin = filters.nearby ? coords : null
-  const query = useNightActs(noche, { onlyFree: filters.onlyFree, origin })
+  const followed = useFollowed()
+  const query = useNightActs(noche, {
+    onlyFree: filters.onlyFree,
+    onlyFollowed: filters.mine,
+    origin,
+  })
   const acts = query.data
   // Mientras llega la consulta con distancias se sigue viendo el orden anterior.
   const byDistance = origin !== null && !query.isPlaceholderData
@@ -131,6 +138,7 @@ export function TodayPage() {
                 locating={status === 'locating'}
                 onToggleNearby={toggleNearby}
                 onToggleFree={() => update({ onlyFree: !filters.onlyFree })}
+                onToggleMine={() => update({ mine: !filters.mine })}
                 onToggleCategory={toggleCategory}
                 onView={(view) => update({ view })}
               />
@@ -140,9 +148,15 @@ export function TodayPage() {
                 hiddenStages={hiddenStages}
                 onRetry={() => void turnNearbyOn()}
               />
-              {visible.length === 0 ? (
+              {filters.mine && !followed.isPending && followed.ids.size === 0 ? (
+                <EmptyMine />
+              ) : visible.length === 0 ? (
                 <div className="space-y-3 py-2">
-                  <p className="text-lg">{t('filters.noResults')}</p>
+                  <p className="text-lg">
+                    {filters.mine
+                      ? t(isTonight ? 'mine.noneTonight' : 'mine.noneThatNight')
+                      : t('filters.noResults')}
+                  </p>
                   <Button variant="secondary" onClick={clear}>
                     {t('filters.clear')}
                   </Button>

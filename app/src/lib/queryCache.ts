@@ -10,7 +10,7 @@ export const CACHE_MAX_AGE_MS = 24 * 60 * 60_000
  * Versión de lo guardado. Subirla cuando cambie la forma de lo que devuelven las
  * consultas: al abrir, la app descarta lo que guardó una versión anterior.
  */
-export const CACHE_VERSION = '1'
+export const CACHE_VERSION = '2'
 
 /** La clave bajo la que se guarda la caché en `@capacitor/preferences`. */
 export const CACHE_KEY = 'cuerda-cache'

@@ -6,6 +6,8 @@ export const REFRESH_MS = 5 * 60_000
 
 export interface NightActsOptions {
   onlyFree?: boolean
+  /** Sólo los conjuntos seguidos («mis conjuntos»). */
+  onlyFollowed?: boolean
   origin?: Coords | null
 }
 
@@ -14,8 +16,25 @@ function roundCoords({ lat, lng }: Coords): Coords {
   return { lat: Math.round(lat * 1e4) / 1e4, lng: Math.round(lng * 1e4) / 1e4 }
 }
 
-export function nightActsKey(noche: string, onlyFree: boolean, origin: Coords | null) {
-  return ['actuaciones', noche, { gratis: onlyFree }, origin] as const
+export function nightActsKey(
+  noche: string,
+  onlyFree: boolean,
+  onlyFollowed: boolean,
+  origin: Coords | null,
+) {
+  return ['actuaciones', noche, { gratis: onlyFree, mios: onlyFollowed }, origin] as const
+}
+
+/** Si la consulta es de «mis conjuntos»: hay que volver a pedirla cuando cambian los seguidos. */
+export function isFollowedActsKey(queryKey: readonly unknown[]): boolean {
+  const filters = queryKey[2]
+  return (
+    queryKey[0] === 'actuaciones' &&
+    typeof filters === 'object' &&
+    filters !== null &&
+    'mios' in filters &&
+    filters.mios === true
+  )
 }
 
 /**
@@ -27,17 +46,19 @@ export function nightActsKey(noche: string, onlyFree: boolean, origin: Coords | 
  */
 export function nightActsQuery(noche: string, options: NightActsOptions = {}) {
   const onlyFree = options.onlyFree ?? false
+  const onlyFollowed = options.onlyFollowed ?? false
   const origin = options.origin ? roundCoords(options.origin) : null
 
   return queryOptions({
-    queryKey: nightActsKey(noche, onlyFree, origin),
-    queryFn: () => fetchNightActs({ noche, onlyFree, origin }),
+    queryKey: nightActsKey(noche, onlyFree, onlyFollowed, origin),
+    queryFn: () => fetchNightActs({ noche, onlyFree, onlyFollowed, origin }),
     staleTime: 60_000,
     refetchInterval: REFRESH_MS,
     refetchIntervalInBackground: false,
     refetchOnWindowFocus: true,
-    // Con la posición del usuario en la clave, no se guarda en el teléfono.
-    meta: { persist: origin === null },
+    // Con la posición del usuario en la clave, no se guarda en el teléfono. «Mis conjuntos»
+    // tampoco: depende de la sesión.
+    meta: { persist: origin === null && !onlyFollowed },
   })
 }
 

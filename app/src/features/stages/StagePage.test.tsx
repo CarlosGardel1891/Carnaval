@@ -130,6 +130,7 @@ describe('ficha de escenario', () => {
     expect(fetchNightActs).toHaveBeenCalledWith({
       noche: '2027-01-28',
       onlyFree: false,
+      onlyFollowed: false,
       origin: null,
     })
   })

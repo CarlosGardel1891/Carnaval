@@ -57,6 +57,8 @@ export interface Coords {
 export interface NightActsParams {
   noche: string
   onlyFree?: boolean
+  /** Sólo los conjuntos que sigue el usuario de la sesión. Sin sesión no vuelve nada. */
+  onlyFollowed?: boolean
   /** Si viene, la base devuelve `distancia_m` desde ese punto. */
   origin?: Coords | null
 }
@@ -77,11 +79,13 @@ export async function fetchCurrentSeason(noche: string): Promise<Temporada | nul
 export async function fetchNightActs({
   noche,
   onlyFree = false,
+  onlyFollowed = false,
   origin = null,
 }: NightActsParams): Promise<Act[]> {
   const { data, error } = await supabase.rpc('actuaciones_de_la_noche', {
     p_noche: noche,
     p_solo_gratis: onlyFree,
+    p_solo_favoritos: onlyFollowed,
     ...(origin ? { p_lat: origin.lat, p_lng: origin.lng } : {}),
   })
   if (error) throw error
