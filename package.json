@@ -24,6 +24,7 @@
     "admin:alta": "node scripts/admin-user.mjs alta",
     "admin:baja": "node scripts/admin-user.mjs baja",
     "admin:lista": "node scripts/admin-user.mjs lista",
+    "gen:demo": "node scripts/gen-demo.mjs",
     "android:release": "node scripts/android-release.mjs",
     "android:keystore": "node scripts/android-release.mjs keystore",
     "remoto:chequeo": "node scripts/remoto-chequeo.mjs",

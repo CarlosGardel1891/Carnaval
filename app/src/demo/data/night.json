@@ -1,0 +1,713 @@
+[
+  {
+    "inicio": "2026-02-28T22:30:00+00:00",
+    "estado": "programada",
+    "etapa_rueda": null,
+    "etapa_numero": null,
+    "conjunto_slug": "la-mojigata",
+    "escenario_slug": "velodromo-municipal",
+    "direccion": "Av. Ramón Benzano 3471"
+  },
+  {
+    "inicio": "2026-02-28T23:00:00+00:00",
+    "estado": "programada",
+    "etapa_rueda": null,
+    "etapa_numero": null,
+    "conjunto_slug": "los-rolin",
+    "escenario_slug": "barrio-a-barrio",
+    "direccion": "UCRANIA Y GRAL. EDUARDO DA COSTA"
+  },
+  {
+    "inicio": "2026-02-28T23:00:00+00:00",
+    "estado": "programada",
+    "etapa_rueda": null,
+    "etapa_numero": null,
+    "conjunto_slug": "la-nueva-milonga",
+    "escenario_slug": "carnaval-en-el-movie",
+    "direccion": "Luis Alberto de Herrera esq. Cr. Luis Lecueder"
+  },
+  {
+    "inicio": "2026-02-28T23:00:00+00:00",
+    "estado": "programada",
+    "etapa_rueda": null,
+    "etapa_numero": null,
+    "conjunto_slug": "caballeros",
+    "escenario_slug": "centro-cultural-julia-arevalo",
+    "direccion": "Camino Tomkinson esq. Luis Batlle Berres"
+  },
+  {
+    "inicio": "2026-02-28T23:00:00+00:00",
+    "estado": "programada",
+    "etapa_rueda": null,
+    "etapa_numero": null,
+    "conjunto_slug": "tabu",
+    "escenario_slug": "club-malvin",
+    "direccion": "Legrand 5163 esq. Av. Rivera"
+  },
+  {
+    "inicio": "2026-02-28T23:00:00+00:00",
+    "estado": "programada",
+    "etapa_rueda": null,
+    "etapa_numero": null,
+    "conjunto_slug": "madame-gotica",
+    "escenario_slug": "monumental-de-la-costa",
+    "direccion": "Av. a la Playa esq. Av. Giannattasio (frente a Geant), Parque Roosevelt"
+  },
+  {
+    "inicio": "2026-02-28T23:00:00+00:00",
+    "estado": "programada",
+    "etapa_rueda": null,
+    "etapa_numero": null,
+    "conjunto_slug": "geminis",
+    "escenario_slug": "nuevo-carrusel-del-prado",
+    "direccion": "India Muerta 3854"
+  },
+  {
+    "inicio": "2026-02-28T23:00:00+00:00",
+    "estado": "programada",
+    "etapa_rueda": null,
+    "etapa_numero": null,
+    "conjunto_slug": "la-sara-del-cordon",
+    "escenario_slug": "paso-de-las-duranas",
+    "direccion": "Pedro Trápani 1350 casi Bayona"
+  },
+  {
+    "inicio": "2026-02-28T23:00:00+00:00",
+    "estado": "programada",
+    "etapa_rueda": null,
+    "etapa_numero": null,
+    "conjunto_slug": "herencia-ancestral",
+    "escenario_slug": "tablado-del-museo-del-carnaval",
+    "direccion": "Rambla 25 de Agosto de 1825 Nº 218 esq. Maciel"
+  },
+  {
+    "inicio": "2026-02-28T23:00:00+00:00",
+    "estado": "programada",
+    "etapa_rueda": null,
+    "etapa_numero": null,
+    "conjunto_slug": "carambola",
+    "escenario_slug": "tablado-del-parque",
+    "direccion": "Julio Herrera y Reissig y Sarmiento"
+  },
+  {
+    "inicio": "2026-02-28T23:00:00+00:00",
+    "estado": "programada",
+    "etapa_rueda": null,
+    "etapa_numero": null,
+    "conjunto_slug": "zingaros",
+    "escenario_slug": "tablado-lavalleja",
+    "direccion": "Av. de las Instrucciones 1435"
+  },
+  {
+    "inicio": "2026-02-28T23:00:00+00:00",
+    "estado": "programada",
+    "etapa_rueda": null,
+    "etapa_numero": null,
+    "conjunto_slug": "los-chobys",
+    "escenario_slug": "tablado-primero-de-mayo",
+    "direccion": "Av. de las Leyes y Gral. Flores (frente al Palacio Legislativo)"
+  },
+  {
+    "inicio": "2026-02-28T23:00:00+00:00",
+    "estado": "programada",
+    "etapa_rueda": null,
+    "etapa_numero": null,
+    "conjunto_slug": "dona-bastarda",
+    "escenario_slug": "teatro-de-verano-de-colon-monte-de-la-francesa",
+    "direccion": "Lanús 5913"
+  },
+  {
+    "inicio": "2026-02-28T23:00:00+00:00",
+    "estado": "programada",
+    "etapa_rueda": null,
+    "etapa_numero": null,
+    "conjunto_slug": "falta-y-resto",
+    "escenario_slug": "velodromo-municipal",
+    "direccion": "Av. Ramón Benzano 3471"
+  },
+  {
+    "inicio": "2026-02-28T23:50:00+00:00",
+    "estado": "programada",
+    "etapa_rueda": null,
+    "etapa_numero": null,
+    "conjunto_slug": "de-todas-partes",
+    "escenario_slug": "arbolito-el-tejano",
+    "direccion": "Carlos María Ramírez 867 esq. Rivera Indarte"
+  },
+  {
+    "inicio": "2026-02-28T23:50:00+00:00",
+    "estado": "programada",
+    "etapa_rueda": null,
+    "etapa_numero": null,
+    "conjunto_slug": "jardin-del-pueblo",
+    "escenario_slug": "barrio-a-barrio",
+    "direccion": "UCRANIA Y GRAL. EDUARDO DA COSTA"
+  },
+  {
+    "inicio": "2026-02-28T23:50:00+00:00",
+    "estado": "programada",
+    "etapa_rueda": null,
+    "etapa_numero": null,
+    "conjunto_slug": "la-sara-del-cordon",
+    "escenario_slug": "carnaval-en-el-movie",
+    "direccion": "Luis Alberto de Herrera esq. Cr. Luis Lecueder"
+  },
+  {
+    "inicio": "2026-02-28T23:50:00+00:00",
+    "estado": "programada",
+    "etapa_rueda": null,
+    "etapa_numero": null,
+    "conjunto_slug": "dona-bastarda",
+    "escenario_slug": "centro-cultural-julia-arevalo",
+    "direccion": "Camino Tomkinson esq. Luis Batlle Berres"
+  },
+  {
+    "inicio": "2026-02-28T23:50:00+00:00",
+    "estado": "programada",
+    "etapa_rueda": null,
+    "etapa_numero": null,
+    "conjunto_slug": "falta-y-resto",
+    "escenario_slug": "club-malvin",
+    "direccion": "Legrand 5163 esq. Av. Rivera"
+  },
+  {
+    "inicio": "2026-02-28T23:50:00+00:00",
+    "estado": "programada",
+    "etapa_rueda": null,
+    "etapa_numero": null,
+    "conjunto_slug": "house",
+    "escenario_slug": "molino-del-galgo",
+    "direccion": "Pan de Azúcar 2397 esq. Timoteo Aparicio"
+  },
+  {
+    "inicio": "2026-02-28T23:50:00+00:00",
+    "estado": "programada",
+    "etapa_rueda": null,
+    "etapa_numero": null,
+    "conjunto_slug": "momosapiens",
+    "escenario_slug": "monumental-de-la-costa",
+    "direccion": "Av. a la Playa esq. Av. Giannattasio (frente a Geant), Parque Roosevelt"
+  },
+  {
+    "inicio": "2026-02-28T23:50:00+00:00",
+    "estado": "programada",
+    "etapa_rueda": null,
+    "etapa_numero": null,
+    "conjunto_slug": "cyranos",
+    "escenario_slug": "nuevo-carrusel-del-prado",
+    "direccion": "India Muerta 3854"
+  },
+  {
+    "inicio": "2026-02-28T23:50:00+00:00",
+    "estado": "programada",
+    "etapa_rueda": null,
+    "etapa_numero": null,
+    "conjunto_slug": "la-margarita",
+    "escenario_slug": "paso-de-las-duranas",
+    "direccion": "Pedro Trápani 1350 casi Bayona"
+  },
+  {
+    "inicio": "2026-02-28T23:50:00+00:00",
+    "estado": "programada",
+    "etapa_rueda": null,
+    "etapa_numero": null,
+    "conjunto_slug": "la-compania",
+    "escenario_slug": "tablado-del-museo-del-carnaval",
+    "direccion": "Rambla 25 de Agosto de 1825 Nº 218 esq. Maciel"
+  },
+  {
+    "inicio": "2026-02-28T23:50:00+00:00",
+    "estado": "programada",
+    "etapa_rueda": null,
+    "etapa_numero": null,
+    "conjunto_slug": "valores",
+    "escenario_slug": "tablado-del-parque",
+    "direccion": "Julio Herrera y Reissig y Sarmiento"
+  },
+  {
+    "inicio": "2026-02-28T23:50:00+00:00",
+    "estado": "programada",
+    "etapa_rueda": null,
+    "etapa_numero": null,
+    "conjunto_slug": "cayo-la-cabra",
+    "escenario_slug": "tablado-lavalleja",
+    "direccion": "Av. de las Instrucciones 1435"
+  },
+  {
+    "inicio": "2026-02-28T23:50:00+00:00",
+    "estado": "programada",
+    "etapa_rueda": null,
+    "etapa_numero": null,
+    "conjunto_slug": "un-titulo-viejo",
+    "escenario_slug": "tablado-primero-de-mayo",
+    "direccion": "Av. de las Leyes y Gral. Flores (frente al Palacio Legislativo)"
+  },
+  {
+    "inicio": "2026-02-28T23:50:00+00:00",
+    "estado": "programada",
+    "etapa_rueda": null,
+    "etapa_numero": null,
+    "conjunto_slug": "patos-cabreros",
+    "escenario_slug": "teatro-de-barrio-punta-de-rieles",
+    "direccion": "Camino Maldonado 6806 esq. Aries"
+  },
+  {
+    "inicio": "2026-02-28T23:50:00+00:00",
+    "estado": "programada",
+    "etapa_rueda": null,
+    "etapa_numero": null,
+    "conjunto_slug": "mas-que-lonja",
+    "escenario_slug": "teatro-de-verano-de-colon-monte-de-la-francesa",
+    "direccion": "Lanús 5913"
+  },
+  {
+    "inicio": "2026-02-28T23:50:00+00:00",
+    "estado": "programada",
+    "etapa_rueda": null,
+    "etapa_numero": null,
+    "conjunto_slug": "sociedad-anonima",
+    "escenario_slug": "velodromo-municipal",
+    "direccion": "Av. Ramón Benzano 3471"
+  },
+  {
+    "inicio": "2026-03-01T00:50:00+00:00",
+    "estado": "programada",
+    "etapa_rueda": null,
+    "etapa_numero": null,
+    "conjunto_slug": "mas-que-lonja",
+    "escenario_slug": "arbolito-el-tejano",
+    "direccion": "Carlos María Ramírez 867 esq. Rivera Indarte"
+  },
+  {
+    "inicio": "2026-03-01T00:50:00+00:00",
+    "estado": "programada",
+    "etapa_rueda": null,
+    "etapa_numero": null,
+    "conjunto_slug": "geminis",
+    "escenario_slug": "barrio-a-barrio",
+    "direccion": "UCRANIA Y GRAL. EDUARDO DA COSTA"
+  },
+  {
+    "inicio": "2026-03-01T00:50:00+00:00",
+    "estado": "programada",
+    "etapa_rueda": null,
+    "etapa_numero": null,
+    "conjunto_slug": "falta-y-resto",
+    "escenario_slug": "carnaval-en-el-movie",
+    "direccion": "Luis Alberto de Herrera esq. Cr. Luis Lecueder"
+  },
+  {
+    "inicio": "2026-03-01T00:50:00+00:00",
+    "estado": "programada",
+    "etapa_rueda": null,
+    "etapa_numero": null,
+    "conjunto_slug": "la-nueva-milonga",
+    "escenario_slug": "centro-cultural-julia-arevalo",
+    "direccion": "Camino Tomkinson esq. Luis Batlle Berres"
+  },
+  {
+    "inicio": "2026-03-01T00:50:00+00:00",
+    "estado": "programada",
+    "etapa_rueda": null,
+    "etapa_numero": null,
+    "conjunto_slug": "los-rolin",
+    "escenario_slug": "club-malvin",
+    "direccion": "Legrand 5163 esq. Av. Rivera"
+  },
+  {
+    "inicio": "2026-03-01T00:50:00+00:00",
+    "estado": "programada",
+    "etapa_rueda": null,
+    "etapa_numero": null,
+    "conjunto_slug": "madame-gotica",
+    "escenario_slug": "molino-del-galgo",
+    "direccion": "Pan de Azúcar 2397 esq. Timoteo Aparicio"
+  },
+  {
+    "inicio": "2026-03-01T00:50:00+00:00",
+    "estado": "programada",
+    "etapa_rueda": null,
+    "etapa_numero": null,
+    "conjunto_slug": "caballeros",
+    "escenario_slug": "monumental-de-la-costa",
+    "direccion": "Av. a la Playa esq. Av. Giannattasio (frente a Geant), Parque Roosevelt"
+  },
+  {
+    "inicio": "2026-03-01T00:50:00+00:00",
+    "estado": "programada",
+    "etapa_rueda": null,
+    "etapa_numero": null,
+    "conjunto_slug": "dona-bastarda",
+    "escenario_slug": "nuevo-carrusel-del-prado",
+    "direccion": "India Muerta 3854"
+  },
+  {
+    "inicio": "2026-03-01T00:50:00+00:00",
+    "estado": "programada",
+    "etapa_rueda": null,
+    "etapa_numero": null,
+    "conjunto_slug": "los-chobys",
+    "escenario_slug": "paso-de-las-duranas",
+    "direccion": "Pedro Trápani 1350 casi Bayona"
+  },
+  {
+    "inicio": "2026-03-01T00:50:00+00:00",
+    "estado": "programada",
+    "etapa_rueda": null,
+    "etapa_numero": null,
+    "conjunto_slug": "cyranos",
+    "escenario_slug": "tablado-del-museo-del-carnaval",
+    "direccion": "Rambla 25 de Agosto de 1825 Nº 218 esq. Maciel"
+  },
+  {
+    "inicio": "2026-03-01T00:50:00+00:00",
+    "estado": "programada",
+    "etapa_rueda": null,
+    "etapa_numero": null,
+    "conjunto_slug": "cayo-la-cabra",
+    "escenario_slug": "tablado-del-parque",
+    "direccion": "Julio Herrera y Reissig y Sarmiento"
+  },
+  {
+    "inicio": "2026-03-01T00:50:00+00:00",
+    "estado": "programada",
+    "etapa_rueda": null,
+    "etapa_numero": null,
+    "conjunto_slug": "curtidores-de-hongos",
+    "escenario_slug": "tablado-lavalleja",
+    "direccion": "Av. de las Instrucciones 1435"
+  },
+  {
+    "inicio": "2026-03-01T00:50:00+00:00",
+    "estado": "programada",
+    "etapa_rueda": null,
+    "etapa_numero": null,
+    "conjunto_slug": "patos-cabreros",
+    "escenario_slug": "tablado-primero-de-mayo",
+    "direccion": "Av. de las Leyes y Gral. Flores (frente al Palacio Legislativo)"
+  },
+  {
+    "inicio": "2026-03-01T00:50:00+00:00",
+    "estado": "programada",
+    "etapa_rueda": null,
+    "etapa_numero": null,
+    "conjunto_slug": "herencia-ancestral",
+    "escenario_slug": "teatro-de-barrio-punta-de-rieles",
+    "direccion": "Camino Maldonado 6806 esq. Aries"
+  },
+  {
+    "inicio": "2026-03-01T00:50:00+00:00",
+    "estado": "programada",
+    "etapa_rueda": null,
+    "etapa_numero": null,
+    "conjunto_slug": "jardin-del-pueblo",
+    "escenario_slug": "teatro-de-verano-de-colon-monte-de-la-francesa",
+    "direccion": "Lanús 5913"
+  },
+  {
+    "inicio": "2026-03-01T00:50:00+00:00",
+    "estado": "programada",
+    "etapa_rueda": null,
+    "etapa_numero": null,
+    "conjunto_slug": "momosapiens",
+    "escenario_slug": "velodromo-municipal",
+    "direccion": "Av. Ramón Benzano 3471"
+  },
+  {
+    "inicio": "2026-03-01T01:50:00+00:00",
+    "estado": "programada",
+    "etapa_rueda": null,
+    "etapa_numero": null,
+    "conjunto_slug": "los-muchachos",
+    "escenario_slug": "barrio-a-barrio",
+    "direccion": "UCRANIA Y GRAL. EDUARDO DA COSTA"
+  },
+  {
+    "inicio": "2026-03-01T01:50:00+00:00",
+    "estado": "programada",
+    "etapa_rueda": null,
+    "etapa_numero": null,
+    "conjunto_slug": "queso-magro",
+    "escenario_slug": "carnaval-en-el-movie",
+    "direccion": "Luis Alberto de Herrera esq. Cr. Luis Lecueder"
+  },
+  {
+    "inicio": "2026-03-01T01:50:00+00:00",
+    "estado": "programada",
+    "etapa_rueda": null,
+    "etapa_numero": null,
+    "conjunto_slug": "un-titulo-viejo",
+    "escenario_slug": "centro-cultural-julia-arevalo",
+    "direccion": "Camino Tomkinson esq. Luis Batlle Berres"
+  },
+  {
+    "inicio": "2026-03-01T01:50:00+00:00",
+    "estado": "programada",
+    "etapa_rueda": null,
+    "etapa_numero": null,
+    "conjunto_slug": "la-trasnochada",
+    "escenario_slug": "club-malvin",
+    "direccion": "Legrand 5163 esq. Av. Rivera"
+  },
+  {
+    "inicio": "2026-03-01T01:50:00+00:00",
+    "estado": "programada",
+    "etapa_rueda": null,
+    "etapa_numero": null,
+    "conjunto_slug": "los-rolin",
+    "escenario_slug": "molino-del-galgo",
+    "direccion": "Pan de Azúcar 2397 esq. Timoteo Aparicio"
+  },
+  {
+    "inicio": "2026-03-01T01:50:00+00:00",
+    "estado": "programada",
+    "etapa_rueda": null,
+    "etapa_numero": null,
+    "conjunto_slug": "zingaros",
+    "escenario_slug": "monumental-de-la-costa",
+    "direccion": "Av. a la Playa esq. Av. Giannattasio (frente a Geant), Parque Roosevelt"
+  },
+  {
+    "inicio": "2026-03-01T01:50:00+00:00",
+    "estado": "programada",
+    "etapa_rueda": null,
+    "etapa_numero": null,
+    "conjunto_slug": "patos-cabreros",
+    "escenario_slug": "nuevo-carrusel-del-prado",
+    "direccion": "India Muerta 3854"
+  },
+  {
+    "inicio": "2026-03-01T01:50:00+00:00",
+    "estado": "programada",
+    "etapa_rueda": null,
+    "etapa_numero": null,
+    "conjunto_slug": "tabu",
+    "escenario_slug": "paso-de-las-duranas",
+    "direccion": "Pedro Trápani 1350 casi Bayona"
+  },
+  {
+    "inicio": "2026-03-01T01:50:00+00:00",
+    "estado": "programada",
+    "etapa_rueda": null,
+    "etapa_numero": null,
+    "conjunto_slug": "la-nueva-milonga",
+    "escenario_slug": "tablado-del-museo-del-carnaval",
+    "direccion": "Rambla 25 de Agosto de 1825 Nº 218 esq. Maciel"
+  },
+  {
+    "inicio": "2026-03-01T01:50:00+00:00",
+    "estado": "programada",
+    "etapa_rueda": null,
+    "etapa_numero": null,
+    "conjunto_slug": "dona-bastarda",
+    "escenario_slug": "tablado-del-parque",
+    "direccion": "Julio Herrera y Reissig y Sarmiento"
+  },
+  {
+    "inicio": "2026-03-01T01:50:00+00:00",
+    "estado": "programada",
+    "etapa_rueda": null,
+    "etapa_numero": null,
+    "conjunto_slug": "caballeros",
+    "escenario_slug": "tablado-lavalleja",
+    "direccion": "Av. de las Instrucciones 1435"
+  },
+  {
+    "inicio": "2026-03-01T01:50:00+00:00",
+    "estado": "programada",
+    "etapa_rueda": null,
+    "etapa_numero": null,
+    "conjunto_slug": "valores",
+    "escenario_slug": "tablado-primero-de-mayo",
+    "direccion": "Av. de las Leyes y Gral. Flores (frente al Palacio Legislativo)"
+  },
+  {
+    "inicio": "2026-03-01T01:50:00+00:00",
+    "estado": "programada",
+    "etapa_rueda": null,
+    "etapa_numero": null,
+    "conjunto_slug": "cayo-la-cabra",
+    "escenario_slug": "teatro-de-barrio-punta-de-rieles",
+    "direccion": "Camino Maldonado 6806 esq. Aries"
+  },
+  {
+    "inicio": "2026-03-01T01:50:00+00:00",
+    "estado": "programada",
+    "etapa_rueda": null,
+    "etapa_numero": null,
+    "conjunto_slug": "la-mojigata",
+    "escenario_slug": "teatro-de-verano-de-colon-monte-de-la-francesa",
+    "direccion": "Lanús 5913"
+  },
+  {
+    "inicio": "2026-03-01T01:50:00+00:00",
+    "estado": "programada",
+    "etapa_rueda": null,
+    "etapa_numero": null,
+    "conjunto_slug": "la-margarita",
+    "escenario_slug": "velodromo-municipal",
+    "direccion": "Av. Ramón Benzano 3471"
+  },
+  {
+    "inicio": "2026-03-01T02:50:00+00:00",
+    "estado": "programada",
+    "etapa_rueda": null,
+    "etapa_numero": null,
+    "conjunto_slug": "jardin-del-pueblo",
+    "escenario_slug": "arbolito-el-tejano",
+    "direccion": "Carlos María Ramírez 867 esq. Rivera Indarte"
+  },
+  {
+    "inicio": "2026-03-01T02:50:00+00:00",
+    "estado": "programada",
+    "etapa_rueda": null,
+    "etapa_numero": null,
+    "conjunto_slug": "cyranos",
+    "escenario_slug": "centro-cultural-julia-arevalo",
+    "direccion": "Camino Tomkinson esq. Luis Batlle Berres"
+  },
+  {
+    "inicio": "2026-03-01T02:50:00+00:00",
+    "estado": "programada",
+    "etapa_rueda": null,
+    "etapa_numero": null,
+    "conjunto_slug": "momosapiens",
+    "escenario_slug": "club-malvin",
+    "direccion": "Legrand 5163 esq. Av. Rivera"
+  },
+  {
+    "inicio": "2026-03-01T02:50:00+00:00",
+    "estado": "programada",
+    "etapa_rueda": null,
+    "etapa_numero": null,
+    "conjunto_slug": "don-bochinche-y-cia",
+    "escenario_slug": "molino-del-galgo",
+    "direccion": "Pan de Azúcar 2397 esq. Timoteo Aparicio"
+  },
+  {
+    "inicio": "2026-03-01T02:50:00+00:00",
+    "estado": "programada",
+    "etapa_rueda": null,
+    "etapa_numero": null,
+    "conjunto_slug": "falta-y-resto",
+    "escenario_slug": "monumental-de-la-costa",
+    "direccion": "Av. a la Playa esq. Av. Giannattasio (frente a Geant), Parque Roosevelt"
+  },
+  {
+    "inicio": "2026-03-01T02:50:00+00:00",
+    "estado": "programada",
+    "etapa_rueda": null,
+    "etapa_numero": null,
+    "conjunto_slug": "los-muchachos",
+    "escenario_slug": "nuevo-carrusel-del-prado",
+    "direccion": "India Muerta 3854"
+  },
+  {
+    "inicio": "2026-03-01T02:50:00+00:00",
+    "estado": "programada",
+    "etapa_rueda": null,
+    "etapa_numero": null,
+    "conjunto_slug": "dona-bastarda",
+    "escenario_slug": "tablado-del-museo-del-carnaval",
+    "direccion": "Rambla 25 de Agosto de 1825 Nº 218 esq. Maciel"
+  },
+  {
+    "inicio": "2026-03-01T02:50:00+00:00",
+    "estado": "programada",
+    "etapa_rueda": null,
+    "etapa_numero": null,
+    "conjunto_slug": "patos-cabreros",
+    "escenario_slug": "tablado-del-parque",
+    "direccion": "Julio Herrera y Reissig y Sarmiento"
+  },
+  {
+    "inicio": "2026-03-01T02:50:00+00:00",
+    "estado": "programada",
+    "etapa_rueda": null,
+    "etapa_numero": null,
+    "conjunto_slug": "la-nueva-milonga",
+    "escenario_slug": "tablado-primero-de-mayo",
+    "direccion": "Av. de las Leyes y Gral. Flores (frente al Palacio Legislativo)"
+  },
+  {
+    "inicio": "2026-03-01T02:50:00+00:00",
+    "estado": "programada",
+    "etapa_rueda": null,
+    "etapa_numero": null,
+    "conjunto_slug": "zingaros",
+    "escenario_slug": "teatro-de-barrio-punta-de-rieles",
+    "direccion": "Camino Maldonado 6806 esq. Aries"
+  },
+  {
+    "inicio": "2026-03-01T02:50:00+00:00",
+    "estado": "programada",
+    "etapa_rueda": null,
+    "etapa_numero": null,
+    "conjunto_slug": "caballeros",
+    "escenario_slug": "teatro-de-verano-de-colon-monte-de-la-francesa",
+    "direccion": "Lanús 5913"
+  },
+  {
+    "inicio": "2026-03-01T02:50:00+00:00",
+    "estado": "programada",
+    "etapa_rueda": null,
+    "etapa_numero": null,
+    "conjunto_slug": "la-trasnochada",
+    "escenario_slug": "velodromo-municipal",
+    "direccion": "Av. Ramón Benzano 3471"
+  },
+  {
+    "inicio": "2026-03-01T03:50:00+00:00",
+    "estado": "programada",
+    "etapa_rueda": null,
+    "etapa_numero": null,
+    "conjunto_slug": "carambola",
+    "escenario_slug": "arbolito-el-tejano",
+    "direccion": "Carlos María Ramírez 867 esq. Rivera Indarte"
+  },
+  {
+    "inicio": "2026-03-01T03:50:00+00:00",
+    "estado": "programada",
+    "etapa_rueda": null,
+    "etapa_numero": null,
+    "conjunto_slug": "cayo-la-cabra",
+    "escenario_slug": "escenario-en-canelones",
+    "direccion": null
+  },
+  {
+    "inicio": "2026-03-01T03:50:00+00:00",
+    "estado": "programada",
+    "etapa_rueda": null,
+    "etapa_numero": null,
+    "conjunto_slug": "la-trasnochada",
+    "escenario_slug": "monumental-de-la-costa",
+    "direccion": "Av. a la Playa esq. Av. Giannattasio (frente a Geant), Parque Roosevelt"
+  },
+  {
+    "inicio": "2026-03-01T03:50:00+00:00",
+    "estado": "programada",
+    "etapa_rueda": null,
+    "etapa_numero": null,
+    "conjunto_slug": "dona-bastarda",
+    "escenario_slug": "tablado-primero-de-mayo",
+    "direccion": "Av. de las Leyes y Gral. Flores (frente al Palacio Legislativo)"
+  },
+  {
+    "inicio": "2026-03-01T03:50:00+00:00",
+    "estado": "programada",
+    "etapa_rueda": null,
+    "etapa_numero": null,
+    "conjunto_slug": "sociedad-anonima",
+    "escenario_slug": "teatro-de-verano-de-colon-monte-de-la-francesa",
+    "direccion": "Lanús 5913"
+  },
+  {
+    "inicio": "2026-03-01T03:50:00+00:00",
+    "estado": "programada",
+    "etapa_rueda": null,
+    "etapa_numero": null,
+    "conjunto_slug": "curtidores-de-hongos",
+    "escenario_slug": "velodromo-municipal",
+    "direccion": "Av. Ramón Benzano 3471"
+  }
+]

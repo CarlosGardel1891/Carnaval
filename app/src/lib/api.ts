@@ -1,4 +1,6 @@
-import type { Database, Tables, Temporada } from '@cuerda/shared'
+import { nocheLogica, type Database, type Tables, type Temporada } from '@cuerda/shared'
+import type { DemoCatalog } from '../demo/demo'
+import { now } from './clock'
 import { supabase } from './supabase'
 
 /**
@@ -91,7 +93,51 @@ export async function fetchNightActs({
     p_solo_favoritos: onlyFollowed,
   })
   if (error) throw error
-  return (data as ActRow[]).map((row) => ({ ...row, distancia_m: null }))
+  const acts = (data as ActRow[]).map((row) => ({ ...row, distancia_m: null }))
+  if (import.meta.env.VITE_DEMO === '1' && acts.length === 0 && noche === nocheLogica(now())) {
+    const { buildDemoNight } = await import('../demo/demo')
+    const [catalog, followed] = await Promise.all([loadDemoCatalog(noche), fetchFollowed()])
+    return buildDemoNight(noche, catalog, new Set(followed), { onlyFree, onlyFollowed })
+  }
+  return acts
+}
+
+// ---------------------------------------------------------------- modo demostración
+
+/**
+ * Sólo en el build `beta` (decisión 85): donde el remoto todavía no tiene nada, la app muestra
+ * los datos de ejemplo de `app/src/demo/`. Cada uso va detrás de `import.meta.env.VITE_DEMO ===
+ * '1'`, escrito así, entero: con la variable vacía el empaquetador saca del build esa rama y el
+ * módulo de ejemplo (`app/src/build.test.ts` lo controla).
+ *
+ * El catálogo real contra el que se resuelven los datos de ejemplo: se pide una vez.
+ */
+let demoCatalog: Promise<DemoCatalog> | null = null
+
+function loadDemoCatalog(noche: string): Promise<DemoCatalog> {
+  if (demoCatalog) return demoCatalog
+  const loading = (async (): Promise<DemoCatalog> => {
+    const [groups, stages, located] = await Promise.all([
+      fetchGroups(),
+      supabase
+        .from('escenarios')
+        .select('id, slug, nombre, tipo, barrio, direccion, gratis, precio_texto, itinerante'),
+      fetchLocatedStages(noche),
+    ])
+    if (stages.error) throw stages.error
+    return {
+      groups,
+      stages: stages.data,
+      coords: new Map(
+        located.map((stage) => [stage.escenario_id, { lat: stage.lat, lng: stage.lng }]),
+      ),
+    }
+  })().catch((error: unknown) => {
+    demoCatalog = null
+    throw error
+  })
+  demoCatalog = loading
+  return loading
 }
 
 /** Centro de Montevideo: desde acá se mide para traer «todos» los escenarios con ubicación. */
@@ -192,6 +238,10 @@ export async function fetchUpcomingActs(groupId: number, noche: string): Promise
     p_noche: noche,
   })
   if (error) throw error
+  if (import.meta.env.VITE_DEMO === '1' && data.length === 0 && noche === nocheLogica(now())) {
+    const { buildDemoUpcoming } = await import('../demo/demo')
+    return buildDemoUpcoming(groupId, noche, await loadDemoCatalog(noche))
+  }
   return data
 }
 
@@ -262,6 +312,13 @@ export type FixtureRow = Nullable<
 export async function fetchContestFixture(year: number): Promise<FixtureRow[]> {
   const { data, error } = await supabase.rpc('fixture_del_concurso', { p_anio: year })
   if (error) throw error
+  if (
+    import.meta.env.VITE_DEMO === '1' &&
+    (data as FixtureRow[]).every((row) => row.actuacion_id === null)
+  ) {
+    const { buildDemoFixture } = await import('../demo/demo')
+    return buildDemoFixture(await fetchGroups())
+  }
   return data
 }
 
@@ -309,6 +366,13 @@ export type ParadeSlot = Nullable<
 export async function fetchParadeOrder(eventId: number): Promise<ParadeSlot[]> {
   const { data, error } = await supabase.rpc('orden_del_desfile', { p_evento_id: eventId })
   if (error) throw error
+  if (import.meta.env.VITE_DEMO === '1' && data.length === 0) {
+    const event = await supabase.from('eventos').select('slug').eq('id', eventId).maybeSingle()
+    if (event.error) throw event.error
+    if (!event.data) return data
+    const { buildDemoOrder } = await import('../demo/demo')
+    return buildDemoOrder(event.data.slug, await fetchGroups())
+  }
   return data
 }
 

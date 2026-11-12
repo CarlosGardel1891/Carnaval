@@ -1,3 +1,4 @@
+import { lazy, Suspense } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Outlet } from 'react-router'
 import { useSessionSync } from '../features/follow/useFollow'
@@ -11,6 +12,11 @@ import { useLocale } from '../lib/useLocale'
 import { useNow } from '../lib/useNow'
 import { nocheLogica } from '@cuerda/shared'
 import { TabBar } from './TabBar'
+
+// Sólo en el build `beta` (decisión 85). Escrito así, entero, para que el empaquetador saque
+// del build de producción la franja y todo el módulo de ejemplo.
+const DemoBanner =
+  import.meta.env.VITE_DEMO === '1' ? lazy(() => import('../demo/DemoBanner')) : null
 
 /** Con el reloj corrido para probar (sólo en desarrollo), se dice bien a la vista. */
 function SimulatedClock() {
@@ -40,6 +46,11 @@ export function AppLayout() {
   return (
     <div className="flex h-dvh flex-col">
       <SimulatedClock />
+      {DemoBanner && (
+        <Suspense fallback={null}>
+          <DemoBanner />
+        </Suspense>
+      )}
       <div className="relative min-h-0 flex-1 overflow-y-auto pt-[env(safe-area-inset-top)]">
         <LocationProvider>
           <Outlet />

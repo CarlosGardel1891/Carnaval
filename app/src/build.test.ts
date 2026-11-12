@@ -71,6 +71,39 @@ describe('el build de producción', () => {
   }, 60_000)
 })
 
+// El modo demostración (decisión 85) no existe en producción: ni su código ni sus datos. La
+// marca sólo está en `app/src/demo/`; el texto de la franja y un dato de la noche de ejemplo
+// tampoco pueden aparecer.
+const DEMO_TRACES = ['carnavalero-modo-demostracion', 'Versión de prueba']
+
+describe('el modo demostración', () => {
+  it('no está en el build de producción', async () => {
+    const bundle = await bundleFor('produccion', remote)
+    expect(bundle).not.toContain(DEMO_TRACES[0])
+    expect(bundle).not.toContain(DEMO_TRACES[1])
+    expect(bundle).not.toContain('buildDemoNight')
+    expect(bundle).not.toContain('UCRANIA Y GRAL. EDUARDO DA COSTA')
+  }, 180_000)
+
+  it('no se compila en producción aunque se lo pida', async () => {
+    await expect(bundleFor('produccion', { ...remote, VITE_DEMO: '1' })).rejects.toThrow(
+      /VITE_DEMO/,
+    )
+  }, 60_000)
+
+  it('sí está en el build de la beta', async () => {
+    const bundle = await bundleFor('beta', { ...remote, VITE_DEMO: '1' })
+    expect(bundle).toContain(DEMO_TRACES[0])
+    expect(bundle).toContain(DEMO_TRACES[1])
+    expect(bundle).toContain('UCRANIA Y GRAL. EDUARDO DA COSTA')
+  }, 180_000)
+
+  it('tampoco está en un build de la beta sin VITE_DEMO', async () => {
+    const bundle = await bundleFor('beta', remote)
+    expect(bundle).not.toContain(DEMO_TRACES[0])
+  }, 180_000)
+})
+
 describe('el build de la beta', () => {
   it('tampoco se compila apuntando a un Supabase local', async () => {
     await expect(bundleFor('beta', local)).rejects.toThrow(/Supabase local/)
