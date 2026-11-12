@@ -429,6 +429,24 @@ export async function fetchStages(): Promise<StageRow[]> {
 
 export type StageFields = Omit<StageRow, 'id'>
 
+/** Una tarea programada del proyecto, con la última vez que terminó bien (decisión 89). */
+export interface SystemTask {
+  tarea: string
+  /** Null si nunca corrió. */
+  ultimo_ok: string | null
+  minutos: number | null
+  limite_min: number
+  al_dia: boolean
+  detalle: { simulacro?: boolean } | null
+}
+
+/** Si las tareas programadas (los avisos y la purga) vienen corriendo. */
+export async function fetchSystemStatus(): Promise<SystemTask[]> {
+  const { data, error } = await supabase.rpc('estado_del_sistema')
+  if (error) throw new Error(error.message, { cause: error })
+  return data as SystemTask[]
+}
+
 /**
  * La ubicación que un geocodificador propuso para un escenario (decisión 87). No es su
  * ubicación: lo es recién cuando un admin guarda el escenario con ese punto.

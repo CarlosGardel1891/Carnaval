@@ -23,6 +23,6 @@ Deno.serve((req) =>
       if (error) throw error
       return { noche, notices: buildChangeNotices(data, noche) }
     },
-    { allowAdmin: true },
+    { allowAdmin: true, task: 'avisos-de-cambios' },
   ),
 )

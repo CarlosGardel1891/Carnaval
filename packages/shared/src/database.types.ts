@@ -615,6 +615,25 @@ export type Database = {
           },
         ]
       }
+      latidos: {
+        Row: {
+          detalle: Json | null
+          tarea: string
+          ultimo_ok: string
+        }
+        ComputedFields: never
+        Insert: {
+          detalle?: Json | null
+          tarea: string
+          ultimo_ok?: string
+        }
+        Update: {
+          detalle?: Json | null
+          tarea?: string
+          ultimo_ok?: string
+        }
+        Relationships: []
+      }
       orden_desfile: {
         Row: {
           conjunto_id: number
@@ -923,6 +942,17 @@ export type Database = {
           tipo: Database['public']['Enums']['tipo_escenario']
         }[]
       }
+      estado_del_sistema: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          al_dia: boolean
+          detalle: Json
+          limite_min: number
+          minutos: number
+          tarea: string
+          ultimo_ok: string
+        }[]
+      }
       fixture_del_concurso: {
         Args: { p_anio: number }
         Returns: {
@@ -1068,6 +1098,7 @@ export type Database = {
         }
         Returns: undefined
       }
+      registrar_latido: { Args: { p_detalle?: Json; p_tarea: string }; Returns: undefined }
       slug_de: { Args: { p_nombre: string }; Returns: string }
       suspender_noche: {
         Args: { p_escenarios?: number[]; p_motivo?: string; p_noche: string }

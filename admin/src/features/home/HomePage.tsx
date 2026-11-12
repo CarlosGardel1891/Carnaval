@@ -2,12 +2,14 @@ import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router'
 import { PageTitle } from '../../components/ui'
 import { sections } from '../../nav'
+import { SystemStatus } from './SystemStatus'
 
 export function HomePage() {
   const { t } = useTranslation()
   return (
     <>
       <PageTitle title={t('home.title')} intro={t('home.intro')} />
+      <SystemStatus />
       <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {sections
           .filter(({ to }) => to !== '/')

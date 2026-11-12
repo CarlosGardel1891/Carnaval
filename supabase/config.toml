@@ -422,3 +422,7 @@ verify_jwt = false
 
 [functions.avisos-de-cambios]
 verify_jwt = false
+
+# La consulta un monitor externo, sin ninguna key (decisión 89).
+[functions.estado]
+verify_jwt = false

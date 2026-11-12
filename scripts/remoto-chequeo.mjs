@@ -145,6 +145,17 @@ for (const [name, body] of [
     return { ok: res.ok, detail: res.ok ? `responde, ${mode}` : `respondió ${res.status}` }
   })
 }
+await check('estado del sistema', async () => {
+  // Sin ninguna key, como lo consulta el monitor externo (decisión 89).
+  const res = await fetch(`${url}/functions/v1/estado`)
+  const data = await res.json().catch(() => ({}))
+  const down = (data.tareas ?? []).filter((task) => !task.al_dia).map((task) => task.tarea)
+  if (res.status === 200 && data.ok === true) return { ok: true, detail: 'todas las tareas al día' }
+  return {
+    ok: false,
+    detail: down.length > 0 ? `sin correr: ${down.join(', ')}` : `respondió ${res.status}`,
+  }
+})
 await check('las funciones rechazan a quien no es admin', async () => {
   const res = await fetch(`${url}/functions/v1/avisos-de-cambios`, {
     method: 'POST',
@@ -159,7 +170,7 @@ await check('las funciones rechazan a quien no es admin', async () => {
 })
 
 console.log(
-  '\nNo se chequea desde acá: que las dos tareas de pg_cron estén programadas (lo muestra el final de supabase/remoto/programar_avisos.sql) y los límites de auth por IP.',
+  '\nNo se chequea desde acá: los límites de auth por IP (decisión 79). Que las tareas de pg_cron corren lo dice «estado del sistema».',
 )
 console.log(failures === 0 ? '\nTodo bien.' : `\n${failures} cosas para revisar.`)
 process.exit(failures === 0 ? 0 : 1)

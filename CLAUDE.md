@@ -5,6 +5,8 @@ App para iPhone y Android con la información del carnaval en Uruguay, con foco 
 ## Leé primero
 
 - `docs/PLAN.md` — el plan por fases (qué hacer y cuándo).
+- `docs/OPERACION.md` — el manual para quien carga los datos en temporada, y qué hacer si algo falla.
+- `docs/IOS.md` — de la Mac a TestFlight.
 - `docs/DECISIONES.md` — decisiones tomadas; mandan sobre el plan.
 - `research/CAMBIOS.md` — estado de los datos semilla y pendientes.
 - `prompts/` — el prompt de cada fase, tal como se usó.
@@ -17,7 +19,7 @@ React 19 + TypeScript (strict) + Vite + Capacitor 8 + Tailwind 4, Supabase (Post
 
 - `app/` — app móvil (Vite + Capacitor). `app/android/` y `app/ios/` son los proyectos nativos generados por Capacitor.
 - `admin/` — panel web interno de carga de datos (ver «Panel admin»).
-- `sitio/` — el sitio público (decisión 83): la política de privacidad, la página de borrar mis datos y el soporte, en español y en inglés. No es una versión web de la app. Los textos están en `sitio/content.mjs` (las dos versiones de cada página con las mismas secciones; hay un test) y el mail de contacto y la dirección, en `sitio/site.config.json`. `pnpm --filter sitio build` deja las páginas en `sitio/dist/`, que es lo que se sube a Vercel. Si cambia qué datos maneja la app, cambian juntos la política, «Acerca de» (`app/src/locales`) y las declaraciones de las tiendas.
+- `sitio/` — el sitio público (decisión 83): la política de privacidad, la página de borrar mis datos y el soporte, en español y en inglés. No es una versión web de la app. Los textos están en `sitio/content.mjs` (las dos versiones de cada página con las mismas secciones; hay un test) y el mail de contacto y la dirección, en `sitio/site.config.json`. Está publicado en <https://carnavalero.vercel.app> (proyecto `carnavalero` de Vercel, mismo equipo que el panel). `pnpm --filter sitio build` deja las páginas en `sitio/dist/`; para publicarlas, desde `sitio/dist`: `npx vercel link --yes --project carnavalero --scope carlosgardel1891s-projects` y `npx vercel deploy --prod --yes --scope carlosgardel1891s-projects`. Si cambia qué datos maneja la app, cambian juntos la política, «Acerca de» (`app/src/locales`) y las declaraciones de las tiendas.
 - `supabase/` — `config.toml`, `migrations/`, `seeds/` (`01_temporadas.sql` y `02_research.sql`, generado: no editar a mano), `local/` (grilla ficticia, fixture ficticio del Concurso, orden ficticio de las Llamadas y noche real del 28/02/2026; sólo para el Supabase local) `functions/` (las Edge Functions de avisos: `avisos-del-dia`, `avisos-de-cambios` y lo común en `_shared/`) y `remoto/` (`programar_avisos.sql`, que se corre a mano en el proyecto remoto).
 - `packages/shared/` (`@cuerda/shared`) — tipos de la base (`database.types.ts`, generado), fechas (`nocheLogica`, `modoLlamadasActivo`, `calendarDateInMontevideo`), `norm` para matching de nombres, la hora estimada del Desfile de Llamadas (`llamadas.ts`) y los avisos push sin la base ni Firebase: textos (`noticeTexts.ts`), agrupado (`notices.ts`), envío (`delivery.ts`) y FCM (`fcm.ts`).
 - `packages/db-tests/` (`@cuerda/db-tests`) — tests de integración de la base (RLS, funciones, invariantes del esquema) contra el Supabase local. Corren con `pnpm test:db`, aparte de `pnpm test`.
@@ -72,6 +74,7 @@ pnpm admin:baja <email>      # le quita el permiso (con --borrar, borra el usuar
 pnpm admin:lista             # quiénes son admin
 pnpm escenarios:proponer     # propone ubicaciones geocodificando direcciones (admite --seco y --remoto)
 pnpm gen:demo                # regenera los datos de ejemplo del modo demostración (app/src/demo/data)
+pnpm remoto:respaldo         # copia del esquema y los datos del remoto en ~/.carnavalero/respaldos/
 pnpm supabase stop
 ```
 
@@ -214,6 +217,7 @@ Decisiones 45 a 49. Tres piezas, cada una con sus tests:
 - **Textos y envío: `@cuerda/shared`.** `buildDailyNotices` y `buildChangeNotices` arman una notificación por dispositivo, en su idioma y con las horas de Montevideo; los textos están en `noticeTexts.ts` (es y en, mismas claves). `deliver` manda con un `Sender`: `createFcmSender` (FCM HTTP v1) o `dryRunSender`.
 - **Quién las llama:** sólo la service role (en el remoto, la secret key; decisión 78), en el encabezado `apikey` o en `Authorization: Bearer`. Van con `verify_jwt = false` (`supabase/config.toml`): la plataforma no verifica nada antes y la barrera es `_shared/run.ts`. `avisos-de-cambios` acepta además la sesión de un admin (decisión 72), para el botón de suspender del panel, y por eso responde CORS.
 - **Borrar mis datos** (decisión 84): `borrar_mis_datos()` la llama la app con la sesión del usuario y borra sus seguidos, sus dispositivos y sus avisos y, si es anónimo, también el usuario. `purgar_anonimos_inactivos(antes)` borra a los anónimos sin actividad desde esa fecha; sólo la corre la service role, y en el remoto la programa `supabase/remoto/programar_avisos.sql` una vez por día con 13 meses. Una tabla nueva con datos de un usuario tiene que llevar su FK a `auth.users` con `on delete cascade` y sumarse a `borrar_mis_datos()` y a su test (`packages/db-tests/src/borrar-mis-datos.test.ts`).
+- **Estado del sistema** (decisión 89): cada pasada de una función de avisos que termina bien deja un latido (`registrar_latido`, desde `_shared/run.ts`), y la purga, desde su tarea de pg_cron. `estado_del_sistema()` dice qué tareas están al día (10 minutos para los avisos de cambios, 100 para el del día y 26 horas para la purga); la muestra la portada del panel y la devuelve la Edge Function `estado`, sin ninguna key, con 200 o 503, para un monitor externo. Una tarea programada nueva tiene que dejar su latido y sumarse a la lista de `estado_del_sistema()`. En el Supabase local no hay tareas programadas: ahí figuran sin correr.
 - **Edge Functions: sólo juntan y mandan.** Importan los archivos de `packages/shared/src/` por ruta relativa y con extensión `.ts` (Deno); por eso `notices.ts`, `delivery.ts`, `fcm.ts`, `dates.ts`, `llamadas.ts` y `noticeTexts.ts` sólo pueden tener imports relativos con `.ts` (lo controla `denoImports.test.ts`).
 
 Probarlas en local, sin Firebase (simulacro: devuelven los avisos armados y no mandan nada):
@@ -251,7 +255,7 @@ Para armarlo desde cero, en este orden:
 1. Crear el proyecto en la región de São Paulo (`sa-east-1`). `pnpm supabase login` y `pnpm supabase link --project-ref <ref>`.
 2. `pnpm supabase db push --include-seed`: aplica las migraciones y los dos seeds de `config.toml`. Nada de `supabase/local/`.
 3. En el panel de Supabase: Authentication → Sign In / Providers → **Allow anonymous sign-ins**; y Authentication → Rate Limits, revisar los límites por IP (decisión 23).
-4. `pnpm supabase functions deploy avisos-del-dia` y `pnpm supabase functions deploy avisos-de-cambios`. Sin el secret `FIREBASE_SERVICE_ACCOUNT` corren en simulacro (ver «Avisos push»).
+4. `pnpm supabase functions deploy avisos-del-dia`, `pnpm supabase functions deploy avisos-de-cambios` y `pnpm supabase functions deploy estado`. Sin el secret `FIREBASE_SERVICE_ACCOUNT` corren en simulacro (ver «Avisos push»).
 5. En el SQL editor (o con `pnpm supabase db query --linked -f <archivo>`): guardar en Vault la dirección del proyecto y la secret key, y correr `supabase/remoto/programar_avisos.sql` (las instrucciones están en el encabezado del archivo).
 6. Dar de alta el primer admin: `pnpm admin:alta <email> --remoto`, con `SUPABASE_URL` y `SUPABASE_SERVICE_ROLE_KEY` definidas en la terminal sólo para ese comando.
 7. `pnpm remoto:chequeo` (con `SUPABASE_URL`, `SUPABASE_ANON_KEY` y `SUPABASE_SERVICE_ROLE_KEY` en la terminal): controla el seed, que no haya nada de prueba, la auth anónima y que las funciones respondan.

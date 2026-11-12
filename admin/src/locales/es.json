@@ -39,6 +39,23 @@
       "contest": "El fixture del Concurso Oficial: las etapas de cada rueda y sus conjuntos.",
       "parade": "El Desfile de Llamadas, noche por noche: orden, horario y atraso, recorrido y cortes de calle.",
       "log": "Quién cambió qué y cuándo."
+    },
+    "status": {
+      "title": "Estado del sistema",
+      "allGood": "Todo anda: los avisos y las tareas programadas vienen corriendo.",
+      "down_one": "Hay {{count}} tarea que no viene corriendo.",
+      "down_other": "Hay {{count}} tareas que no vienen corriendo.",
+      "loadFailed": "No se pudo leer el estado del sistema.",
+      "never": "nunca corrió",
+      "ago_one": "hace {{count}} minuto",
+      "ago_other": "hace {{count}} minutos",
+      "dryRun": "Los avisos están en simulacro: se arman pero no se mandan, porque falta configurar Firebase.",
+      "help": "Qué hacer está en el manual de operación (docs/OPERACION.md), en «Si algo falla».",
+      "task": {
+        "avisos-de-cambios": "Avisos de cambios y suspensiones",
+        "avisos-del-dia": "Aviso «tu conjunto actúa hoy»",
+        "purga-anonimos": "Purga de usuarios inactivos"
+      }
     }
   },
   "category": {

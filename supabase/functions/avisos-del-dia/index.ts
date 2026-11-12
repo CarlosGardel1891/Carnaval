@@ -6,13 +6,17 @@ import { buildDailyNotices, isDailyNoticeWindow } from '../../../packages/shared
 import { handle } from '../_shared/run.ts'
 
 Deno.serve((req) =>
-  handle(req, async ({ db, now, options }) => {
-    const noche = nocheLogica(now)
-    if (!isDailyNoticeWindow(now) && options.forzar !== true) {
-      return { noche, notices: [], info: { fuera_de_horario: true } }
-    }
-    const { data, error } = await db.rpc('tomar_avisos_del_dia', { p_noche: noche })
-    if (error) throw error
-    return { noche, notices: buildDailyNotices(data) }
-  }),
+  handle(
+    req,
+    async ({ db, now, options }) => {
+      const noche = nocheLogica(now)
+      if (!isDailyNoticeWindow(now) && options.forzar !== true) {
+        return { noche, notices: [], info: { fuera_de_horario: true } }
+      }
+      const { data, error } = await db.rpc('tomar_avisos_del_dia', { p_noche: noche })
+      if (error) throw error
+      return { noche, notices: buildDailyNotices(data) }
+    },
+    { task: 'avisos-del-dia' },
+  ),
 )

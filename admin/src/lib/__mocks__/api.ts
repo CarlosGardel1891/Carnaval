@@ -28,6 +28,7 @@ export const saveGroup = vi.fn<typeof real.saveGroup>()
 export const setParticipation = vi.fn<typeof real.setParticipation>()
 export const fetchStages = vi.fn<typeof real.fetchStages>()
 export const saveStage = vi.fn<typeof real.saveStage>()
+export const fetchSystemStatus = vi.fn<typeof real.fetchSystemStatus>(() => Promise.resolve([]))
 export const fetchLocationProposals = vi.fn<typeof real.fetchLocationProposals>(() =>
   Promise.resolve([]),
 )

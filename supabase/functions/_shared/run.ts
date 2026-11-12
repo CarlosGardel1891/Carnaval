@@ -31,6 +31,11 @@ export interface HandleOptions {
    * para el panel, que corre en un navegador: por eso también responde al preflight de CORS.
    */
   allowAdmin?: boolean
+  /**
+   * El nombre de la tarea: con él, cada pasada que termina bien deja su latido
+   * (`registrar_latido`, decisión 89), que es lo que mira el estado del sistema.
+   */
+  task?: string
 }
 
 // El panel llama desde otro origen. No hay cookies: lo que autoriza es el token.
@@ -61,7 +66,7 @@ async function isAdminToken(db: Db, authorization: string | null): Promise<boole
  * existan las keys viejas, también `SUPABASE_SERVICE_ROLE_KEY`. La primera es la que se usa
  * para hablar con la base.
  */
-function serverKeys(): string[] {
+export function serverKeys(): string[] {
   const keys: string[] = []
   try {
     const named: unknown = JSON.parse(Deno.env.get('SUPABASE_SECRET_KEYS') ?? '{}')
@@ -98,7 +103,7 @@ const maskToken = (token: string) => `…${token.slice(-6)}`
 export async function handle(
   req: Request,
   build: (context: RunContext) => Promise<RunResult>,
-  { allowAdmin = false }: HandleOptions = {},
+  { allowAdmin = false, task }: HandleOptions = {},
 ): Promise<Response> {
   const cors = allowAdmin ? corsHeaders : {}
   const json = (body: unknown, status = 200) => respond(body, status, cors)
@@ -159,6 +164,20 @@ export async function handle(
     })
     if (lostError) throw lostError
     if (lost > 0) console.error(`Avisos de cambio que no salieron antes de la actuación: ${lost}`)
+
+    if (task) {
+      // Si el latido no se pudo anotar, la pasada igual salió bien: se deja en el log.
+      const { error: beatError } = await db.rpc('registrar_latido', {
+        p_tarea: task,
+        p_detalle: {
+          simulacro: sender.dryRun,
+          avisos: notices.length,
+          enviados: report.sent,
+          fallidos: report.failed,
+        },
+      })
+      if (beatError) console.error(beatError)
+    }
 
     return json({
       noche,

@@ -71,8 +71,16 @@ select cron.schedule(
 select cron.schedule(
   'purga-anonimos',
   '15 7 * * *',
-  $cron$ select public.purgar_anonimos_inactivos(now() - interval '13 months'); $cron$
+  $cron$
+  select public.purgar_anonimos_inactivos(now() - interval '13 months');
+  select public.registrar_latido('purga-anonimos');
+  $cron$
 );
+
+-- Para que el estado del sistema no arranque en rojo hasta la primera pasada de la purga
+-- (decisión 89): se corre una vez ahora.
+select public.purgar_anonimos_inactivos(now() - interval '13 months') as anonimos_borrados;
+select public.registrar_latido('purga-anonimos');
 
 -- Lo que quedó programado.
 select jobname, schedule, active from cron.job
