@@ -1,6 +1,6 @@
 # Carnavalero · contexto completo del proyecto
 
-Documento para poner al día a alguien que llega de cero. Estado al **2026-11-12**. Repo: <https://github.com/Emiliano-Vanzini/Carnaval>, `develop` tiene hasta la Fase 7; la Fase 8 todavía no arrancó.
+Documento para poner al día a alguien que llega de cero. Estado al **2026-11-12**. Repo: <https://github.com/Emiliano-Vanzini/Carnaval>, `develop` tiene hasta la Fase 7; la Fase 8 está en curso en la rama `publicacion`.
 
 Si algo de acá choca con los documentos del repo, mandan ellos, en este orden: `docs/DECISIONES.md`, `docs/PLAN.md`, `CLAUDE.md`.
 
@@ -104,7 +104,7 @@ El análisis completo está en `docs/competencia-carnaval-app.md`.
 | 5 · Calendario y Concurso | 1 – 7 dic | **Código terminado** (2026-11-11), ya en `develop`; falta el fixture real, que no se publicó |
 | 6 · Modo Llamadas | 8 – 13 dic | **Código terminado** (2026-11-11), ya en `develop`; faltan el orden de desfile real y el recorrido y los cortes oficiales |
 | 7 · Datos y panel admin | 1 dic – 10 ene (en paralelo) | **Terminada** (2026-11-12), ya en `develop`: panel publicado y proyecto remoto armado |
-| 8 · QA, beta y publicación | 14 dic – 20 ene | Sin empezar |
+| 8 · QA, beta y publicación | 14 dic – 20 ene | **En curso** (desde el 2026-11-12) en `publicacion`: hecho el código; faltan las cuentas de tienda en acción, Firebase, Sentry, la key de MapTiler, iOS en la Mac y la pasada de QA |
 | 9 · Operación en temporada | 21 ene – 7 mar | — |
 
 En una frase: **la app ya muestra la noche, los conjuntos, el calendario de la temporada, el Concurso y el Desfile de Llamadas (orden, hora estimada por cuadra, recorrido y glosario, también sin señal); deja seguir conjuntos sin registrarse y tiene armados los avisos push, que todavía no salieron nunca de verdad.** Lo hace sobre datos de prueba (la grilla ficticia o la cartelera real del 28/02/2026): todavía no hay grilla real, los escenarios reales no tienen coordenadas y falta Firebase para mandar un aviso real. **Desde la Fase 7 hay con qué cargar todo eso: un panel web interno que importa la cartelera de una noche pegando su texto, suspende por lluvia con su aviso, ubica los escenarios en el mapa y opera las Llamadas.**
@@ -212,6 +212,18 @@ LEEME.md           Cómo arrancar
 - 110 tests, entre ellos uno que compila el panel y controla que la service role no quede en lo que se publica.
 
 **Scripts nuevos:** `pnpm admin:alta`, `admin:baja` y `admin:lista` (admins del panel) y `pnpm remoto:chequeo` (controla un proyecto remoto).
+
+**Lo de la Fase 8, en la rama `publicacion` (2026-11-12):**
+
+- **La ubicación ya no sale del teléfono:** las distancias de «Cerca mío» se calculan en la app y la base dejó de recibir la posición (decisión 90).
+- **«Acerca de»** (el ícono de arriba a la derecha en Hoy): la política de privacidad, **borrar mis datos**, los créditos y la versión. Borrar mis datos elimina el usuario anónimo con todo lo suyo; además, los anónimos sin actividad en 13 meses se borran solos.
+- **Sitio público** en <https://carnavalero.vercel.app>: la política de privacidad, cómo borrar los datos y el soporte, en español y en inglés.
+- **Builds para las tiendas:** versión única (`app/version.json`), modos `beta` y `produccion` que no se compilan contra un Supabase local, y el AAB firmado de Android con `pnpm android:release`. iOS se compila en la Mac del equipo (`docs/IOS.md`).
+- **Modo demostración** para la beta: una noche, un orden de desfile y un fixture de ejemplo empaquetados en la app, con una franja que lo avisa; el build de producción no lo contiene.
+- **Reporte de errores** con Sentry (sólo si el build trae el DSN) y una pantalla de error cuando algo se rompe.
+- **Estado del sistema:** las tareas programadas dejan un latido; la portada del panel y la función `estado` dicen si vienen corriendo.
+- **Ubicaciones propuestas** para los escenarios, geocodificadas con OpenStreetMap, que se confirman una por una en el panel.
+- **Fichas de las dos tiendas**, con sus declaraciones y sus gráficos (`tiendas/`), el **plan de QA** (`docs/QA.md`) y el **manual de operación** (`docs/OPERACION.md`).
 
 **Lo que no existe aún:** un aviso push real (falta Firebase), el fixture real del Concurso (no se publicó), los resultados y el historial, el orden de desfile real y el recorrido oficial de las Llamadas, la grilla real y las coordenadas de los escenarios (ya hay con qué cargarlas).
 
@@ -359,7 +371,12 @@ Nativo: `pnpm --filter app android` (o `android:local` para usar el Supabase loc
 - **AUDECA:** pedir el orden de desfile y contenido de Llamadas (borrador 8.2).
 - **Conjuntos y comparsas:** mensaje directo por Instagram (borrador 8.3).
 - **Instagram de la app:** cuenta profesional vinculada a una Página de Facebook.
-- **Supabase remoto** (São Paulo): está armado (`carnavalero`, plan Free). Falta pasarlo a Pro antes del Inaugural, decidir si se suben los límites de auth por IP y dar de alta al resto de los admins. Falta también la key de MapTiler en el panel publicado.
+- **Supabase remoto** (São Paulo): está armado (`carnavalero`, plan Free), con los límites de auth por IP ya subidos (decisión 79). Falta pasarlo a Pro antes del Inaugural y dar de alta al resto de los admins.
+- **Ubicaciones de los escenarios:** hay 16 propuestas de OpenStreetMap cargadas en el remoto, para confirmar una por una en el panel (Escenarios), y 7 escenarios sin propuesta para ubicar a mano.
+- **Tiendas:** crear la app en Play Console y en App Store Connect, cargar las fichas y las declaraciones (`tiendas/`), juntar los testers y subir los builds (`docs/IOS.md` y `CLAUDE.md`, «Publicación»). El calendario hasta el 5/1 está en `docs/PLAN.md`.
+- **Sentry:** crear el proyecto, pasar el DSN y prender «Prevent Storing of IP Addresses».
+- **Monitor externo:** una cuenta gratis (UptimeRobot, healthchecks.io o similar) que consulte la función `estado` cada 5 minutos y avise por mail.
+- **Clave de subida de Android:** guardar fuera de la máquina una copia de `~/.carnavalero/`. Falta también la key de MapTiler en el panel publicado.
 - **Una muestra real de la tabla de DAECPU** («Programación de hoy», en temporada), para confirmar que el importador la lee tal como se copia.
 - **Key de MapTiler:** ponerla en `app/.env` y restringirla por origen en MapTiler Cloud (los orígenes están en `CLAUDE.md`). Con una key real todavía no se probó el mapa.
 - **GitHub Actions:** quien administra la cuenta dueña del repo tiene que resolver el pago fallido o subir el límite de gasto (Settings → Billing & plans) para que el CI arranque.

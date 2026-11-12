@@ -306,6 +306,19 @@ Oportunidad: el 3 de diciembre es el Día Nacional del Candombe. Sirve para most
 
 Si el día 1 de la prueba cerrada se corre más allá del 12/12, Android no llega al 5/1.
 
+Estado al 2026-11-12, en la rama `publicacion` (decisiones 79 a 90). Hecho, con sus tests:
+
+- **Pasos 1 a 6:** decisiones y calendario; versiones, modos y release firmado de Android (probado en el emulador); borrar mis datos y la purga de anónimos; «Acerca de»; el sitio público, publicado en <https://carnavalero.vercel.app>; y el modo demostración.
+- **Además:** la ubicación dejó de salir del teléfono (decisión 90).
+- **Paso 7:** el reporte de errores, listo; falta el DSN de Sentry.
+- **Paso 8:** los archivos de iOS y la guía `docs/IOS.md`; falta hacerlo en la Mac.
+- **Paso 9:** las fichas, las declaraciones y los gráficos de Google Play (`tiendas/`); faltan las capturas y el video, que necesitan las ubicaciones confirmadas y la key de MapTiler.
+- **Paso 10:** 16 ubicaciones propuestas cargadas en el remoto; faltan confirmarlas en el panel y ubicar a mano las 7 sin propuesta.
+- **Paso 11:** el estado del sistema, la función `estado` y `pnpm remoto:respaldo`; falta el monitor externo.
+- **Paso 12:** el manual de operación, `docs/OPERACION.md`.
+- **Paso 13:** el plan de QA y la lista de verificación, `docs/QA.md`; faltan las pasadas completas.
+- **Falta, y depende de cuentas:** crear la app en las dos tiendas y subir los builds, Firebase, Sentry, la key de MapTiler, el monitor externo y Supabase en Pro.
+
 ## Fase 9 · Operación en temporada y después (21 ene en adelante)
 
 **En temporada**
