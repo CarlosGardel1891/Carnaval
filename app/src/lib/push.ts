@@ -50,6 +50,15 @@ export async function getPushToken(): Promise<string> {
 }
 
 /**
+ * Da de baja el token de FCM de este teléfono: deja de recibir avisos hasta que se vuelva a
+ * pedir uno (decisión 84, borrar mis datos).
+ */
+export async function deletePushToken(): Promise<void> {
+  if (!pushEnabled) return
+  await (await messaging()).deleteToken()
+}
+
+/**
  * El canal de Android en el que caen los avisos, con su nombre visible en los ajustes del
  * teléfono. Crear uno que ya existe no hace nada. En iOS no hay canales.
  */

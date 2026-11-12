@@ -97,7 +97,25 @@ export function TodayPage() {
 
   return (
     <main className="mx-auto max-w-2xl px-4 pb-6">
-      <header className="pt-4 pb-2">
+      <header className="relative pt-4 pb-2">
+        <Link
+          to="/acerca"
+          aria-label={t('about.open')}
+          className="text-soft absolute top-2 right-0 flex size-12 items-center justify-center"
+        >
+          <svg
+            viewBox="0 0 24 24"
+            className="size-7"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+            aria-hidden="true"
+          >
+            <circle cx="12" cy="12" r="9" />
+            <path d="M12 11v5.5M12 7.5v.5" />
+          </svg>
+        </Link>
         <p className="text-accent font-semibold tracking-wide uppercase">{t('app.name')}</p>
         <h1 className="text-3xl font-bold">
           {isTonight ? t('today.title') : t('today.otherNight')}

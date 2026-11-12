@@ -411,6 +411,19 @@ export async function unfollowGroup(groupId: number): Promise<void> {
 }
 
 /**
+ * Borrar mis datos (decisión 84): la base borra al usuario anónimo de la sesión, y con él sus
+ * seguidos, su dispositivo y sus avisos; después se cierra la sesión en el teléfono. Si la
+ * sesión guardada ya no existía del lado de la base, no quedaba nada que borrar ahí.
+ */
+export async function deleteMyData(): Promise<void> {
+  if (await getUserId()) {
+    const { error } = await supabase.rpc('borrar_mis_datos')
+    if (error && !SESSION_GONE.has(error.code)) throw error
+  }
+  await supabase.auth.signOut({ scope: 'local' })
+}
+
+/**
  * Registra el token de push de este teléfono para el usuario de la sesión, o lo reasigna
  * si era de otro (reinstalación). Hace falta sesión.
  */

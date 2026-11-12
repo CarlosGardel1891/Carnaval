@@ -392,6 +392,33 @@
     "hidden_one": "{{count}} escenario sin ubicación cargada no aparece en «Cerca mío».",
     "hidden_other": "{{count}} escenarios sin ubicación cargada no aparecen en «Cerca mío»."
   },
+  "about": {
+    "title": "Acerca de",
+    "open": "Acerca de Carnavalero, privacidad y tus datos",
+    "privacy": {
+      "title": "Privacidad",
+      "summary": "Carnavalero no te pide nombre, mail ni registro. Tu ubicación se usa sólo en tu teléfono, para «Cerca mío» y el mapa: no se guarda ni se envía.",
+      "link": "Leer la política de privacidad"
+    },
+    "data": {
+      "title": "Tus datos",
+      "what": "Si seguís un conjunto, guardamos una sesión anónima con los conjuntos que seguís y, si activaste los avisos, el identificador de este teléfono para mandártelos y su idioma. Nada más.",
+      "delete": "Borrar mis datos",
+      "confirmTitle": "¿Borrar tus datos?",
+      "confirmBody": "Se borran los conjuntos que seguís, este teléfono deja de recibir avisos y se cierra tu sesión anónima. No se puede deshacer.",
+      "confirm": "Sí, borrar",
+      "cancel": "Cancelar",
+      "deleting": "Borrando…",
+      "done": "Listo: borramos tus datos.",
+      "error": "No pudimos borrar tus datos. Fijate si tenés conexión y probá de nuevo."
+    },
+    "credits": {
+      "title": "Créditos",
+      "map": "Mapa: © MapTiler y © colaboradores de OpenStreetMap.",
+      "data": "La información del carnaval sale de fuentes públicas: DAECPU, la Intendencia de Montevideo y la prensa. Carnavalero no es una app oficial."
+    },
+    "version": "Versión {{version}} ({{build}})"
+  },
   "dev": {
     "simulatedClock": "Reloj simulado: {{date}}, {{time}}"
   }

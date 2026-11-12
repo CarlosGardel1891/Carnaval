@@ -1,5 +1,6 @@
 import { Navigate, type RouteObject } from 'react-router'
 import { AppLayout } from './components/AppLayout'
+import { AboutPage } from './features/about/AboutPage'
 import { CalendarPage } from './features/calendar/CalendarPage'
 import { EventPage } from './features/calendar/EventPage'
 import { ContestPage } from './features/contest/ContestPage'
@@ -25,6 +26,7 @@ export const routes: RouteObject[] = [
     children: [
       { index: true, element: <TodayPage /> },
       { path: 'mapa', element: <LazyMapPage /> },
+      { path: 'acerca', element: <AboutPage /> },
       { path: 'escenarios/:slug', element: <StagePage /> },
       { path: 'conjuntos', element: <GroupsPage /> },
       { path: 'conjuntos/:slug', element: <GroupPage /> },

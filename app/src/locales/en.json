@@ -392,6 +392,33 @@
     "hidden_one": "{{count}} stage with no location on file is not shown in “Near me”.",
     "hidden_other": "{{count}} stages with no location on file are not shown in “Near me”."
   },
+  "about": {
+    "title": "About",
+    "open": "About Carnavalero, privacy and your data",
+    "privacy": {
+      "title": "Privacy",
+      "summary": "Carnavalero doesn't ask for your name, email or sign-up. Your location is used only on your phone, for “Near me” and the map: it is never stored or sent.",
+      "link": "Read the privacy policy"
+    },
+    "data": {
+      "title": "Your data",
+      "what": "If you follow a group, we keep an anonymous session with the groups you follow and, if you turned on notifications, this phone's identifier to send them and its language. Nothing else.",
+      "delete": "Delete my data",
+      "confirmTitle": "Delete your data?",
+      "confirmBody": "The groups you follow are deleted, this phone stops getting notifications and your anonymous session is closed. This can't be undone.",
+      "confirm": "Yes, delete",
+      "cancel": "Cancel",
+      "deleting": "Deleting…",
+      "done": "Done: your data was deleted.",
+      "error": "We couldn't delete your data. Check your connection and try again."
+    },
+    "credits": {
+      "title": "Credits",
+      "map": "Map: © MapTiler and © OpenStreetMap contributors.",
+      "data": "Carnival information comes from public sources: DAECPU, the Montevideo city government and the press. Carnavalero is not an official app."
+    },
+    "version": "Version {{version}} ({{build}})"
+  },
   "dev": {
     "simulatedClock": "Simulated clock: {{date}}, {{time}}"
   }

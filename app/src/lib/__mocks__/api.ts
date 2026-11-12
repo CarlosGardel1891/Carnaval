@@ -32,3 +32,4 @@ export const fetchFollowed = vi.fn<typeof Api.fetchFollowed>(() => Promise.resol
 export const followGroup = vi.fn<typeof Api.followGroup>(() => Promise.resolve())
 export const unfollowGroup = vi.fn<typeof Api.unfollowGroup>(() => Promise.resolve())
 export const registerPushDevice = vi.fn<typeof Api.registerPushDevice>(() => Promise.resolve())
+export const deleteMyData = vi.fn<typeof Api.deleteMyData>(() => Promise.resolve())
