@@ -267,7 +267,7 @@ pnpm --filter app exec vite --mode remoto    # pnpm dev, pero contra el remoto
 
 Para el teléfono, después de ese build: `pnpm --filter app exec cap sync android` y `pnpm --filter app exec cap run android`.
 
-Límites de auth por IP en el remoto (los de fábrica, iguales a los de `config.toml`; decisión 23): 30 altas anónimas por hora, 150 refrescos de sesión cada 5 minutos y 30 inicios de sesión cada 5 minutos. `pnpm supabase config diff` compara `config.toml` con el remoto; no correr `config push` sin mirar ese diff, porque también lleva las direcciones locales de auth.
+Límites de auth por IP, iguales en `config.toml` y en el remoto (decisión 79): 1000 altas anónimas por hora, 1500 refrescos de sesión cada 5 minutos y 30 inicios de sesión cada 5 minutos. `pnpm supabase config diff` compara `config.toml` con el remoto. No correr `config push` desde el repo: llevaría también las direcciones locales de auth. Para cambiar un valor suelto en el remoto, `config push --workdir <carpeta>` con un `supabase/config.toml` que declare sólo ese valor (lo que no se declara no se toca).
 
 Después de cada migración nueva: `pnpm supabase db push`. Después de cambiar una Edge Function o algo de `packages/shared/src/` que ellas importan: volver a desplegarla.
 
