@@ -56,7 +56,9 @@
     "instagram": "Instagram",
     "facebook": "Facebook",
     "upcoming": "Próximas actuaciones",
-    "noUpcoming": "Todavía no hay actuaciones cargadas para este conjunto."
+    "noUpcoming": "Todavía no hay actuaciones cargadas para este conjunto.",
+    "share": "Compartir",
+    "shareText": "{{name}} en Carnavalero, la app del carnaval de Uruguay."
   },
   "calendar": {
     "title": "Calendario",

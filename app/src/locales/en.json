@@ -56,7 +56,9 @@
     "instagram": "Instagram",
     "facebook": "Facebook",
     "upcoming": "Upcoming shows",
-    "noUpcoming": "No shows have been added for this group yet."
+    "noUpcoming": "No shows have been added for this group yet.",
+    "share": "Share",
+    "shareText": "{{name}} on Carnavalero, the app for Uruguay's carnival."
   },
   "calendar": {
     "title": "Calendar",

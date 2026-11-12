@@ -125,7 +125,8 @@ describe('ficha de conjunto', () => {
     expect(
       await screen.findByRole('heading', { level: 1, name: 'La Gran Muñeca' }),
     ).toBeInTheDocument()
-    expect(screen.getByText('Murga · La Teja')).toBeInTheDocument()
+    expect(screen.getByText('Murga')).toBeInTheDocument()
+    expect(screen.getByText('La Teja')).toBeInTheDocument()
     expect(screen.getByText('En concurso')).toBeInTheDocument()
     expect(screen.getByText('Murga fundada en 1921.')).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Instagram' })).toHaveAttribute(

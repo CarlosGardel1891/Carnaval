@@ -59,6 +59,13 @@ export function formatDayParts(
   }
 }
 
+/** El mes abreviado de una fecha pura: «feb». */
+export function formatMonthShort(isoDate: string, locale: string): string {
+  return new Intl.DateTimeFormat(locale, { month: 'short', timeZone: 'UTC' })
+    .format(new Date(`${isoDate}T00:00:00Z`))
+    .replace('.', '')
+}
+
 const timeFormatters = new Map<string, Intl.DateTimeFormat>()
 
 function timeFormatter(locale: string): Intl.DateTimeFormat {

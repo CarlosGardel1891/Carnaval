@@ -256,7 +256,7 @@ interface DateBadgeProps {
   /** Arriba, chico: «HOY», «VIE 13», «LUN 1». */
   top: string
   /** Abajo, grande: la hora o el mes. */
-  bottom: string
+  bottom: ReactNode
   /** Hoy: lleno en azul. */
   today?: boolean
 }

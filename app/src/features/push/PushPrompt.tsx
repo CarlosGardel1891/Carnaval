@@ -57,9 +57,9 @@ export function PushPrompt() {
   return (
     <section
       aria-labelledby="avisos"
-      className="bg-surface border-line space-y-3 rounded-2xl border p-4"
+      className="bg-surface shadow-card space-y-3 rounded-[1.375rem] p-4"
     >
-      <h2 id="avisos" className="text-xl font-bold">
+      <h2 id="avisos" className="text-[1.1875rem] leading-tight font-extrabold tracking-tight">
         {t('push.askTitle')}
       </h2>
       <p className="text-soft">{t('push.askBody')}</p>
