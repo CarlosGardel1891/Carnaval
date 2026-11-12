@@ -118,3 +118,15 @@ export function contestNightsOfGroup(rows: FixtureRow[], groupId: number): Group
       })),
   )
 }
+
+/**
+ * La rueda que se muestra al abrir el Concurso: la de la primera noche que todavía no pasó
+ * (la de hoy cuenta); si ya pasaron todas, la última. Sin ruedas, ninguna.
+ */
+export function currentRound(rounds: ContestRound[], today: string): ContestRound | null {
+  return (
+    rounds.find((round) => round.nights.some((night) => night.fecha >= today)) ??
+    rounds[rounds.length - 1] ??
+    null
+  )
+}

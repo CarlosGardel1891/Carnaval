@@ -1,18 +1,31 @@
 import { useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
-import { Link, useLocation, useNavigate } from 'react-router'
-import { Button } from '../../components/Button'
+import { Link, useSearchParams } from 'react-router'
+import { BackButton } from '../../components/ui/BackButton'
+import { EmptyStageArt, OfflineArt } from '../../components/ui/illustrations'
+import {
+  CategoryPill,
+  EmptyState,
+  Pill,
+  PrimaryButton,
+  Segmented,
+} from '../../components/ui/primitives'
 import { fetchEvents, type CalendarEvent } from '../../lib/api'
 import { formatIsoDate, formatNight, formatTime } from '../../lib/format'
+import { useSystemBars } from '../../lib/systemBars'
 import { useLocale } from '../../lib/useLocale'
 import { Tickets } from '../calendar/Tickets'
 import { hasTickets } from '../calendar/ticketSale'
 import { groupPath } from '../groups/groupPath'
-import { contestRounds, isSampleFixture, type ContestNight } from './contest'
+import {
+  contestRounds,
+  currentRound,
+  isSampleFixture,
+  type ContestNight,
+  type Round,
+} from './contest'
 import { useContestFixture } from './useContestFixture'
-
-const badge = 'rounded-md border px-2 py-0.5 text-sm font-semibold'
 
 function NightCard({ night, today }: { night: ContestNight; today: string }) {
   const { t } = useTranslation()
@@ -25,59 +38,63 @@ function NightCard({ night, today }: { night: ContestNight; today: string }) {
     <section
       // El nombre de la noche: «Etapa 1 · lunes, 25 de enero».
       aria-label={`${title} · ${date}`}
-      className={`bg-surface rounded-2xl border px-4 ${isToday ? 'border-accent' : 'border-line'} ${
-        night.fecha < today ? 'opacity-60' : ''
-      }`}
+      className={`bg-surface shadow-card overflow-hidden rounded-[1.375rem] ${
+        isToday ? 'ring-brand ring-2' : ''
+      } ${night.fecha < today ? 'opacity-60' : ''}`}
     >
-      <h3 className="flex flex-wrap items-baseline gap-x-2 pt-3 text-lg font-bold">
-        <span>{title}</span>
+      <h3 className="flex flex-wrap items-center gap-x-2 gap-y-1 px-4 pt-4 pb-2 text-[1.0625rem] leading-tight">
+        <span className="font-extrabold tracking-tight">{title}</span>
         {/* Tocar la fecha abre el pizarrón de esa noche. */}
         <Link
           to={`/?noche=${night.fecha}`}
           aria-label={t('calendar.openNight', { date })}
-          className="text-accent font-semibold underline first-letter:uppercase"
+          className="text-accent -my-2 inline-flex min-h-11 items-center font-bold first-letter:uppercase"
         >
           {date}
         </Link>
         {isToday && (
-          <span className={`${badge} bg-accent text-accent-ink border-accent`}>
+          <span className="bg-brand rounded-full px-2.5 py-0.5 text-[0.8125rem] font-bold text-white">
             {t('calendar.today')}
           </span>
         )}
       </h3>
       {night.acts.length === 0 ? (
-        <p className="text-soft py-3">{t('contest.noActs')}</p>
+        <p className="text-soft px-4 pb-4 text-sm">{t('contest.noActs')}</p>
       ) : (
-        <ul className="divide-line divide-y">
+        <ul className="divide-line border-line divide-y border-t">
           {night.acts.map((act) => {
             const suspended = act.estado === 'suspendida'
             return (
-              <li key={act.actuacion_id} className="flex gap-3 py-3">
+              <li key={act.actuacion_id} className="relative flex items-center gap-3 px-4 py-3">
                 <time
                   dateTime={act.inicio}
-                  className={`w-20 shrink-0 text-lg font-semibold tabular-nums ${suspended ? 'text-soft' : ''}`}
+                  className={`w-[3.75rem] shrink-0 self-start pt-px text-[1.0625rem] font-extrabold tabular-nums ${
+                    suspended ? 'text-soft line-through' : ''
+                  }`}
                 >
                   {formatTime(act.inicio, locale)}
                 </time>
                 <div className="min-w-0 flex-1">
-                  <p className="text-lg font-semibold">
+                  <p className="text-[1.0625rem] leading-snug font-bold">
                     <Link
                       to={groupPath(act.conjunto_slug)}
-                      className="decoration-soft underline underline-offset-4"
+                      className="after:absolute after:inset-0"
                     >
-                      {suspended ? <s>{act.conjunto_nombre}</s> : act.conjunto_nombre}
+                      {suspended ? (
+                        <s className="text-soft">{act.conjunto_nombre}</s>
+                      ) : (
+                        act.conjunto_nombre
+                      )}
                     </Link>
                   </p>
-                  <p className="text-soft">{t(`category.${act.conjunto_categoria}`)}</p>
-                  {act.estado !== 'programada' && (
-                    <p className="mt-1">
-                      <span
-                        className={`${badge} ${suspended ? 'border-danger text-danger' : 'border-accent text-accent'}`}
-                      >
-                        {t(`status.${act.estado}`)}
-                      </span>
-                    </p>
-                  )}
+                  <p className="mt-1.5 flex flex-wrap items-center gap-1.5">
+                    <CategoryPill category={act.conjunto_categoria}>
+                      {t(`category.${act.conjunto_categoria}`)}
+                    </CategoryPill>
+                    {act.estado !== 'programada' && (
+                      <Pill tone={suspended ? 'danger' : 'amber'}>{t(`status.${act.estado}`)}</Pill>
+                    )}
+                  </p>
                 </div>
               </li>
             )
@@ -119,7 +136,7 @@ function ContestStart({ first }: { first: CalendarEvent | undefined }) {
   const locale = useLocale()
   if (!first) return null
   return (
-    <p className="text-soft text-lg">
+    <p className="text-ink mt-2 font-bold">
       {t(first.estado === 'estimado' ? 'contest.startsAround' : 'contest.startsOn', {
         date: formatIsoDate(first.fecha_inicio, locale),
       })}
@@ -127,11 +144,15 @@ function ContestStart({ first }: { first: CalendarEvent | undefined }) {
   )
 }
 
-/** El Concurso Oficial: las ruedas, sus noches y los conjuntos de cada noche. */
+/**
+ * El Concurso Oficial: las ruedas en un segmentado y, de la elegida, una tarjeta por noche con
+ * los conjuntos que actúan. La rueda va en la URL (`?rueda=`); sin elegir, es la que está en
+ * curso o la que viene.
+ */
 export function ContestPage() {
   const { t } = useTranslation()
-  const navigate = useNavigate()
-  const location = useLocation()
+  useSystemBars('onLight')
+  const [params, setParams] = useSearchParams()
   const { today, season, fixture } = useContestFixture()
   const rows = fixture.data
   const rounds = useMemo(() => (rows ? contestRounds(rows) : []), [rows])
@@ -142,16 +163,26 @@ export function ContestPage() {
   // Las entradas del Concurso son las de su evento en el calendario (decisión 60).
   const withTickets = contestEvents.find(hasTickets)
 
-  const back = () => void (location.key === 'default' ? navigate('/calendario') : navigate(-1))
+  const chosen =
+    rounds.find((round) => round.rueda === params.get('rueda')) ?? currentRound(rounds, today)
+  const choose = (rueda: Round) =>
+    setParams(
+      (prev) => {
+        const next = new URLSearchParams(prev)
+        next.set('rueda', rueda)
+        return next
+      },
+      { replace: true },
+    )
 
   return (
-    <main className="mx-auto max-w-2xl space-y-4 px-4 pt-4 pb-6">
-      <Button variant="secondary" onClick={back}>
-        {t('stage.back')}
-      </Button>
+    <main className="mx-auto max-w-2xl space-y-5 px-4 pt-3 pb-6">
+      <BackButton fallback="/calendario" />
       <header>
-        <h1 className="text-3xl font-bold">{t('contest.title')}</h1>
-        <p className="text-soft text-lg">
+        <h1 className="text-[1.875rem] leading-[1.1] font-extrabold tracking-tight">
+          {t('contest.title')}
+        </h1>
+        <p className="text-soft mt-1.5 text-[1.0625rem] font-semibold">
           {season.data ? t('contest.subtitle', { year: season.data.anio }) : t('contest.venue')}
         </p>
       </header>
@@ -159,45 +190,72 @@ export function ContestPage() {
       {withTickets && <Tickets event={withTickets} />}
 
       {failed ? (
-        <div role="alert" className="space-y-3">
-          <p className="text-lg">{t('contest.error')}</p>
-          <Button onClick={retry}>{t('today.retry')}</Button>
+        <div role="alert">
+          <EmptyState
+            illustration={<OfflineArt />}
+            title={t('contest.error')}
+            action={<PrimaryButton onClick={retry}>{t('today.retry')}</PrimaryButton>}
+          />
         </div>
       ) : noSeason ? (
-        <p className="text-lg">{t('contest.noSeason')}</p>
+        <EmptyState illustration={<EmptyStageArt />}>{t('contest.noSeason')}</EmptyState>
       ) : !rows || !season.data ? (
-        <p className="text-soft">{t('contest.loading')}</p>
-      ) : rounds.length === 0 ? (
+        <p className="text-soft py-6 text-center">{t('contest.loading')}</p>
+      ) : !chosen ? (
         // Sin etapas cargadas: el fixture todavía no se publicó. No es una lista vacía.
-        <div className="space-y-2">
-          <p className="text-lg font-semibold">
-            {t('contest.notPublished', { year: season.data.anio })}
-          </p>
-          <p className="text-soft">{t('contest.notPublishedHint')}</p>
-          <ContestStart first={contestEvents[0]} />
+        <div className="bg-surface shadow-card rounded-[1.375rem]">
+          <EmptyState
+            illustration={<EmptyStageArt />}
+            title={t('contest.notPublished', { year: season.data.anio })}
+          >
+            <p>{t('contest.notPublishedHint')}</p>
+            <ContestStart first={contestEvents[0]} />
+          </EmptyState>
         </div>
       ) : (
         <>
           {isSampleFixture(rows) && (
-            <p role="note" className="border-accent text-accent rounded-xl border px-4 py-3">
+            <p
+              role="note"
+              className="bg-brand-soft text-brand rounded-2xl px-4 py-2.5 text-sm font-semibold"
+            >
               {t('contest.sample')}
             </p>
           )}
           {fixture.isError && !fixture.isFetching && (
-            <p role="alert" className="text-danger">
+            <p
+              role="alert"
+              className="bg-danger-soft text-danger rounded-2xl px-4 py-2.5 text-sm font-semibold"
+            >
               {t('today.refreshError')}
             </p>
           )}
-          {rounds.map(({ rueda, nights }) => (
-            <section key={rueda} aria-labelledby={`rueda-${rueda}`} className="space-y-3">
-              <h2 id={`rueda-${rueda}`} className="pt-2 text-2xl font-bold">
-                {t(`round.${rueda}`)}
-              </h2>
-              {nights.map((night) => (
-                <NightCard key={night.etapa_id} night={night} today={today} />
-              ))}
-            </section>
-          ))}
+          {rounds.length > 1 && (
+            <Segmented
+              label={t('contest.rounds')}
+              value={chosen.rueda}
+              options={rounds.map((round) => ({
+                value: round.rueda,
+                label: t(`round.${round.rueda}`),
+              }))}
+              onChange={choose}
+            />
+          )}
+          <section aria-labelledby={`rueda-${chosen.rueda}`} className="space-y-3">
+            <h2
+              id={`rueda-${chosen.rueda}`}
+              className={
+                rounds.length > 1
+                  ? 'sr-only'
+                  : 'px-1 text-[1.1875rem] leading-tight font-extrabold tracking-tight'
+              }
+            >
+              {t(`round.${chosen.rueda}`)}
+            </h2>
+            {chosen.nights.map((night) => (
+              <NightCard key={night.etapa_id} night={night} today={today} />
+            ))}
+          </section>
         </>
       )}
     </main>

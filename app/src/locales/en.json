@@ -113,7 +113,8 @@
     "inContest": "In the Contest",
     "groupNight": "{{round}} · night {{number}}",
     "seeFixture": "See the Contest fixture",
-    "groupNotPublished": "It's in the Official Contest. The fixture hasn't been published yet: once it's out, its nights will be listed here."
+    "groupNotPublished": "It's in the Official Contest. The fixture hasn't been published yet: once it's out, its nights will be listed here.",
+    "rounds": "Contest round"
   },
   "llamadas": {
     "title": "Llamadas",

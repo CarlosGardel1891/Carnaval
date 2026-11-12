@@ -113,7 +113,8 @@
     "inContest": "En el Concurso",
     "groupNight": "{{round}} · etapa {{number}}",
     "seeFixture": "Ver el fixture del Concurso",
-    "groupNotPublished": "Está en el Concurso Oficial. El fixture todavía no se publicó: cuando salga, acá van a estar sus noches."
+    "groupNotPublished": "Está en el Concurso Oficial. El fixture todavía no se publicó: cuando salga, acá van a estar sus noches.",
+    "rounds": "Rueda del Concurso"
   },
   "llamadas": {
     "title": "Llamadas",

@@ -38,7 +38,7 @@ describe('Concurso Oficial', () => {
     else process.env.TZ = systemTz
   })
 
-  it('muestra las tres ruedas, cada una con sus noches', async () => {
+  it('muestra las tres ruedas en un segmentado y, de la elegida, sus noches', async () => {
     renderApp('/calendario/concurso')
     expect(
       await screen.findByRole('heading', { level: 2, name: 'Primera rueda' }),
@@ -48,8 +48,14 @@ describe('Concurso Oficial', () => {
     expect(screen.getByText('Teatro de Verano · Carnaval 2027')).toBeInTheDocument()
 
     expect(
-      screen.getAllByRole('heading', { level: 2 }).map((heading) => heading.textContent),
-    ).toEqual(['Primera rueda', 'Segunda rueda', 'Liguilla'])
+      within(screen.getByRole('group', { name: 'Rueda del Concurso' }))
+        .getAllByRole('button')
+        .map((button) => [button.textContent, button.getAttribute('aria-pressed')]),
+    ).toEqual([
+      ['Primera rueda', 'true'],
+      ['Segunda rueda', 'false'],
+      ['Liguilla', 'false'],
+    ])
     const primera = screen.getByRole('region', { name: 'Primera rueda' })
     expect(
       within(primera)
@@ -97,8 +103,20 @@ describe('Concurso Oficial', () => {
     expect(nightOf('Etapa 2 · martes, 26 de enero').className).not.toContain('opacity-60')
   })
 
+  it('se cambia de rueda con el segmentado, y la elegida queda en la URL', async () => {
+    const { router } = renderApp('/calendario/concurso')
+    await userEvent.click(await screen.findByRole('button', { name: 'Segunda rueda' }))
+    expect(
+      await screen.findByRole('heading', { level: 2, name: 'Segunda rueda' }),
+    ).toBeInTheDocument()
+    expect(
+      screen.queryByRole('heading', { level: 2, name: 'Primera rueda' }),
+    ).not.toBeInTheDocument()
+    expect(router.state.location.search).toBe('?rueda=segunda')
+  })
+
   it('una noche que todavía no tiene conjuntos lo dice', async () => {
-    renderApp('/calendario/concurso')
+    renderApp('/calendario/concurso?rueda=liguilla')
     await screen.findByRole('heading', { level: 2, name: 'Liguilla' })
     const liguilla = screen.getByRole('region', { name: 'Liguilla' })
     expect(
@@ -134,8 +152,8 @@ describe('Concurso Oficial', () => {
   })
 
   it('tocar la fecha de una noche abre el pizarrón de esa noche', async () => {
-    const { router } = renderApp('/calendario/concurso')
-    await screen.findByRole('heading', { level: 2, name: 'Primera rueda' })
+    const { router } = renderApp('/calendario/concurso?rueda=segunda')
+    await screen.findByRole('heading', { level: 2, name: 'Segunda rueda' })
     await userEvent.click(
       screen.getByRole('link', { name: 'Ver la noche del lunes, 1 de febrero' }),
     )

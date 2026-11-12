@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { contestNightsOfGroup, contestRounds, isSampleFixture } from './contest'
+import { contestNightsOfGroup, contestRounds, currentRound, isSampleFixture } from './contest'
 import { fixtureRows } from './contest-fixtures'
 
 describe('contestRounds', () => {
@@ -75,5 +75,32 @@ describe('contestNightsOfGroup', () => {
 
   it('un conjunto que no está en el fixture no tiene noches', () => {
     expect(contestNightsOfGroup(fixtureRows(), 999)).toEqual([])
+  })
+})
+
+describe('currentRound', () => {
+  const night = (fecha: string) => ({
+    etapa_id: 1,
+    rueda: 'primera' as const,
+    numero: 1,
+    fecha,
+    acts: [],
+  })
+  const rounds = [
+    { rueda: 'primera' as const, nights: [night('2027-01-25'), night('2027-01-26')] },
+    { rueda: 'segunda' as const, nights: [night('2027-02-01')] },
+    { rueda: 'liguilla' as const, nights: [night('2027-02-08')] },
+  ]
+
+  it('la rueda de la primera noche que todavía no pasó; la de hoy cuenta', () => {
+    expect(currentRound(rounds, '2027-01-10')?.rueda).toBe('primera')
+    expect(currentRound(rounds, '2027-01-26')?.rueda).toBe('primera')
+    expect(currentRound(rounds, '2027-01-27')?.rueda).toBe('segunda')
+    expect(currentRound(rounds, '2027-02-08')?.rueda).toBe('liguilla')
+  })
+
+  it('si ya pasaron todas, la última; sin ruedas, ninguna', () => {
+    expect(currentRound(rounds, '2027-03-01')?.rueda).toBe('liguilla')
+    expect(currentRound([], '2027-01-26')).toBeNull()
   })
 })
