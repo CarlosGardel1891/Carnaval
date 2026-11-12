@@ -1008,6 +1008,24 @@ export type Database = {
           orden: number
         }[]
       }
+      reemplazar_orden_desfile: {
+        Args: {
+          p_conjuntos: number[]
+          p_evento_id: number
+          p_fuente: string
+          p_fuente_url?: string
+        }
+        Returns: number
+      }
+      reemplazar_recorrido: {
+        Args: {
+          p_esquinas: Json
+          p_estado: Database['public']['Enums']['estado_evento']
+          p_evento_id: number
+          p_fuente_url?: string[]
+        }
+        Returns: number
+      }
       registrar_dispositivo_push: {
         Args: {
           p_idioma: Database['public']['Enums']['idioma_app']

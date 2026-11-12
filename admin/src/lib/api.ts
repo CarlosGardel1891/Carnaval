@@ -547,3 +547,162 @@ export async function deleteContestStage(id: number): Promise<void> {
   if (error) throw new Error(error.message, { cause: error })
   if (data.length === 0) throw new Error('No se borró: la etapa ya no existe o no hay permiso.')
 }
+
+// ---------------------------------------------------------------- Llamadas
+
+export interface ParadeEvent {
+  id: number
+  nombre: string
+  fecha_inicio: string
+  /** «HH:MM:SS» de Montevideo. Null = la regla general (20:00). */
+  desfile_inicio: string | null
+  desfile_intervalo_min: number | null
+  desfile_separacion_m: number | null
+  desfile_atraso_min: number
+  recorrido_estado: EstadoEvento | null
+  recorrido_fuente_url: string[]
+}
+
+export async function fetchParadeEvents(): Promise<ParadeEvent[]> {
+  const { data, error } = await supabase
+    .from('eventos')
+    .select(
+      'id, nombre, fecha_inicio, desfile_inicio, desfile_intervalo_min, desfile_separacion_m, desfile_atraso_min, recorrido_estado, recorrido_fuente_url',
+    )
+    .eq('tipo', 'llamadas')
+    .order('fecha_inicio')
+    .order('id')
+  if (error) throw error
+  return data
+}
+
+export type ParadeSchedule = Pick<
+  ParadeEvent,
+  'desfile_inicio' | 'desfile_intervalo_min' | 'desfile_separacion_m' | 'desfile_atraso_min'
+>
+
+/** El horario del desfile y su atraso (decisión 63). Lo vacío vale la regla general. */
+export async function saveParadeSchedule(eventId: number, schedule: ParadeSchedule): Promise<void> {
+  const { data, error } = await supabase
+    .from('eventos')
+    .update(schedule)
+    .eq('id', eventId)
+    .select('id')
+  if (error) throw new Error(error.message, { cause: error })
+  if (data.length === 0) throw new Error('No se guardó: el evento ya no existe o no hay permiso.')
+}
+
+export interface ParadeSlot {
+  posicion: number
+  conjunto_id: number
+  conjunto_nombre: string
+  fuente: string
+}
+
+export async function fetchParadeOrder(eventId: number): Promise<ParadeSlot[]> {
+  const { data, error } = await supabase.rpc('orden_del_desfile', { p_evento_id: eventId })
+  if (error) throw error
+  return data
+}
+
+/** Reemplaza el orden de desfile entero, todo o nada. Una lista vacía lo borra. */
+export async function replaceParadeOrder(
+  eventId: number,
+  groupIds: number[],
+  fuente: string,
+  fuenteUrl: string | null,
+): Promise<number> {
+  const { data, error } = await supabase.rpc('reemplazar_orden_desfile', {
+    p_evento_id: eventId,
+    p_conjuntos: groupIds,
+    p_fuente: fuente,
+    ...(fuenteUrl ? { p_fuente_url: fuenteUrl } : {}),
+  })
+  if (error) throw new Error(error.message, { cause: error })
+  return data
+}
+
+export interface RouteCorner {
+  calle: string
+  cruce: string
+  lat: number
+  lng: number
+}
+
+export async function fetchParadeRoute(eventId: number): Promise<RouteCorner[]> {
+  const { data, error } = await supabase.rpc('recorrido_del_desfile', { p_evento_id: eventId })
+  if (error) throw error
+  return data.map(({ calle, cruce, lat, lng }) => ({ calle, cruce, lat, lng }))
+}
+
+/** Reemplaza el recorrido entero, todo o nada, con su estado y su fuente. */
+export async function replaceParadeRoute(
+  eventId: number,
+  corners: RouteCorner[],
+  estado: EstadoEvento,
+  fuentes: string[],
+): Promise<number> {
+  const { data, error } = await supabase.rpc('reemplazar_recorrido', {
+    p_evento_id: eventId,
+    p_esquinas: corners as unknown as Json,
+    p_estado: estado,
+    p_fuente_url: fuentes,
+  })
+  if (error) throw new Error(error.message, { cause: error })
+  return data
+}
+
+export type TipoCorte = Enums<'tipo_corte'>
+
+export interface Closure {
+  id: number
+  slug: string
+  tipo: TipoCorte
+  descripcion: string
+  desde: string | null
+  hasta: string | null
+  estado: EstadoEvento
+  fuente_url: string[]
+  /** El tramo, como lista de puntos. Vacío si sólo se tiene la descripción. */
+  puntos: { lat: number; lng: number }[]
+}
+
+export async function fetchClosures(eventId: number): Promise<Closure[]> {
+  const { data, error } = await supabase.rpc('cortes_del_desfile', { p_evento_id: eventId })
+  if (error) throw error
+  return data.map(({ corte_id, puntos, ...row }) => ({
+    ...row,
+    id: corte_id,
+    // La base los da como [longitud, latitud].
+    puntos: ((puntos as [number, number][] | null) ?? []).map(([lng, lat]) => ({ lat, lng })),
+  }))
+}
+
+export type ClosureFields = Omit<Closure, 'id'>
+
+export async function saveClosure(
+  eventId: number,
+  id: number | null,
+  fields: ClosureFields,
+): Promise<void> {
+  const { puntos, ...rest } = fields
+  const row = {
+    ...rest,
+    evento_id: eventId,
+    tramo:
+      puntos.length >= 2
+        ? `SRID=4326;LINESTRING(${puntos.map((p) => `${p.lng} ${p.lat}`).join(', ')})`
+        : null,
+  }
+  const { data, error } = id
+    ? await supabase.from('cortes_calle').update(row).eq('id', id).select('id')
+    : await supabase.from('cortes_calle').insert(row).select('id')
+  if (error) throw new Error(error.message, { cause: error })
+  if (data.length === 0) throw new Error('No se guardó: el corte ya no existe o no hay permiso.')
+}
+
+export async function deleteClosure(id: number): Promise<void> {
+  const { data, error } = await supabase.from('cortes_calle').delete().eq('id', id).select('id')
+  if (error) throw new Error(error.message, { cause: error })
+  if (data.length === 0) throw new Error('No se borró: el corte ya no existe o no hay permiso.')
+}

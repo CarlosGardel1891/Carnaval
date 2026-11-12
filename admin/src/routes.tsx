@@ -8,6 +8,7 @@ import { GroupsPage } from './features/groups/GroupsPage'
 import { StagesPage } from './features/stages/StagesPage'
 import { EventsPage } from './features/events/EventsPage'
 import { ContestPage } from './features/contest/ContestPage'
+import { ParadePage } from './features/parade/ParadePage'
 
 export const routes: RouteObject[] = [
   { path: '/login', element: <LoginPage /> },
@@ -21,6 +22,7 @@ export const routes: RouteObject[] = [
       { path: 'escenarios', element: <StagesPage /> },
       { path: 'eventos', element: <EventsPage /> },
       { path: 'concurso', element: <ContestPage /> },
+      { path: 'llamadas', element: <ParadePage /> },
     ],
   },
 ]

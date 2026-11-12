@@ -12,7 +12,8 @@
     "groups": "Conjuntos",
     "stages": "Escenarios",
     "events": "Eventos",
-    "contest": "Concurso"
+    "contest": "Concurso",
+    "parade": "Llamadas"
   },
   "login": {
     "title": "Carnavalero · Admin",
@@ -34,7 +35,8 @@
       "groups": "El catálogo de conjuntos: nombres, alias, categoría y si participan en la temporada.",
       "stages": "Los escenarios, con su dirección y su ubicación en el mapa.",
       "events": "El calendario de la temporada y el enlace a la venta de entradas de cada evento.",
-      "contest": "El fixture del Concurso Oficial: las etapas de cada rueda y sus conjuntos."
+      "contest": "El fixture del Concurso Oficial: las etapas de cada rueda y sus conjuntos.",
+      "parade": "El Desfile de Llamadas, noche por noche: orden, horario y atraso, recorrido y cortes de calle."
     }
   },
   "category": {
@@ -380,6 +382,105 @@
       "date": "Fecha de la noche",
       "source": "Fuente",
       "sourceUrl": "Enlace a la fuente (opcional)"
+    }
+  },
+  "parade": {
+    "title": "Desfile de Llamadas",
+    "intro": "Cada noche del desfile tiene lo suyo. Todo esto se ve en la app sin sacar otra versión.",
+    "loadFailed": "No se pudieron cargar las noches del desfile.",
+    "noEvents": "No hay ningún evento de tipo «Llamadas»: creá uno por noche en Eventos.",
+    "night": "Noche",
+    "schedule": {
+      "title": "Horario y atraso",
+      "delay": "Atraso (minutos)",
+      "delayHint": "Corre todas las horas estimadas. 0 si va en hora.",
+      "start": "Sale la primera",
+      "startHint": "Vacío: 20:00.",
+      "interval": "Minutos entre comparsas",
+      "intervalHint": "Vacío: 10.",
+      "separation": "Metros entre comparsas",
+      "separationHint": "Vacío: 150.",
+      "invalid": "Revisá los números: el atraso va de 0 a 600 minutos, y el intervalo y la separación son enteros mayores que cero.",
+      "save": "Guardar el horario",
+      "saved": "Horario guardado: la app ya muestra las horas nuevas."
+    },
+    "order": {
+      "title": "Orden de desfile",
+      "loadFailed": "No se pudo cargar el orden.",
+      "empty": "Todavía no hay orden cargado: la app dice que no se publicó y lista las comparsas clasificadas.",
+      "text": "Una comparsa por línea, en el orden en que desfilan",
+      "textHint": "Podés pegar el orden publicado: el número de adelante se ignora. Para reordenar, mové las líneas.",
+      "source": "Fuente",
+      "sourceUrl": "Enlace a la fuente (opcional)",
+      "summary": "{{count}} comparsas; {{unknown}} sin coincidencia y {{repeated}} repetidas.",
+      "unknown": "sin coincidencia",
+      "repeated": "repetida",
+      "unknownHint": "Hay nombres que no coinciden con ningún conjunto ni alias. Corregilos acá, o agregá el alias en Conjuntos y volvé.",
+      "save": "Guardar el orden",
+      "clear": "Borrar el orden",
+      "saved_one": "Orden guardado: {{count}} comparsa.",
+      "saved_other": "Orden guardado: {{count}} comparsas."
+    },
+    "route": {
+      "title": "Recorrido",
+      "intro": "Las esquinas por las que pasa el desfile, en orden: la primera es la salida y la última, la llegada.",
+      "loadFailed": "No se pudo cargar el recorrido.",
+      "street": "Calle de la esquina {{n}}",
+      "streetPlaceholder": "Calle del desfile",
+      "cross": "Cruce de la esquina {{n}}",
+      "crossPlaceholder": "Calle que cruza",
+      "lat": "Latitud de la esquina {{n}}",
+      "latPlaceholder": "Latitud",
+      "lng": "Longitud de la esquina {{n}}",
+      "lngPlaceholder": "Longitud",
+      "onMap": "Ubicar la esquina {{n}} en el mapa",
+      "up": "Subir la esquina {{n}}",
+      "down": "Bajar la esquina {{n}}",
+      "remove": "Quitar la esquina {{n}}",
+      "add": "Agregar una esquina",
+      "state": "El recorrido es",
+      "stateHint": "Confirmado: el que publicó la IM para este año. La app marca el estimado como tal.",
+      "states": {
+        "confirmado": "Confirmado",
+        "estimado": "Estimado"
+      },
+      "sources": "Fuentes del recorrido",
+      "incomplete_one": "A {{count}} esquina le falta la calle, el cruce o el punto.",
+      "incomplete_other": "A {{count}} esquinas les falta la calle, el cruce o el punto.",
+      "tooShort": "Un recorrido tiene por lo menos dos esquinas.",
+      "save": "Guardar el recorrido",
+      "clear": "Borrar el recorrido",
+      "saved_one": "Recorrido guardado: {{count}} esquina.",
+      "saved_other": "Recorrido guardado: {{count}} esquinas."
+    },
+    "closures": {
+      "title": "Cortes de calle",
+      "loadFailed": "No se pudieron cargar los cortes.",
+      "empty": "No hay cortes cargados.",
+      "new": "Agregar un corte",
+      "newTitle": "Corte nuevo",
+      "saved": "Corte guardado.",
+      "deleted": "Corte borrado.",
+      "delete": "Borrar el corte",
+      "confirmDelete": "Sí, borrar el corte",
+      "noLine": "sin tramo en el mapa",
+      "types": {
+        "corte": "Corte de tránsito",
+        "estacionamiento": "Prohibido estacionar"
+      },
+      "badPoints": "El tramo lleva por lo menos dos puntos, uno por línea, como «-34.9104, -56.1872». Dejalo vacío si sólo tenés la descripción.",
+      "badRange": "El corte no puede terminar antes de empezar.",
+      "field": {
+        "description": "Descripción",
+        "type": "Tipo",
+        "state": "Es",
+        "from": "Desde",
+        "to": "Hasta",
+        "timeHint": "Hora de Montevideo.",
+        "points": "Tramo",
+        "pointsHint": "Un punto por línea: latitud, longitud.",
+        "sources": "Fuentes"
+      }
     }
   }
 }
