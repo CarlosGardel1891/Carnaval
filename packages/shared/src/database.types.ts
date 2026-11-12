@@ -788,6 +788,45 @@ export type Database = {
         }
         Relationships: []
       }
+      ubicaciones_propuestas: {
+        Row: {
+          consulta: string
+          creado_en: string
+          escenario_id: number
+          fuente: string
+          lat: number
+          lng: number
+          resultado: string
+        }
+        ComputedFields: never
+        Insert: {
+          consulta: string
+          creado_en?: string
+          escenario_id: number
+          fuente: string
+          lat: number
+          lng: number
+          resultado: string
+        }
+        Update: {
+          consulta?: string
+          creado_en?: string
+          escenario_id?: number
+          fuente?: string
+          lat?: number
+          lng?: number
+          resultado?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'ubicaciones_propuestas_escenario_id_fkey'
+            columns: ['escenario_id']
+            isOneToOne: true
+            referencedRelation: 'escenarios'
+            referencedColumns: ['id']
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never

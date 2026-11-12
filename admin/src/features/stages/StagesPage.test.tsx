@@ -52,6 +52,8 @@ beforeEach(() => {
   vi.stubEnv('VITE_MAPTILER_KEY', '')
   vi.mocked(api.fetchStages).mockResolvedValue(STAGES)
   vi.mocked(api.saveStage).mockResolvedValue(1)
+  vi.mocked(api.fetchLocationProposals).mockResolvedValue([])
+  vi.mocked(api.discardLocationProposal).mockResolvedValue()
 })
 
 const open = async () => {
@@ -115,6 +117,73 @@ describe('escenarios', () => {
     await user.click(screen.getByRole('button', { name: 'Guardar' }))
     await waitFor(() => expect(api.saveStage).toHaveBeenCalled())
     expect(vi.mocked(api.saveStage).mock.calls[0]![1]).toMatchObject({ lat: null, lng: null })
+  })
+
+  describe('con una ubicación propuesta (decisión 87)', () => {
+    const PROPOSAL = {
+      escenario_id: 1,
+      lat: -34.851634,
+      lng: -56.290163,
+      consulta: 'Av. Tal 123, Montevideo, Uruguay',
+      resultado: 'Avenida Tal, Cerro, Montevideo, Uruguay',
+      fuente: 'openstreetmap',
+    }
+
+    beforeEach(() => {
+      vi.mocked(api.fetchLocationProposals).mockResolvedValue([PROPOSAL])
+    })
+
+    it('avisa cuántas hay y marca el escenario en la lista', async () => {
+      await open()
+      expect(await screen.findByText('1 tiene una propuesta para confirmar.')).toBeVisible()
+      expect(
+        within(screen.getByRole('button', { name: /Julia Arévalo/ })).getByText('con propuesta'),
+      ).toBeVisible()
+    })
+
+    it('muestra qué se buscó y qué se encontró, y no guarda nada sola', async () => {
+      const user = await open()
+      await user.click(screen.getByRole('button', { name: /Julia Arévalo/ }))
+      expect(await screen.findByText('Se buscó: Av. Tal 123, Montevideo, Uruguay')).toBeVisible()
+      expect(
+        screen.getByText('OpenStreetMap encontró: Avenida Tal, Cerro, Montevideo, Uruguay'),
+      ).toBeVisible()
+      expect(api.saveStage).not.toHaveBeenCalled()
+    })
+
+    it('la propuesta pasa a ser la ubicación recién al guardar el escenario', async () => {
+      const user = await open()
+      await user.click(screen.getByRole('button', { name: /Julia Arévalo/ }))
+      await user.click(await screen.findByRole('button', { name: 'Ver la propuesta en el mapa' }))
+      expect(api.saveStage).not.toHaveBeenCalled()
+
+      await user.click(screen.getByRole('button', { name: 'Guardar' }))
+
+      await waitFor(() =>
+        expect(api.saveStage).toHaveBeenCalledWith(
+          1,
+          expect.objectContaining({ lat: -34.851634, lng: -56.290163 }),
+        ),
+      )
+    })
+
+    it('se puede descartar sin tocar el escenario', async () => {
+      const user = await open()
+      await user.click(screen.getByRole('button', { name: /Julia Arévalo/ }))
+      await user.click(await screen.findByRole('button', { name: 'Descartar la propuesta' }))
+
+      await waitFor(() => expect(api.discardLocationProposal).toHaveBeenCalledWith(1))
+      expect(await screen.findByText('Propuesta descartada.')).toBeVisible()
+      expect(api.saveStage).not.toHaveBeenCalled()
+    })
+
+    it('un escenario que ya tiene ubicación no muestra propuesta', async () => {
+      vi.mocked(api.fetchLocationProposals).mockResolvedValue([{ ...PROPOSAL, escenario_id: 2 }])
+      const user = await open()
+      await user.click(screen.getByRole('button', { name: /Velódromo Municipal/ }))
+      expect(screen.queryByText('1 tiene una propuesta para confirmar.')).not.toBeInTheDocument()
+      expect(screen.queryByText('con propuesta')).not.toBeInTheDocument()
+    })
   })
 
   it('un itinerante no tiene ubicación propia', async () => {

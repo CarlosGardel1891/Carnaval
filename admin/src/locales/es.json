@@ -292,7 +292,19 @@
       "active": "Funciona esta temporada"
     },
     "location": "Ubicación",
-    "itinerantNoLocation": "Un escenario itinerante no tiene un lugar fijo: la parada de cada noche se carga en cada actuación."
+    "itinerantNoLocation": "Un escenario itinerante no tiene un lugar fijo: la parada de cada noche se carga en cada actuación.",
+    "proposal": {
+      "title": "Hay una ubicación propuesta, sin confirmar",
+      "searched": "Se buscó: {{query}}",
+      "found": "OpenStreetMap encontró: {{result}}",
+      "hint": "Mirala en el mapa: si está bien, o después de corregirla, guardá el escenario. Hasta entonces no es su ubicación y la app no la muestra.",
+      "show": "Ver la propuesta en el mapa",
+      "discard": "Descartar la propuesta",
+      "discarded": "Propuesta descartada.",
+      "pending_one": "{{count}} tiene una propuesta para confirmar.",
+      "pending_other": "{{count}} tienen una propuesta para confirmar.",
+      "badge": "con propuesta"
+    }
   },
   "location": {
     "search": "Buscar una dirección",

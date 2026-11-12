@@ -70,6 +70,8 @@ pnpm supabase functions serve  # sirve las Edge Functions en http://127.0.0.1:55
 pnpm admin:alta <email>      # crea un admin del panel y muestra su contraseña (ver «Panel admin»)
 pnpm admin:baja <email>      # le quita el permiso (con --borrar, borra el usuario)
 pnpm admin:lista             # quiénes son admin
+pnpm escenarios:proponer     # propone ubicaciones geocodificando direcciones (admite --seco y --remoto)
+pnpm gen:demo                # regenera los datos de ejemplo del modo demostración (app/src/demo/data)
 pnpm supabase stop
 ```
 
@@ -185,6 +187,7 @@ Web interna de carga de datos (decisiones 51 y 69 a 77), en `admin/`. `pnpm dev:
 - **Suspender** (decisión 72): `suspender_noche` y `deshacer_suspension`. Después, el panel llama a `avisos-de-cambios` con la sesión del admin para que el aviso salga enseguida; si falla, sale con la pasada de cada minuto.
 - **Horas:** las que se escriben son de Montevideo. `nightInstant(noche, hora)` (`admin/src/lib/night.ts`) las pasa a un instante con la regla de las 06:00, y `formatTime` y `formatDateTime` (`lib/format.ts`) las muestran en Montevideo. Nunca la zona del navegador.
 - **Mapa:** `features/map/LocationPicker.tsx` (tocar, arrastrar o buscar la dirección con el geocoder de MapTiler). MapLibre se baja aparte (`LocationMap.tsx`) y en los tests se reemplaza con `vi.mock('../map/LocationMap')`: jsdom no tiene WebGL. En i18next, `lng` es una opción reservada: un texto con una longitud usa otro nombre (`lon`).
+- **Ubicaciones propuestas** (decisión 87): `pnpm escenarios:proponer` geocodifica con OpenStreetMap (Nominatim, una consulta por segundo) la dirección de los escenarios activos, fijos y sin ubicación, y guarda lo que encuentra en `ubicaciones_propuestas`, no en `escenarios.ubicacion`. Con `--seco` sólo lo muestra; con `--remoto`, contra el proyecto remoto (con `SUPABASE_URL` y `SUPABASE_SERVICE_ROLE_KEY` en la terminal). En `/escenarios` el panel avisa cuáles tienen propuesta, muestra qué se buscó y qué se encontró, y deja verla en el mapa o descartarla: pasa a ser la ubicación recién al guardar el escenario, y ahí la base borra la propuesta. Muchas caen en la calle y no en la puerta: hay que mirarlas.
 - **Registro de cambios** (decisión 73): `registro_cambios` lo llena un trigger en cada tabla de datos. Una tabla de datos nueva tiene que llevar su trigger `…_registrar_cambio` con las columnas de su clave primaria.
 - **Publicar el panel:** es un sitio estático en Vercel, publicado en <https://carnavalero-admin.vercel.app> (proyecto `carnavalero-admin`, equipo `carlosgardel1891s-projects`). No se despliega solo: después de cambiar el panel se compila con las variables del remoto (`admin/.env.remoto`, fuera del repo) y se sube `admin/dist/` (`admin/public/vercel.json` manda todas las rutas a `index.html` y pide que no se indexe). Hace falta `npx vercel login` una vez; como compilar vacía `dist/`, hay que volver a enlazarlo cada vez:
 

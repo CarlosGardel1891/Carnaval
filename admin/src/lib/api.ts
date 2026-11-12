@@ -429,6 +429,42 @@ export async function fetchStages(): Promise<StageRow[]> {
 
 export type StageFields = Omit<StageRow, 'id'>
 
+/**
+ * La ubicación que un geocodificador propuso para un escenario (decisión 87). No es su
+ * ubicación: lo es recién cuando un admin guarda el escenario con ese punto.
+ */
+export interface LocationProposal {
+  escenario_id: number
+  lat: number
+  lng: number
+  /** La dirección que se buscó. */
+  consulta: string
+  /** Lo que el geocodificador entendió. */
+  resultado: string
+  fuente: string
+}
+
+/** Las propuestas pendientes de confirmar. Las carga `pnpm escenarios:proponer`. */
+export async function fetchLocationProposals(): Promise<LocationProposal[]> {
+  const { data, error } = await supabase
+    .from('ubicaciones_propuestas')
+    .select('escenario_id, lat, lng, consulta, resultado, fuente')
+  if (error) throw new Error(error.message, { cause: error })
+  return data
+}
+
+/** Descarta la propuesta de un escenario: estaba mal y no se va a usar. */
+export async function discardLocationProposal(stageId: number): Promise<void> {
+  const { data, error } = await supabase
+    .from('ubicaciones_propuestas')
+    .delete()
+    .eq('escenario_id', stageId)
+    .select('escenario_id')
+  if (error) throw new Error(error.message, { cause: error })
+  if (data.length === 0)
+    throw new Error('No se descartó: la propuesta ya no existe o no hay permiso.')
+}
+
 /** Crea (sin `id`) o cambia un escenario, con su ubicación. Devuelve su id. */
 export async function saveStage(id: number | null, fields: StageFields): Promise<number> {
   const { lat, lng, ...rest } = fields

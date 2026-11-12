@@ -72,6 +72,13 @@ export function StagesPage() {
   const [message, setMessage] = useState<{ kind: 'ok' | 'error'; text: string } | null>(null)
 
   const stages = useQuery({ queryKey: ['stages'], queryFn: api.fetchStages })
+  // Lo que propuso el geocodificador (decisión 87). Si no se pueden leer, el panel anda igual.
+  const proposals = useQuery({
+    queryKey: ['locationProposals'],
+    queryFn: api.fetchLocationProposals,
+  })
+  const proposalOf = (stageId: number) =>
+    proposals.data?.find((proposal) => proposal.escenario_id === stageId)
 
   const shown = useMemo(
     () =>
@@ -84,6 +91,17 @@ export function StagesPage() {
   const current =
     typeof selected === 'number' ? stages.data?.find((s) => s.id === selected) : undefined
   const itinerant = draft.itinerante === 'si'
+  const proposal = current && missesLocation(current) ? proposalOf(current.id) : undefined
+  const proposed = (stages.data ?? []).filter((s) => missesLocation(s) && proposalOf(s.id)).length
+
+  const discard = useMutation({
+    mutationFn: (stageId: number) => api.discardLocationProposal(stageId),
+    onSuccess: () => {
+      setMessage({ kind: 'ok', text: t('stages.proposal.discarded') })
+      void queryClient.invalidateQueries({ queryKey: ['locationProposals'] })
+    },
+    onError: (error) => setMessage({ kind: 'error', text: error.message }),
+  })
 
   const save = useMutation({
     mutationFn: () =>
@@ -108,6 +126,8 @@ export function StagesPage() {
       setMessage({ kind: 'ok', text: t('stages.saved') })
       void queryClient.invalidateQueries({ queryKey: ['stages'] })
       void queryClient.invalidateQueries({ queryKey: ['catalog'] })
+      // Con la ubicación guardada, la base quita la propuesta de ese escenario.
+      void queryClient.invalidateQueries({ queryKey: ['locationProposals'] })
     },
     onError: (error) => setMessage({ kind: 'error', text: error.message }),
   })
@@ -164,6 +184,11 @@ export function StagesPage() {
             />
             {t('stages.onlyMissing', { count: missing })}
           </label>
+          {proposed > 0 && (
+            <p className="text-sm text-slate-600">
+              {t('stages.proposal.pending', { count: proposed })}
+            </p>
+          )}
           {stages.isError && <Notice kind="error">{t('stages.loadFailed')}</Notice>}
           {stages.data && (
             <p role="status" className="text-sm text-slate-600">
@@ -192,7 +217,9 @@ export function StagesPage() {
                       : stage.itinerante
                         ? t('stages.itinerant')
                         : stage.lat === null
-                          ? t('stages.noLocation')
+                          ? proposalOf(stage.id)
+                            ? t('stages.proposal.badge')
+                            : t('stages.noLocation')
                           : t('stages.located')}
                   </span>
                 </button>
@@ -286,13 +313,40 @@ export function StagesPage() {
               {itinerant ? (
                 <Notice>{t('stages.itinerantNoLocation')}</Notice>
               ) : (
-                <LocationPicker
-                  // Un mapa por escenario: al cambiar de escenario arranca en su punto.
-                  key={String(selected)}
-                  value={draft.ubicacion}
-                  onChange={(value) => set('ubicacion', value)}
-                  searchHint={[draft.direccion, draft.barrio].filter(Boolean).join(', ')}
-                />
+                <>
+                  {proposal && (
+                    <Notice>
+                      <p className="font-medium">{t('stages.proposal.title')}</p>
+                      <p>{t('stages.proposal.searched', { query: proposal.consulta })}</p>
+                      <p>{t('stages.proposal.found', { result: proposal.resultado })}</p>
+                      <p className="text-slate-600">{t('stages.proposal.hint')}</p>
+                      <div className="mt-2 flex flex-wrap gap-2">
+                        <Button
+                          type="button"
+                          variant="secondary"
+                          onClick={() => set('ubicacion', { lat: proposal.lat, lng: proposal.lng })}
+                        >
+                          {t('stages.proposal.show')}
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="secondary"
+                          disabled={discard.isPending}
+                          onClick={() => discard.mutate(proposal.escenario_id)}
+                        >
+                          {t('stages.proposal.discard')}
+                        </Button>
+                      </div>
+                    </Notice>
+                  )}
+                  <LocationPicker
+                    // Un mapa por escenario: al cambiar de escenario arranca en su punto.
+                    key={String(selected)}
+                    value={draft.ubicacion}
+                    onChange={(value) => set('ubicacion', value)}
+                    searchHint={[draft.direccion, draft.barrio].filter(Boolean).join(', ')}
+                  />
+                </>
               )}
             </fieldset>
 
