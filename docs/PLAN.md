@@ -232,6 +232,14 @@ La app vale lo que vale su grilla: cada actuación guarda de dónde salió y la 
 - Un LLM extrae conjunto, escenario, fecha y hora, y guarda un borrador en `borradores_ingesta`.
 - Aprobación o descarte manual desde el admin.
 
+Listo cuando (agregado el 2026-11-12; el plan no lo traía):
+
+- Desde el texto de la cartelera del 28/02/2026, una noche entera queda cargada y publicada en menos de 5 minutos, con los nombres resueltos. Reimportarla no cambia nada.
+- Suspender la noche manda un solo aviso por dispositivo y la app la muestra suspendida.
+- Se pueden cargar las coordenadas de un escenario desde el mapa, y el escenario aparece en «cerca mío».
+- Un usuario que no es admin no puede escribir nada.
+- El proyecto remoto tiene las migraciones, el seed, las funciones programadas y la auth anónima, y el panel está publicado.
+
 ## Fase 8 · QA, beta y publicación (14 dic – 20 ene)
 
 La fecha que no se mueve: enviar a revisión de Apple y Google antes del 5 de enero, para tener dos semanas de margen antes del Inaugural.
