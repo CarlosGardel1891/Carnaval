@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router'
 import { Constants } from '@cuerda/shared'
@@ -108,13 +108,25 @@ export function TodayPage() {
   )
   // «Ver todo»: pasa a la lista por hora y baja hasta la hora actual.
   const [jump, setJump] = useState(0)
+  const jumpPending = useRef(false)
   const seeAll = useCallback(() => {
+    jumpPending.current = true
     update({ view: 'time' })
     setJump((n) => n + 1)
   }, [update])
   useEffect(() => {
-    if (jump === 0 || filters.view !== 'time') return
-    document.getElementById(NOW_ANCHOR_ID)?.scrollIntoView?.({ behavior: 'smooth', block: 'start' })
+    if (!jumpPending.current || filters.view !== 'time') return
+    jumpPending.current = false
+    const row = document.getElementById(NOW_ANCHOR_ID)
+    if (!row?.scrollIntoView) return
+    row.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    // Hay WebViews que ignoran el scroll suave: si no se movió, va de un salto.
+    const top = row.getBoundingClientRect().top
+    const timer = setTimeout(() => {
+      if (Math.abs(row.getBoundingClientRect().top - top) < 2)
+        row.scrollIntoView({ block: 'start' })
+    }, 350)
+    return () => clearTimeout(timer)
   }, [jump, filters.view])
 
   const title = isTonight ? t('today.title') : t('today.otherNight')

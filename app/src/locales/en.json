@@ -436,7 +436,19 @@
     "retry": "Back to start"
   },
   "search": {
-    "placeholder": "Search groups or stages"
+    "placeholder": "Search groups or stages",
+    "title": "Search",
+    "clear": "Clear search",
+    "hintTitle": "What are you looking for?",
+    "hint": "Type the name of a group or a stage.",
+    "groups": "Groups",
+    "stages": "Stages",
+    "noResultsTitle": "No results",
+    "noResults": "We couldn't find any groups or stages matching “{{text}}”. Try another name.",
+    "loading": "Loading…",
+    "error": "We couldn't load the search.",
+    "count_one": "{{count}} result",
+    "count_other": "{{count}} results"
   },
   "pull": {
     "pull": "Pull to refresh",

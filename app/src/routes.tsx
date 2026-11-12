@@ -14,6 +14,7 @@ import { LlamadasLayout } from './features/llamadas/LlamadasLayout'
 import { OrderView } from './features/llamadas/OrderView'
 import { RouteView } from './features/llamadas/RouteView'
 import { LazyMapPage } from './features/map/LazyMapPage'
+import { SearchPage } from './features/search/SearchPage'
 import { StagePage } from './features/stages/StagePage'
 import { TodayPage } from './features/today/TodayPage'
 import { simulationAllowed } from './lib/clock'
@@ -35,6 +36,7 @@ export const routes: RouteObject[] = [
     errorElement: <RouteErrorScreen />,
     children: [
       { index: true, element: <TodayPage /> },
+      { path: 'buscar', element: <SearchPage /> },
       { path: 'mapa', element: <LazyMapPage /> },
       { path: 'acerca', element: <AboutPage /> },
       { path: 'escenarios/:slug', element: <StagePage /> },

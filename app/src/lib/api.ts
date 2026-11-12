@@ -508,6 +508,31 @@ export async function registerPushDevice(
 
 // ---------------------------------------------------------------- escenarios
 
+/** Un escenario del catálogo, con lo que hace falta para buscarlo. */
+export interface StageEntry {
+  id: number
+  slug: string
+  nombre: string
+  tipo: Tables<'escenarios'>['tipo']
+  barrio: string | null
+  /** Nombre y alias pasados por `norm` en la base: contra esto se busca. */
+  claves: string[]
+}
+
+/** Los escenarios activos, por nombre, para el buscador. */
+export async function fetchStages(): Promise<StageEntry[]> {
+  const { data, error } = await supabase
+    .from('escenarios')
+    .select('id, slug, nombre, tipo, barrio, nombre_norm, alias_norm')
+    .eq('activo', true)
+    .order('nombre_norm')
+  if (error) throw error
+  return data.map(({ nombre_norm, alias_norm, ...stage }) => ({
+    ...stage,
+    claves: [nombre_norm, ...(alias_norm ?? [])].filter((key): key is string => Boolean(key)),
+  }))
+}
+
 /** Un escenario por su slug, o null si no existe. */
 export async function fetchStage(slug: string): Promise<Stage | null> {
   const { data, error } = await supabase

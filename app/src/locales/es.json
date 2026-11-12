@@ -436,7 +436,19 @@
     "retry": "Volver al inicio"
   },
   "search": {
-    "placeholder": "Buscar conjunto o escenario"
+    "placeholder": "Buscar conjunto o escenario",
+    "title": "Buscar",
+    "clear": "Borrar la búsqueda",
+    "hintTitle": "¿Qué estás buscando?",
+    "hint": "Escribí el nombre de un conjunto o de un escenario.",
+    "groups": "Conjuntos",
+    "stages": "Escenarios",
+    "noResultsTitle": "Sin resultados",
+    "noResults": "No encontramos conjuntos ni escenarios con «{{text}}». Probá con otro nombre.",
+    "loading": "Cargando…",
+    "error": "No pudimos cargar la búsqueda.",
+    "count_one": "{{count}} resultado",
+    "count_other": "{{count}} resultados"
   },
   "pull": {
     "pull": "Tirá para actualizar",

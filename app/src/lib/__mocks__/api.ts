@@ -12,6 +12,7 @@ export const MONTEVIDEO_CENTER: typeof Api.MONTEVIDEO_CENTER = { lat: -34.9058, 
 export const fetchCurrentSeason = vi.fn<typeof Api.fetchCurrentSeason>(() => Promise.resolve(null))
 export const fetchNightActs = vi.fn<typeof Api.fetchNightActs>(() => Promise.resolve([]))
 export const fetchLocatedStages = vi.fn<typeof Api.fetchLocatedStages>(() => Promise.resolve([]))
+export const fetchStages = vi.fn<typeof Api.fetchStages>(() => Promise.resolve([]))
 export const fetchStage = vi.fn<typeof Api.fetchStage>(() => Promise.resolve(null))
 export const fetchGroups = vi.fn<typeof Api.fetchGroups>(() => Promise.resolve([]))
 export const fetchGroup = vi.fn<typeof Api.fetchGroup>(() => Promise.resolve(null))

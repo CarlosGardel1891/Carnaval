@@ -62,8 +62,11 @@ export function AppLayout() {
         </ScrollProvider>
       </div>
       {/* Avisos de desarrollo y de la beta: píldoras chicas arriba, que no empujan nada. */}
-      <div className="pointer-events-none fixed inset-x-0 top-[calc(var(--safe-top)+0.5rem)] z-50 flex flex-col items-center gap-1 px-16">
+      {/* El del reloj va abajo, sobre la barra: arriba taparía la marca o el buscador. */}
+      <div className="pointer-events-none fixed inset-x-0 bottom-[calc(var(--tabbar-space)+0.25rem)] z-50 flex justify-center px-6">
         <SimulatedClock />
+      </div>
+      <div className="pointer-events-none fixed inset-x-0 top-[calc(var(--safe-top)+0.5rem)] z-50 flex flex-col items-center gap-1 px-16">
         {DemoBanner && (
           <Suspense fallback={null}>
             <DemoBanner />
