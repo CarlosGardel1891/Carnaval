@@ -6,7 +6,8 @@ Antes de generar corre research/validate.py: si hay errores, no escribe nada.
 El SQL se puede correr más de una vez: inserta o actualiza por slug, y sólo toca las
 columnas que salen de los CSV (no pisa bio, foto, ubicación, recorrido ni la venta de
 entradas). La `info` de un evento sale del calendario cuando la trae; si el CSV la deja vacía,
-se conserva la que haya en la base.
+se conserva la que haya en la base. Los alias de conjuntos y escenarios se unen con los que ya
+haya: uno agregado desde el panel no se pierde, y uno que se saca del CSV no se borra solo.
 
 Participación en la temporada (`conjunto_temporada`): sólo para las filas respaldadas por
 una lista oficial de esa temporada (`temporada_lista` igual al año). Las demás quedan en el
@@ -118,7 +119,14 @@ from (values
 ) as v (slug, nombre, alias, categoria, barrio, instagram, facebook, verificado, fuente_url)
 on conflict (slug) do update set
   nombre = excluded.nombre,
-  alias = excluded.alias,
+  -- Los alias se unen: los que ya hay en la base (por ejemplo, agregados desde el panel) se
+  -- conservan y se suman los del CSV que falten (decisión 75).
+  alias = conjuntos.alias || array(
+    select a.alias
+    from unnest(excluded.alias) with ordinality as a (alias, n)
+    where public.norm(a.alias) <> all (conjuntos.alias_norm)
+    order by a.n
+  ),
   categoria = excluded.categoria,
   barrio = excluded.barrio,
   instagram = excluded.instagram,
@@ -198,7 +206,14 @@ from (values
 ) as v (slug, nombre, alias, tipo, direccion, barrio, precio_texto, gratis, activo, itinerante, fuente_url)
 on conflict (slug) do update set
   nombre = excluded.nombre,
-  alias = excluded.alias,
+  -- Los alias se unen: los que ya hay en la base (por ejemplo, agregados desde el panel) se
+  -- conservan y se suman los del CSV que falten (decisión 75).
+  alias = escenarios.alias || array(
+    select a.alias
+    from unnest(excluded.alias) with ordinality as a (alias, n)
+    where public.norm(a.alias) <> all (escenarios.alias_norm)
+    order by a.n
+  ),
   tipo = excluded.tipo,
   direccion = excluded.direccion,
   barrio = excluded.barrio,

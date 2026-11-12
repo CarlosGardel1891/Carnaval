@@ -134,7 +134,14 @@ from (values
 ) as v (slug, nombre, alias, categoria, barrio, instagram, facebook, verificado, fuente_url)
 on conflict (slug) do update set
   nombre = excluded.nombre,
-  alias = excluded.alias,
+  -- Los alias se unen: los que ya hay en la base (por ejemplo, agregados desde el panel) se
+  -- conservan y se suman los del CSV que falten (decisión 75).
+  alias = conjuntos.alias || array(
+    select a.alias
+    from unnest(excluded.alias) with ordinality as a (alias, n)
+    where public.norm(a.alias) <> all (conjuntos.alias_norm)
+    order by a.n
+  ),
   categoria = excluded.categoria,
   barrio = excluded.barrio,
   instagram = excluded.instagram,
@@ -327,7 +334,14 @@ from (values
 ) as v (slug, nombre, alias, tipo, direccion, barrio, precio_texto, gratis, activo, itinerante, fuente_url)
 on conflict (slug) do update set
   nombre = excluded.nombre,
-  alias = excluded.alias,
+  -- Los alias se unen: los que ya hay en la base (por ejemplo, agregados desde el panel) se
+  -- conservan y se suman los del CSV que falten (decisión 75).
+  alias = escenarios.alias || array(
+    select a.alias
+    from unnest(excluded.alias) with ordinality as a (alias, n)
+    where public.norm(a.alias) <> all (escenarios.alias_norm)
+    order by a.n
+  ),
   tipo = excluded.tipo,
   direccion = excluded.direccion,
   barrio = excluded.barrio,

@@ -260,7 +260,8 @@ describe('seed: se puede volver a correr', () => {
           .eq('slug', eventoConInfo.slug!)
           .select(),
       )
-      // Lo que sí sale de los CSV: el seed lo vuelve a dejar como estaba.
+      // Lo que sí sale de los CSV: el seed lo vuelve a dejar como estaba. Los alias no se
+      // pisan: se unen con los que haya en la base (decisión 75).
       ok(
         await service
           .from('conjuntos')
@@ -295,7 +296,18 @@ describe('seed: se puede volver a correr', () => {
             .eq('slug', sinLista.slug!)
             .single(),
         ),
-      ).toEqual({ nombre: sinLista.nombre, alias: list(sinLista.alias!, '|') })
+      ).toEqual({
+        nombre: sinLista.nombre,
+        alias: ['Zz Alias Cambiado', ...list(sinLista.alias!, '|')],
+      })
+      // El alias de prueba no queda en el catálogo.
+      ok(
+        await service
+          .from('conjuntos')
+          .update({ alias: list(sinLista.alias!, '|') })
+          .eq('slug', sinLista.slug!)
+          .select(),
+      )
       expect(
         ok(await anonClient().rpc('buscar_por_nombre', { p_texto: 'Zz Nombre Cambiado' })),
       ).toEqual([])
