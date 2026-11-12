@@ -2,7 +2,8 @@
 
 - app/assets/splash.png y splash-dark.png: la pantalla de inicio, con el logo al centro
   sobre el color de fondo de la app (`--color-ground` en app/src/index.css). La app tiene un
-  solo tema, oscuro, así que las dos son iguales.
+  solo diseño, claro (decisión 92), así que las dos son iguales: con el teléfono en modo oscuro
+  la pantalla de inicio también es clara.
 - app/public/favicon.png y admin/public/favicon.png: el favicon de la web de desarrollo y
   del panel de carga.
 
@@ -23,11 +24,11 @@ ROOT = Path(__file__).resolve().parent.parent
 ASSETS = ROOT / "app" / "assets"
 
 # El mismo color que `--color-ground`, `GROUND` (capacitor.config.ts) y `ground` (colors.xml).
-GROUND = (0x0A, 0x0F, 0x1C)
+GROUND = (0xF4, 0xF6, 0xFB)
 SPLASH_SIZE = 2732
 # El logo ocupa el 30 % del lado: entra entero en un teléfono vertical, que recorta los costados.
 LOGO_SIZE = 820
-# Esquinas redondeadas, para que el cuadrado no corte contra el fondo oscuro.
+# Esquinas redondeadas, para que el cuadrado no corte contra el fondo.
 CORNER_RADIUS = round(LOGO_SIZE * 0.2)
 FAVICON_SIZE = 192
 
