@@ -164,7 +164,19 @@ En el emulador Android, la app reescribe `127.0.0.1`/`localhost` a `10.0.2.2` pa
 - **La ubicación no sale del teléfono** (decisión 90): `useNightActs` recibe la posición y calcula ahí las distancias (`withDistances`, `lib/distance.ts`); ni `fetchNightActs` ni ninguna otra función de `api.ts` la reciben. No sumar parámetros de posición a una función de la base.
 - Toda distancia que se muestra pasa por `useDistanceLabel` (`features/location/`): con una ubicación aproximada va redondeada al kilómetro (decisión 42).
 - «App al frente», refresco al volver y botón «atrás» de Android: `app/src/lib/lifecycle.ts` (decisiones 32 y 33).
-- El color de fondo está en tres lugares que tienen que coincidir: `--color-ground` (`app/src/index.css`), `GROUND` (`app/capacitor.config.ts`) y `ground` (`app/android/app/src/main/res/values/colors.xml`, lo que se ve detrás de las barras del sistema; decisión 41).
+- El color de fondo (`#f4f6fb`) está en tres lugares que tienen que coincidir: `--color-ground` (`app/src/index.css`), `GROUND` (`app/capacitor.config.ts`) y `ground` (`app/android/app/src/main/res/values/colors.xml`, lo que se ve detrás de las barras del sistema; decisión 41).
+
+### Diseño
+
+Decisión 92: un único diseño, claro, que se ve igual con el teléfono en modo claro o en modo oscuro. La guía es `docs/diseno/referencia.png`; las capturas de antes y de después están en `docs/diseno/`.
+
+- **El sistema está en `app/src/index.css`:** los colores (`ground`, `surface`, `ink`, `soft`, `brand`, `sun`, `amber`, `danger`, `ok` y sus versiones suaves), la tipografía (Plus Jakarta Sans, dentro de la app, sólo el subconjunto latino), las sombras y el degradé de los encabezados (`.brand-gradient`). Todo lo que se toca va en `brand`. No usar colores sueltos en las pantallas: si falta uno, se suma ahí.
+- **Las piezas, en `app/src/components/ui/`:** `primitives.tsx` (tarjeta, encabezado de sección, segmentado, chip de filtro, píldoras, avatar, cuadradito de fecha, botones, fila, estado vacío), `TabHeader.tsx` (el encabezado con degradé de cada pestaña), `icons.tsx` (un solo juego de íconos), `illustrations.tsx` (las de los estados vacíos) y `scroll.tsx` (el título que se achica y tirar para actualizar). `/muestra` las tiene todas juntas; sólo existe en desarrollo y se llega desde «Acerca de».
+- **Un color por categoría** (`lib/category.ts` y los `--cat-…` de `index.css`): cuatro tonos de cada una, escritos a mano. `category.test.ts` controla que cada categoría de la base tenga los suyos y que la píldora tenga contraste AA. El color nunca va solo: siempre con el nombre de la categoría. Los `--cat-…` no van en `@theme`: Tailwind sólo emite las variables que usa alguna clase.
+- **Siempre claro:** `color-scheme: only light` en la web, `UIUserInterfaceStyle = Light` en `Info.plist`, tema `Theme.AppCompat.Light.NoActionBar` con `forceDarkAllowed = false` en `styles.xml` y el oscurecimiento del WebView apagado en `MainActivity`.
+- **Barras del sistema:** cada pantalla dice qué tiene arriba con `useSystemBars` (`lib/systemBars.ts`): íconos blancos sobre el degradé y oscuros sobre fondo claro. `TabHeader` ya lo hace. Los márgenes seguros salen de `--safe-top` y `--safe-bottom`, nunca de `env()` directo: en Android los inyecta Capacitor. En un WebView viejo la app no se dibuja debajo de la barra de estado, y ahí los íconos quedan oscuros sobre el fondo claro.
+- **La barra de pestañas flota** sobre el contenido: el contenedor que scrollea deja libre `--tabbar-space` abajo. Una pantalla con algo fijo abajo tiene que contar ese espacio.
+- Los tests buscan por rol y por texto, no por clases: al rediseñar una pantalla, conservar los roles, los nombres accesibles y los textos. Una fila entera que se toca lleva el enlace en el nombre, con `after:absolute after:inset-0`.
 
 ### Simular la fecha
 
@@ -327,6 +339,7 @@ El ícono de los avisos de Android es `app/android/app/src/main/res/drawable/ic_
 
 ## Reglas
 
+- Un único diseño, claro (decisión 92): sin variantes oscuras ni `dark:`; los colores salen de `app/src/index.css`.
 - Zona horaria siempre `America/Montevideo`, nunca la del dispositivo: usar las funciones de `@cuerda/shared`. Una actuación antes de las 06:00 es de la noche anterior.
 - Tablas y columnas en español snake_case; código en inglés; commits en español.
 - Nada de texto hardcodeado en la UI: todo por i18n (`src/locales/{es,en}.json`, mismas claves; hay un test que lo controla). El panel también, pero sólo en español (decisión 70).

@@ -1,4 +1,5 @@
 import { useMemo } from 'react'
+import { Card } from '../../components/ui/primitives'
 import type { Act } from '../../lib/api'
 import { ActRow } from './ActRow'
 import { groupByStage, sortByDistance, sortByFirstStart } from './board'
@@ -13,7 +14,7 @@ interface NightBoardProps {
   byDistance?: boolean
 }
 
-/** El pizarrón de la noche: por escenario o, en una sola lista, por hora. */
+/** El pizarrón de la noche: una tarjeta por escenario o, en una sola lista, por hora. */
 export function NightBoard({ acts, onStage, view = 'stage', byDistance = false }: NightBoardProps) {
   const groups = useMemo(() => {
     const grouped = groupByStage(acts)
@@ -22,17 +23,19 @@ export function NightBoard({ acts, onStage, view = 'stage', byDistance = false }
 
   if (view === 'time') {
     return (
-      <ul className="bg-surface border-line divide-line divide-y rounded-2xl border px-4">
-        {acts.map((act) => (
-          <ActRow
-            key={act.actuacion_id}
-            act={act}
-            onStage={onStage.has(act.actuacion_id)}
-            showStage
-            showDistance={byDistance}
-          />
-        ))}
-      </ul>
+      <Card>
+        <ul className="divide-line divide-y">
+          {acts.map((act) => (
+            <ActRow
+              key={act.actuacion_id}
+              act={act}
+              onStage={onStage.has(act.actuacion_id)}
+              showStage
+              showDistance={byDistance}
+            />
+          ))}
+        </ul>
+      </Card>
     )
   }
 

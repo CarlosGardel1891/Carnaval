@@ -13,8 +13,10 @@ export function SeasonCard({ season }: SeasonCardProps) {
   const fmt = (d: string) => formatIsoDate(d, locale)
 
   return (
-    <section className="bg-surface border-line rounded-2xl border p-4">
-      <h2 className="text-xl font-semibold">{t('season.title', { year: season.anio })}</h2>
+    <section className="bg-surface shadow-card rounded-[1.375rem] p-4">
+      <h2 className="text-[1.1875rem] font-extrabold tracking-tight">
+        {t('season.title', { year: season.anio })}
+      </h2>
       <p className="text-soft">
         {t('season.dates', { start: fmt(season.fecha_inicio), end: fmt(season.fecha_fin) })}
       </p>

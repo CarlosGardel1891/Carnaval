@@ -18,9 +18,12 @@ const season = {
   modo_llamadas_hasta: '2027-02-06',
 }
 
-/** La fila (li) de un conjunto. */
+/** El pizarrón: la grilla de la noche, sin el resumen ni el carrusel de arriba. */
+const board = () => within(screen.getByRole('region', { name: i18n.t('today.board') }))
+
+/** La fila (li) de un conjunto en el pizarrón. */
 function rowOf(name: string): HTMLElement {
-  const row = screen.getByText(name).closest('li')
+  const row = board().getByText(name).closest('li')
   if (!row) throw new Error(`No hay fila para ${name}`)
   return row
 }
@@ -57,15 +60,21 @@ describe('pizarrón Hoy', () => {
     })
     expect(screen.getByText('jueves, 28 de enero')).toBeInTheDocument()
     expect(
-      screen.getAllByRole('heading', { level: 2 }).map((heading) => heading.textContent),
+      board()
+        .getAllByRole('heading', { level: 2 })
+        .map((heading) => heading.textContent),
     ).toEqual(['Escenario Prado', 'Tablado Centro', 'Escenario Móvil', 'Club Unión'])
     expect(
       within(centro)
         .getAllByRole('listitem')
         .map((row) => row.querySelector('time')?.textContent),
     ).toEqual(['20:30', '23:45', '00:40'])
-    expect(within(centro).getByText('Tablado privado · Centro · $ 300')).toBeInTheDocument()
-    expect(screen.getByText('Escenario popular · Prado · Gratis')).toBeInTheDocument()
+    // El tipo y el barrio van debajo del nombre; el precio, en su píldora.
+    expect(within(centro).getByText('Tablado privado · Centro')).toBeInTheDocument()
+    expect(within(centro).getByText('$ 300')).toBeInTheDocument()
+    const prado = within(screen.getByRole('region', { name: 'Escenario Prado' }))
+    expect(prado.getByText('Escenario popular · Prado')).toBeInTheDocument()
+    expect(prado.getByText('Gratis')).toBeInTheDocument()
   })
 
   it('a las 02:00 pide y muestra la noche anterior', async () => {
@@ -100,7 +109,7 @@ describe('pizarrón Hoy', () => {
     for (const name of ['Agarrate Catalina', 'C 1080', 'Los Patos Cabreros', 'Zíngaros']) {
       expect(within(rowOf(name)).getByText('Ahora en escena')).toBeInTheDocument()
     }
-    expect(screen.getAllByText('Ahora en escena')).toHaveLength(4)
+    expect(board().getAllByText('Ahora en escena')).toHaveLength(4)
   })
 
   it('la parada de un itinerante sale en cada actuación', async () => {
@@ -189,7 +198,7 @@ describe('pizarrón Hoy', () => {
     renderApp('/')
     const centro = await screen.findByRole('region', { name: 'Tablado Centro' })
     expect(within(rowOf('La Nueva Milonga')).getByText('Cancelled')).toBeInTheDocument()
-    expect(screen.getAllByText('On stage now')).toHaveLength(4)
+    expect(board().getAllByText('On stage now')).toHaveLength(4)
     expect(within(centro).getAllByRole('listitem')[0]?.querySelector('time')?.textContent).toMatch(
       /^8:30\sPM$/,
     )

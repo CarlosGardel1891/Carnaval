@@ -307,7 +307,17 @@
     "emptyNight": "Todavía no hay actuaciones cargadas para esta noche.",
     "beforeSeason": "El Carnaval {{year}} arranca el {{date}}.",
     "offSeason": "Esta noche no hay actuaciones.",
-    "onStage": "Ahora en escena"
+    "onStage": "Ahora en escena",
+    "now": "Ahora",
+    "summary": {
+      "acts_one": "actuación",
+      "acts_other": "actuaciones",
+      "stages_one": "escenario",
+      "stages_other": "escenarios",
+      "onStage_one": "en escena",
+      "onStage_other": "en escena"
+    },
+    "board": "Grilla de la noche"
   },
   "stage": {
     "title": "Escenario",
@@ -424,14 +434,15 @@
     "body": "Esta pantalla no se pudo mostrar. Ya quedó anotado para arreglarlo. Probá volver al inicio.",
     "retry": "Volver al inicio"
   },
+  "search": {
+    "placeholder": "Buscar conjunto o escenario"
+  },
+  "pull": {
+    "pull": "Tirá para actualizar",
+    "release": "Soltá para actualizar"
+  },
   "dev": {
     "simulatedClock": "Reloj simulado: {{date}}, {{time}}",
-    "look": {
-      "label": "Diseño",
-      "actual": "Actual",
-      "clara": "Clara",
-      "tablado": "Tablado",
-      "festiva": "Festiva"
-    }
+    "sample": "Muestra del diseño"
   }
 }

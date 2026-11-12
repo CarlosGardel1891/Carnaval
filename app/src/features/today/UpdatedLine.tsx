@@ -21,9 +21,9 @@ export function UpdatedLine({ updatedAt, now, isFetching, failed, onRefresh }: U
   const ago = formatAgo(now.getTime() - clockOffsetMs() - updatedAt, locale)
 
   return (
-    <div>
-      <div className="flex items-center justify-between gap-3">
-        <p className="text-soft">
+    <div className="pt-1 pb-1">
+      <div className="flex items-center justify-between gap-3 px-1">
+        <p className="text-soft text-[0.8125rem] font-semibold">
           {isFetching
             ? t('today.updating')
             : ago
@@ -32,7 +32,7 @@ export function UpdatedLine({ updatedAt, now, isFetching, failed, onRefresh }: U
         </p>
         <button
           type="button"
-          className="text-accent min-h-12 shrink-0 px-2 font-semibold"
+          className="text-accent -mr-1 inline-flex min-h-11 shrink-0 items-center gap-1.5 px-1 text-[0.8125rem] font-bold disabled:opacity-60"
           disabled={isFetching}
           onClick={onRefresh}
         >
@@ -40,7 +40,10 @@ export function UpdatedLine({ updatedAt, now, isFetching, failed, onRefresh }: U
         </button>
       </div>
       {failed && !isFetching && (
-        <p role="alert" className="text-danger pb-2">
+        <p
+          role="alert"
+          className="bg-danger-soft text-danger mb-2 rounded-2xl px-4 py-2.5 text-sm font-semibold"
+        >
           {t('today.refreshError')}
         </p>
       )}

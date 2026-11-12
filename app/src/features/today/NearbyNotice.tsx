@@ -20,21 +20,27 @@ export function NearbyNotice({ status, approximate, hiddenStages, onRetry }: Nea
 
   if (status === 'locating') {
     return (
-      <p role="status" className="text-soft pb-3">
+      <p role="status" className="text-soft px-1 pb-3 text-sm font-semibold">
         {t('nearby.locating')}
       </p>
     )
   }
   if (status === 'denied') {
     return (
-      <p role="alert" className="border-line bg-surface mb-3 rounded-xl border p-3">
+      <p
+        role="alert"
+        className="bg-amber-soft text-amber mb-4 rounded-2xl px-4 py-3 text-[0.9375rem] font-semibold"
+      >
         {t('nearby.denied')}
       </p>
     )
   }
   if (status === 'unavailable') {
     return (
-      <div role="alert" className="border-line bg-surface mb-3 space-y-3 rounded-xl border p-3">
+      <div
+        role="alert"
+        className="bg-amber-soft text-amber mb-4 space-y-3 rounded-2xl px-4 py-3 text-[0.9375rem] font-semibold"
+      >
         <p>{t('nearby.unavailable')}</p>
         <Button variant="secondary" onClick={onRetry}>
           {t('nearby.retry')}
@@ -44,7 +50,7 @@ export function NearbyNotice({ status, approximate, hiddenStages, onRetry }: Nea
   }
   if (!approximate && hiddenStages === 0) return null
   return (
-    <div className="text-soft space-y-2 pb-3">
+    <div className="text-soft space-y-1.5 px-1 pb-3 text-sm">
       {approximate && <p>{t('nearby.approximate')}</p>}
       {hiddenStages > 0 && <p>{t('nearby.hidden', { count: hiddenStages })}</p>}
     </div>

@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import type { CategoriaConjunto } from '@cuerda/shared'
-import { Chip } from '../../components/Chip'
+import { HeartIcon, NearIcon } from '../../components/ui/icons'
+import { FilterChip, Segmented } from '../../components/ui/primitives'
 import type { BoardFilters, BoardView } from './useBoardFilters'
 
 interface FilterBarProps {
@@ -16,6 +17,7 @@ interface FilterBarProps {
   onView: (view: BoardView) => void
 }
 
+/** Los filtros, en un carrusel de chips, y la vista, en un control segmentado. */
 export function FilterBar({
   filters,
   categories,
@@ -29,39 +31,50 @@ export function FilterBar({
   const { t } = useTranslation()
 
   return (
-    <div className="space-y-2 pb-3">
+    <div className="space-y-3 pb-4">
       <div
         role="group"
         aria-label={t('filters.label')}
-        className="-mx-4 flex gap-2 overflow-x-auto px-4 py-1"
+        className="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4 py-1"
       >
-        <Chip pressed={filters.nearby} disabled={locating} onClick={onToggleNearby}>
+        <FilterChip
+          pressed={filters.nearby}
+          disabled={locating}
+          onClick={onToggleNearby}
+          icon={<NearIcon className="size-4" />}
+        >
           {t('nearby.label')}
-        </Chip>
-        <Chip pressed={filters.onlyFree} onClick={onToggleFree}>
+        </FilterChip>
+        <FilterChip pressed={filters.onlyFree} onClick={onToggleFree}>
           {t('filters.free')}
-        </Chip>
-        <Chip pressed={filters.mine} onClick={onToggleMine}>
+        </FilterChip>
+        <FilterChip
+          pressed={filters.mine}
+          onClick={onToggleMine}
+          icon={<HeartIcon className="size-4" filled={filters.mine} />}
+        >
           {t('filters.mine')}
-        </Chip>
+        </FilterChip>
         {categories.map((category) => (
-          <Chip
+          <FilterChip
             key={category}
+            category={category}
             pressed={filters.categories.includes(category)}
             onClick={() => onToggleCategory(category)}
           >
             {t(`category.${category}`)}
-          </Chip>
+          </FilterChip>
         ))}
       </div>
-      <div role="group" aria-label={t('filters.view')} className="flex gap-2">
-        <Chip pressed={filters.view === 'stage'} onClick={() => onView('stage')}>
-          {t('filters.byStage')}
-        </Chip>
-        <Chip pressed={filters.view === 'time'} onClick={() => onView('time')}>
-          {t('filters.byTime')}
-        </Chip>
-      </div>
+      <Segmented
+        label={t('filters.view')}
+        value={filters.view}
+        onChange={onView}
+        options={[
+          { value: 'stage', label: t('filters.byStage') },
+          { value: 'time', label: t('filters.byTime') },
+        ]}
+      />
     </div>
   )
 }

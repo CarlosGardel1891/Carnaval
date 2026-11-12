@@ -307,7 +307,17 @@
     "emptyNight": "There are no shows listed for this night yet.",
     "beforeSeason": "Carnival {{year}} starts on {{date}}.",
     "offSeason": "There are no shows tonight.",
-    "onStage": "On stage now"
+    "onStage": "On stage now",
+    "now": "Now",
+    "summary": {
+      "acts_one": "performance",
+      "acts_other": "performances",
+      "stages_one": "stage",
+      "stages_other": "stages",
+      "onStage_one": "on stage",
+      "onStage_other": "on stage"
+    },
+    "board": "Lineup"
   },
   "stage": {
     "title": "Stage",
@@ -424,14 +434,15 @@
     "body": "This screen couldn't be shown. It has been logged so we can fix it. Try going back to the start.",
     "retry": "Back to start"
   },
+  "search": {
+    "placeholder": "Search groups or stages"
+  },
+  "pull": {
+    "pull": "Pull to refresh",
+    "release": "Release to refresh"
+  },
   "dev": {
     "simulatedClock": "Simulated clock: {{date}}, {{time}}",
-    "look": {
-      "label": "Design",
-      "actual": "Current",
-      "clara": "Light",
-      "tablado": "Tablado",
-      "festiva": "Festive"
-    }
+    "sample": "Design sample"
   }
 }

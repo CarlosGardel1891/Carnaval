@@ -3,8 +3,11 @@ import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router'
 import { Constants } from '@cuerda/shared'
 import { Button } from '../../components/Button'
-import { LookPicker } from '../../design/LookPicker'
-import { useApplyLook, useLook } from '../../design/looks'
+import { ChevronLeftIcon, SearchIcon } from '../../components/ui/icons'
+import { EmptySearchArt, OfflineArt } from '../../components/ui/illustrations'
+import { EmptyState, PrimaryButton } from '../../components/ui/primitives'
+import { CompactTitle, PullToRefresh } from '../../components/ui/scroll'
+import { TabHeader } from '../../components/ui/TabHeader'
 import { formatNight } from '../../lib/format'
 import { useLocale } from '../../lib/useLocale'
 import { useFollowed } from '../follow/useFollow'
@@ -17,11 +20,11 @@ import {
   onStageNow,
 } from './board'
 import { EmptyMine } from './EmptyMine'
-import { FreshBoard, FreshFilters, FreshHeader } from './fresh/FreshToday'
 import { EmptyNight } from './EmptyNight'
 import { FilterBar } from './FilterBar'
 import { NearbyNotice } from './NearbyNotice'
 import { NightBoard } from './NightBoard'
+import { NightSummary, NowOnStage } from './Overview'
 import { UpdatedLine } from './UpdatedLine'
 import { useBoardFilters } from './useBoardFilters'
 import { useNightActs } from './useNightActs'
@@ -33,9 +36,6 @@ const NOBODY: ReadonlySet<number> = new Set()
 export function TodayPage() {
   const { t } = useTranslation()
   const locale = useLocale()
-  // Sólo en desarrollo: una de las tres direcciones del rediseño (decisión 91).
-  const look = useLook()
-  useApplyLook(look)
   const { noche, isTonight, now } = useNoche()
   const { filters, active, update, toggleCategory, clear } = useBoardFilters()
   const { coords, approximate, status, request, restore, dismiss } = useUserLocation()
@@ -100,61 +100,61 @@ export function TodayPage() {
     )
   }, [acts, filters.categories])
 
+  const stageCount = useMemo(() => new Set((acts ?? []).map((a) => a.escenario_id)).size, [acts])
+  const liveActs = useMemo(
+    () => (acts ?? []).filter((act) => onStage.has(act.actuacion_id)),
+    [acts, onStage],
+  )
+  const title = isTonight ? t('today.title') : t('today.otherNight')
+  const hasBoard = Boolean(acts && (acts.length > 0 || active))
+
   return (
-    <main className={`mx-auto max-w-2xl pb-6 ${look ? '' : 'px-4'}`}>
-      {look ? (
-        <FreshHeader
-          noche={noche}
-          isTonight={isTonight}
-          view={filters.view}
-          onView={(view) => update({ view })}
-          showViews={Boolean(acts && (acts.length > 0 || active))}
-        />
-      ) : (
-        <header className="relative pt-4 pb-2">
+    <main className="mx-auto max-w-2xl pb-6">
+      <CompactTitle title={title} />
+      <PullToRefresh onRefresh={() => void query.refetch()} refreshing={query.isRefetching} />
+      <TabHeader title={title} subtitle={formatNight(noche, locale)} overlap={hasBoard}>
+        {!isTonight && (
           <Link
-            to="/acerca"
-            aria-label={t('about.open')}
-            className="text-soft absolute top-2 right-0 flex size-12 items-center justify-center"
+            to="/"
+            className="-mt-3 mb-3 inline-flex min-h-11 items-center gap-1 font-bold text-white"
           >
-            <svg
-              viewBox="0 0 24 24"
-              className="size-7"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.8"
-              strokeLinecap="round"
-              aria-hidden="true"
-            >
-              <circle cx="12" cy="12" r="9" />
-              <path d="M12 11v5.5M12 7.5v.5" />
-            </svg>
+            <ChevronLeftIcon className="size-5" />
+            {t('today.backToTonight')}
           </Link>
-          <p className="text-accent font-semibold tracking-wide uppercase">{t('app.name')}</p>
-          <h1 className="text-3xl font-bold">
-            {isTonight ? t('today.title') : t('today.otherNight')}
-          </h1>
-          <p className="text-soft text-lg first-letter:uppercase">{formatNight(noche, locale)}</p>
-          {!isTonight && (
-            <Link to="/" className="text-accent inline-flex min-h-12 items-center underline">
-              {t('today.backToTonight')}
-            </Link>
-          )}
-        </header>
-      )}
-      <LookPicker />
-      <div className={look ? 'px-4' : undefined}>
-        {query.isPending && <p className="text-soft py-4">{t('today.loading')}</p>}
+        )}
+        <Link
+          to="/buscar"
+          className="pressable text-soft flex min-h-13 items-center gap-3 rounded-full bg-white px-5 text-[1.0625rem] font-semibold shadow-[0_8px_24px_rgb(4_40_100/0.18)]"
+        >
+          <SearchIcon className="size-5 shrink-0" />
+          {t('search.placeholder')}
+        </Link>
+      </TabHeader>
+
+      <div className="px-4">
+        {query.isPending && <p className="text-soft py-6 text-center">{t('today.loading')}</p>}
 
         {query.isError && !acts && (
-          <div role="alert" className="space-y-3 py-4">
-            <p className="text-lg">{t('today.error')}</p>
-            <Button onClick={() => void query.refetch()}>{t('today.retry')}</Button>
+          <div role="alert">
+            <EmptyState
+              illustration={<OfflineArt />}
+              title={t('today.error')}
+              action={
+                <PrimaryButton onClick={() => void query.refetch()}>
+                  {t('today.retry')}
+                </PrimaryButton>
+              }
+            />
           </div>
         )}
 
         {acts && (
           <>
+            {hasBoard && (
+              <div className="relative z-10 -mt-11">
+                <NightSummary acts={acts.length} stages={stageCount} onStage={liveActs.length} />
+              </div>
+            )}
             <UpdatedLine
               updatedAt={query.dataUpdatedAt}
               now={now}
@@ -166,30 +166,17 @@ export function TodayPage() {
               <EmptyNight noche={noche} />
             ) : (
               <>
-                {look ? (
-                  <div className="-mx-4">
-                    <FreshFilters
-                      filters={filters}
-                      categories={categories}
-                      locating={status === 'locating'}
-                      onToggleNearby={toggleNearby}
-                      onToggleFree={() => update({ onlyFree: !filters.onlyFree })}
-                      onToggleMine={() => update({ mine: !filters.mine })}
-                      onToggleCategory={toggleCategory}
-                    />
-                  </div>
-                ) : (
-                  <FilterBar
-                    filters={filters}
-                    categories={categories}
-                    locating={status === 'locating'}
-                    onToggleNearby={toggleNearby}
-                    onToggleFree={() => update({ onlyFree: !filters.onlyFree })}
-                    onToggleMine={() => update({ mine: !filters.mine })}
-                    onToggleCategory={toggleCategory}
-                    onView={(view) => update({ view })}
-                  />
-                )}
+                <NowOnStage acts={liveActs} />
+                <FilterBar
+                  filters={filters}
+                  categories={categories}
+                  locating={status === 'locating'}
+                  onToggleNearby={toggleNearby}
+                  onToggleFree={() => update({ onlyFree: !filters.onlyFree })}
+                  onToggleMine={() => update({ mine: !filters.mine })}
+                  onToggleCategory={toggleCategory}
+                  onView={(view) => update({ view })}
+                />
                 <NearbyNotice
                   status={status}
                   approximate={byDistance && approximate}
@@ -199,30 +186,28 @@ export function TodayPage() {
                 {filters.mine && !followed.isPending && followed.ids.size === 0 ? (
                   <EmptyMine />
                 ) : visible.length === 0 ? (
-                  <div className="space-y-3 py-2">
-                    <p className="text-lg">
-                      {filters.mine
+                  <EmptyState
+                    illustration={<EmptySearchArt />}
+                    title={
+                      filters.mine
                         ? t(isTonight ? 'mine.noneTonight' : 'mine.noneThatNight')
-                        : t('filters.noResults')}
-                    </p>
-                    <Button variant="secondary" onClick={clear}>
-                      {t('filters.clear')}
-                    </Button>
-                  </div>
-                ) : look ? (
-                  <FreshBoard
-                    acts={visible}
-                    onStage={onStage}
-                    view={filters.view}
-                    byDistance={byDistance}
+                        : t('filters.noResults')
+                    }
+                    action={
+                      <Button variant="secondary" onClick={clear}>
+                        {t('filters.clear')}
+                      </Button>
+                    }
                   />
                 ) : (
-                  <NightBoard
-                    acts={visible}
-                    onStage={onStage}
-                    view={filters.view}
-                    byDistance={byDistance}
-                  />
+                  <section aria-label={t('today.board')}>
+                    <NightBoard
+                      acts={visible}
+                      onStage={onStage}
+                      view={filters.view}
+                      byDistance={byDistance}
+                    />
+                  </section>
                 )}
               </>
             )}

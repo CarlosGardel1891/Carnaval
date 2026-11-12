@@ -9,6 +9,7 @@ i18n.addResourceBundle(
   'translation',
   {
     demo: {
+      pill: 'Datos de ejemplo',
       banner:
         'Versión de prueba: mientras no hay temporada, la noche de hoy, el orden de las Llamadas y el fixture del Concurso son de ejemplo.',
     },
@@ -21,6 +22,7 @@ i18n.addResourceBundle(
   'translation',
   {
     demo: {
+      pill: 'Sample data',
       banner:
         "Test version: while the season hasn't started, tonight's lineup, the Llamadas order and the Contest schedule are sample data.",
     },
@@ -29,16 +31,20 @@ i18n.addResourceBundle(
   false,
 )
 
-/** La franja fija que avisa, en toda la app, que lo que se ve es de ejemplo. */
+/**
+ * El aviso fijo, en toda la app, de que lo que se ve es de ejemplo: una píldora chica arriba,
+ * que no empuja el contenido. El texto entero queda para los lectores de pantalla.
+ */
 export default function DemoBanner() {
   const { t } = useTranslation()
   return (
     <p
       role="note"
       data-demo={DEMO_MARKER}
-      className="bg-accent text-accent-ink px-4 py-1 text-center text-sm font-semibold"
+      aria-label={t('demo.banner')}
+      className="bg-sun text-ink shadow-float rounded-full px-3 py-1 text-xs font-extrabold tracking-wide uppercase"
     >
-      {t('demo.banner')}
+      {t('demo.pill')}
     </p>
   )
 }

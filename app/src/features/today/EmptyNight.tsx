@@ -1,3 +1,5 @@
+import { EmptyStageArt } from '../../components/ui/illustrations'
+import { EmptyState } from '../../components/ui/primitives'
 import { useTranslation } from 'react-i18next'
 import { formatIsoDate } from '../../lib/format'
 import { useLocale } from '../../lib/useLocale'
@@ -13,24 +15,25 @@ export function EmptyNight({ noche }: { noche: string }) {
   const locale = useLocale()
   const season = useCurrentSeason(noche)
 
-  if (season.isPending) return <p className="text-soft">{t('today.loading')}</p>
+  if (season.isPending) return <p className="text-soft py-6 text-center">{t('today.loading')}</p>
 
   const current = season.data
-  if (!current) return <p className="text-lg">{t('today.offSeason')}</p>
+  if (!current) return <EmptyState illustration={<EmptyStageArt />} title={t('today.offSeason')} />
 
   if (noche < current.fecha_inicio) {
     return (
-      <div className="space-y-4">
-        <p className="text-lg">
-          {t('today.beforeSeason', {
+      <div className="space-y-2">
+        <EmptyState
+          illustration={<EmptyStageArt />}
+          title={t('today.beforeSeason', {
             year: current.anio,
             date: formatIsoDate(current.fecha_inicio, locale),
           })}
-        </p>
+        />
         <SeasonCard season={current} />
       </div>
     )
   }
 
-  return <p className="text-lg">{t('today.emptyNight')}</p>
+  return <EmptyState illustration={<EmptyStageArt />} title={t('today.emptyNight')} />
 }

@@ -173,7 +173,8 @@ describe('«cerca mío»', () => {
       '23:45',
       '00:40',
     ])
-    expect(within(rows[0] as HTMLElement).getByText(/Murga · 2,5\skm/)).toBeInTheDocument()
+    expect(within(rows[0] as HTMLElement).getByText('Murga')).toBeInTheDocument()
+    expect(within(rows[0] as HTMLElement).getByText(/^2,5\skm$/)).toBeInTheDocument()
   })
 
   it('si niega el permiso, todo sigue andando sin cercanía y se le explica', async () => {

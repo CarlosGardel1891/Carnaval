@@ -1,3 +1,5 @@
+import { EmptyHeartArt } from '../../components/ui/illustrations'
+import { EmptyState } from '../../components/ui/primitives'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router'
 
@@ -5,14 +7,18 @@ import { Link } from 'react-router'
 export function EmptyMine() {
   const { t } = useTranslation()
   return (
-    <div className="space-y-3 py-2">
-      <p className="text-lg">{t('mine.none')}</p>
-      <Link
-        to="/conjuntos"
-        className="bg-accent text-accent-ink inline-flex min-h-12 items-center rounded-xl px-5 font-semibold"
-      >
-        {t('mine.browse')}
-      </Link>
-    </div>
+    <EmptyState
+      illustration={<EmptyHeartArt />}
+      action={
+        <Link
+          to="/conjuntos"
+          className="pressable bg-brand shadow-button inline-flex min-h-13 items-center rounded-2xl px-6 text-[1.0625rem] font-bold text-white"
+        >
+          {t('mine.browse')}
+        </Link>
+      }
+    >
+      <p className="text-ink text-base font-semibold">{t('mine.none')}</p>
+    </EmptyState>
   )
 }

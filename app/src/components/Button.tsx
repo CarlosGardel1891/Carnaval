@@ -5,8 +5,8 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const variants = {
-  primary: 'bg-accent text-accent-ink',
-  secondary: 'bg-raised text-ink border-line border',
+  primary: 'bg-brand text-white shadow-button',
+  secondary: 'bg-surface text-brand border-line border',
 }
 
 /** Botón de acción: 48 px de alto como mínimo, para tocarlo en la calle. */
@@ -14,7 +14,7 @@ export function Button({ variant = 'primary', className = '', ...props }: Button
   return (
     <button
       type="button"
-      className={`min-h-12 rounded-xl px-5 font-semibold ${variants[variant]} ${className}`}
+      className={`pressable min-h-12 rounded-2xl px-5 font-bold disabled:opacity-60 ${variants[variant]} ${className}`}
       {...props}
     />
   )

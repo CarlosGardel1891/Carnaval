@@ -168,8 +168,8 @@ describe('ficha de escenario', () => {
     expect(main().getByText('Escenario móvil · Itinerante')).toBeInTheDocument()
     const lineup = within(screen.getByRole('region', { name: 'Esta noche' }))
     expect(lineup.getAllByRole('listitem').map((row) => row.textContent)).toEqual([
-      '21:00Los Patos CabrerosMurga · Esquina ficticia 1',
-      '22:15Queso MagroMurga · Esquina ficticia 2',
+      '21:00Los Patos CabrerosMurgaEsquina ficticia 1',
+      '22:15Queso MagroMurgaEsquina ficticia 2',
     ])
   })
 

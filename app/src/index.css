@@ -1,38 +1,187 @@
 @import 'tailwindcss';
-@import './design/looks.css';
 
 /*
- * Un solo tema, oscuro: la app se usa de noche y en la calle. Fondo casi negro, texto
- * claro (nunca menos de 16 px) y un acento ámbar para lo que se toca o está pasando ahora.
+ * El sistema de diseño de Carnavalero (decisión 92). Un único diseño, claro: se ve igual con el
+ * teléfono en modo claro o en modo oscuro. Fondo gris azulado muy claro, tarjetas blancas, el
+ * azul del logo para todo lo que se toca y un color por categoría. La guía es
+ * docs/diseno/referencia.png.
  */
+
+/* Plus Jakarta Sans va dentro de la app, para que ande sin señal: sólo el subconjunto latino. */
+@font-face {
+  font-family: 'Plus Jakarta Sans Variable';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 200 800;
+  src: url('@fontsource-variable/plus-jakarta-sans/files/plus-jakarta-sans-latin-wght-normal.woff2')
+    format('woff2-variations');
+}
+
 @theme {
-  --color-ground: #0a0f1c;
-  --color-surface: #141b2d;
-  --color-raised: #1f2940;
-  --color-line: #334155;
-  --color-ink: #f8fafc;
-  --color-soft: #cbd5e1;
-  --color-accent: #fbbf24;
-  --color-accent-ink: #1c1304;
-  --color-danger: #fca5a5;
-  --color-ok: #86efac;
+  --font-sans:
+    'Plus Jakarta Sans Variable', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+
+  /* Superficies y texto. */
+  --color-ground: #f4f6fb;
+  --color-surface: #ffffff;
+  --color-raised: #eef2f9;
+  --color-line: #e3e8f1;
+  --color-ink: #0f172a;
+  --color-soft: #64748b;
+
+  /* La marca: el azul del logo. `accent` es lo que se toca. */
+  --color-brand: #0448a7;
+  --color-brand-mid: #2f80ed;
+  --color-brand-sky: #56ccf2;
+  --color-brand-soft: #e8f0fd;
+  --color-accent: #0448a7;
+  --color-accent-ink: #ffffff;
+
+  /* Estados. */
+  --color-sun: #ffc83d;
+  --color-sun-soft: #fff4d1;
+  --color-sun-ink: #7a4a00;
+  --color-amber: #b45309;
+  --color-amber-soft: #fef3c7;
+  --color-danger: #c81e1e;
+  --color-danger-soft: #fde8e8;
+  --color-ok: #15803d;
+  --color-ok-soft: #dcfce7;
+
+  --radius-card: 1.375rem;
+  --shadow-card: 0 1px 2px rgb(4 72 167 / 0.04), 0 10px 28px rgb(4 72 167 / 0.08);
+  --shadow-float: 0 2px 6px rgb(15 23 42 / 0.06), 0 14px 34px rgb(4 72 167 / 0.16);
+  --shadow-button: 0 6px 16px rgb(4 72 167 / 0.28);
+}
+
+:root {
+  /*
+   * Los márgenes seguros del teléfono. Capacitor inyecta `--safe-area-inset-*` en Android; en
+   * iOS y en el navegador valen los de `env()`.
+   */
+  --safe-top: var(--safe-area-inset-top, env(safe-area-inset-top, 0px));
+  --safe-bottom: var(--safe-area-inset-bottom, env(safe-area-inset-bottom, 0px));
+  /* El alto de la barra de pestañas flotante, con su margen: lo que hay que dejar libre abajo. */
+  --tabbar-space: calc(5.25rem + var(--safe-bottom));
+
+  /*
+   * Un color por categoría (decisión 92). Cuatro tonos de cada uno, escritos a mano para que
+   * anden en cualquier WebView: el color, uno más oscuro para texto chico (contraste AA sobre
+   * el suave), uno suave para el fondo de píldoras y avatares, y uno más claro para el final
+   * del degradé de la ficha. Van acá y no en `@theme` porque se usan desde `lib/category.ts`,
+   * no desde clases de Tailwind.
+   */
+  --cat-murga: #7c3aed;
+  --cat-murga-ink: #5b21b6;
+  --cat-murga-soft: #efe7fd;
+  --cat-murga-light: #a47bf5;
+  --cat-parodistas: #ea580c;
+  --cat-parodistas-ink: #ac3f06;
+  --cat-parodistas-soft: #fdebe0;
+  --cat-parodistas-light: #f79254;
+  --cat-humoristas: #16a34a;
+  --cat-humoristas-ink: #126c34;
+  --cat-humoristas-soft: #e0f4e8;
+  --cat-humoristas-light: #4cc57a;
+  --cat-revista: #db2777;
+  --cat-revista-ink: #a3185a;
+  --cat-revista-soft: #fbe4ee;
+  --cat-revista-light: #ee6ea8;
+  --cat-comparsa: #dc2626;
+  --cat-comparsa-ink: #a61b1b;
+  --cat-comparsa-soft: #fbe4e4;
+  --cat-comparsa-light: #f06a6a;
+  --cat-samba: #d97706;
+  --cat-samba-ink: #8f4e05;
+  --cat-samba-soft: #fbeeda;
+  --cat-samba-light: #f0a94a;
+  --cat-otro: #64748b;
+  --cat-otro-ink: #475569;
+  --cat-otro-soft: #eceff3;
+  --cat-otro-light: #94a3b8;
 }
 
 html {
-  color-scheme: dark;
+  /* Siempre claro, esté como esté el teléfono (decisión 92). */
+  color-scheme: only light;
   background-color: var(--color-ground);
 }
 
 body {
   background-color: var(--color-ground);
   color: var(--color-ink);
+  font-family: var(--font-sans);
   font-size: 1rem;
+  font-weight: 500;
   line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
   -webkit-tap-highlight-color: transparent;
   overscroll-behavior-y: none;
 }
 
 :focus-visible {
-  outline: 3px solid var(--color-accent);
+  outline: 3px solid var(--color-brand-mid);
   outline-offset: 2px;
+}
+
+/* ------------------------------------------------------------------ piezas del sistema */
+
+/* El degradé de los encabezados de pestaña. */
+.brand-gradient {
+  background: linear-gradient(165deg, #0448a7 0%, #1565d8 42%, #2f80ed 70%, #56ccf2 118%);
+}
+
+/* Una tarjeta que se achica apenas al tocarla. */
+.pressable {
+  transition: transform 140ms ease;
+}
+.pressable:active {
+  transform: scale(0.985);
+}
+
+/* «Ahora en escena»: un punto que late, suave. */
+.live-dot {
+  position: relative;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 999px;
+  background: var(--color-sun);
+  flex-shrink: 0;
+}
+.live-dot::after {
+  content: '';
+  position: absolute;
+  inset: -0.3rem;
+  border-radius: 999px;
+  background: var(--color-sun);
+  opacity: 0.45;
+  animation: live-pulse 1.8s ease-out infinite;
+}
+@keyframes live-pulse {
+  0% {
+    transform: scale(0.45);
+    opacity: 0.55;
+  }
+  100% {
+    transform: scale(1.25);
+    opacity: 0;
+  }
+}
+
+/* Sin barras de scroll en los carruseles. */
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Quien pidió menos movimiento en su teléfono no ve latidos ni rebotes. */
+@media (prefers-reduced-motion: reduce) {
+  .live-dot::after {
+    animation: none;
+  }
+  .pressable {
+    transition: none;
+  }
 }

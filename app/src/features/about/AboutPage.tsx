@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Button } from '../../components/Button'
+import { Link } from 'react-router'
+import { simulationAllowed } from '../../lib/clock'
 import { privacyUrl } from '../../lib/site'
 import { useDeleteMyData } from './useDeleteMyData'
 
@@ -85,6 +87,11 @@ export function AboutPage() {
       <p className="text-soft border-line border-t pt-4">
         {t('about.version', { version: __APP_VERSION__, build: __APP_BUILD__ })}
       </p>
+      {simulationAllowed(import.meta.env) && (
+        <Link to="/muestra" className="text-accent inline-flex min-h-11 items-center font-bold">
+          {t('dev.sample')}
+        </Link>
+      )}
     </main>
   )
 }
