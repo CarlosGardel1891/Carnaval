@@ -258,19 +258,60 @@ La fecha que no se mueve: enviar a revisión de Apple y Google antes del 5 de en
 
 1. Tests unitarios de la lógica de fechas: noche lógica, zona horaria, «ahora en escena», modo Llamadas por fecha, hora estimada de paso.
 2. QA en simulador y en teléfonos reales iOS y Android.
-3. Beta cerrada en TestFlight y en Google Play (prueba interna) con 20 a 30 carnavaleros, desde el 14 de diciembre.
+3. Beta cerrada en TestFlight y en Google Play con 20 a 30 carnavaleros, desde el 14 de diciembre. En Google Play es una **prueba cerrada** y arranca antes, apenas haya un build (decisión 80).
 4. Fichas de tienda: nombre, descripción en español e inglés, capturas, categoría (Viajes o Entretenimiento), política de privacidad que explique ubicación y push. Mensaje: «Qué hay de carnaval hoy, cerca tuyo y gratis. Y la guía de las Llamadas.»
 5. Envío a revisión: antes del 5 de enero.
 6. Lanzamiento público en la semana del Inaugural: Instagram de la app, conjuntos que la compartan, DAECPU si hay alianza, hostels y hoteles de Ciudad Vieja y Barrio Sur.
 
 Oportunidad: el 3 de diciembre es el Día Nacional del Candombe. Sirve para mostrar la beta o abrir una lista de espera.
 
+**Listo cuando** (del prompt de la fase, `prompts/fase-8-qa-beta-y-publicacion.md`):
+
+- Hay un build de Android en la prueba cerrada de Google Play y uno de iOS en TestFlight, los dos con el nombre y el ícono de Carnavalero.
+- La política de privacidad está publicada y enlazada desde la app y desde las fichas.
+- Desde la app se pueden borrar los datos propios.
+- Las fichas de las dos tiendas están completas en español y en inglés.
+- El plan de QA está hecho y lo que quedó abierto está anotado.
+- El manual de operación está en `docs/` y las alertas andan.
+- El envío a revisión del 5/1 tiene su lista de verificación y su calendario.
+- `docs/DECISIONES.md`, `docs/PLAN.md`, `CLAUDE.md` y `context.md` están al día.
+
+**Pasos de la fase** (decisiones 80 a 89), uno por commit: 1) decisiones y calendario; 2) versiones, modos `beta` y `produccion` y release firmado de Android; 3) función de borrar mis datos y purga de anónimos inactivos; 4) pantalla «Acerca de» con borrar mis datos y la política; 5) sitio público; 6) modo demostración; 7) reporte de errores; 8) iOS (manifest de privacidad, cifrado, textos, push y guía para la Mac); 9) fichas, gráficos, capturas y video; 10) coordenadas propuestas; 11) estado, alerta y respaldo; 12) manual de operación; 13) QA; 14) documentación final.
+
+**Calendario hasta el 5/1** (armado el 2026-11-12, con las dos cuentas de tienda ya abiertas). Las fechas de Google suponen que la cuenta tiene que hacer la prueba cerrada; si no la pide, sobra margen.
+
+| Fecha | Qué | Quién |
+| --- | --- | --- |
+| jue 12/11 | Decisiones y calendario. Juntar los Gmail de 20 testers o más y los Apple ID de los de iPhone | Código / equipo |
+| vie 13/11 | Versiones, modos de compilación y release firmado de Android, probado en el emulador | Código |
+| sáb 14/11 | Borrar mis datos en la base y en la app; pantalla «Acerca de» | Código |
+| dom 15/11 | Sitio público con la política (hace falta el mail de contacto) | Código / equipo |
+| lun 16/11 | Modo demostración | Código |
+| mar 17/11 | Reporte de errores (hace falta la cuenta de Sentry). Firebase: proyecto y `google-services.json` | Código / equipo |
+| mié 18/11 | Textos de las fichas, ícono de 512, gráfico destacado y primeras capturas | Código |
+| jue 19/11 | Crear la app en Play Console; ficha, política, Data safety y clasificación; primer AAB en prueba interna | Equipo, con guía |
+| vie 20/11 | Envío de la prueba cerrada a revisión de Google | Equipo, con guía |
+| sáb 21 – dom 22/11 | iOS en la Mac: Xcode, manifest de privacidad, firma y primer build en TestFlight interno | Equipo, con guía |
+| lun 23/11 | **Día 1** de la prueba cerrada, con 12 inscriptos o más. Coordenadas propuestas, para confirmar en el panel | Equipo / código |
+| mar 24 – vie 27/11 | Estado, alerta, respaldo y manual de operación. TestFlight externo a revisión de beta | Código / equipo |
+| lun 30/11 – vie 4/12 | QA completo en el emulador y en el iPhone; arreglos; versión nueva a los testers. Jue 3/12, Día del Candombe: sumar testers | Código / equipo |
+| lun 7/12 | **Día 14.** Pedido de acceso a producción en Play Console | Equipo, con guía |
+| lun 14/12 | Fecha del plan: beta ampliada a 20 o 30 personas en las dos tiendas. Respuesta esperable de Google al pedido | Equipo |
+| mar 15 – mié 23/12 | Arreglos de la beta. Supabase a Pro. Video de la noche real para el revisor | Código / equipo |
+| lun 28 – mié 30/12 | Build `produccion` de las dos, capturas finales, ensayo de la lista de verificación | Código / equipo |
+| lun 4/1 | Congelado: todos los chequeos y el build final probado en el emulador y en el iPhone | Código / equipo |
+| **mar 5/1** | **Envío a revisión en las dos tiendas, con publicación manual** | Equipo, con guía |
+| mié 6 – vie 15/1 | Margen para rechazos y reenvíos | Código / equipo |
+| lun 18 – mié 20/1 | Publicación. Jue 21/1: Desfile Inaugural | Equipo |
+
+Si el día 1 de la prueba cerrada se corre más allá del 12/12, Android no llega al 5/1.
+
 ## Fase 9 · Operación en temporada y después (21 ene en adelante)
 
 **En temporada**
 
 - Carga o chequeo diario de la grilla antes de las 18:00.
-- Monitoreo de errores con Sentry y de uso con PostHog: aperturas por noche, conjuntos más seguidos, filtros más usados.
+- Monitoreo de errores con Sentry (desde el lanzamiento) y de uso con PostHog (queda para después del lanzamiento, decisión 86): aperturas por noche, conjuntos más seguidos, filtros más usados.
 - Sacar v2 en partes: resultados del concurso, «¿por dónde va el desfile?» antes de las Llamadas, ingesta desde Instagram.
 - Botón «esto está mal» en cada actuación.
 
