@@ -183,7 +183,14 @@ Web interna de carga de datos (decisiones 51 y 69 a 77), en `admin/`. `pnpm dev:
 - **Horas:** las que se escriben son de Montevideo. `nightInstant(noche, hora)` (`admin/src/lib/night.ts`) las pasa a un instante con la regla de las 06:00, y `formatTime` y `formatDateTime` (`lib/format.ts`) las muestran en Montevideo. Nunca la zona del navegador.
 - **Mapa:** `features/map/LocationPicker.tsx` (tocar, arrastrar o buscar la dirección con el geocoder de MapTiler). MapLibre se baja aparte (`LocationMap.tsx`) y en los tests se reemplaza con `vi.mock('../map/LocationMap')`: jsdom no tiene WebGL. En i18next, `lng` es una opción reservada: un texto con una longitud usa otro nombre (`lon`).
 - **Registro de cambios** (decisión 73): `registro_cambios` lo llena un trigger en cada tabla de datos. Una tabla de datos nueva tiene que llevar su trigger `…_registrar_cambio` con las columnas de su clave primaria.
-- **Publicar el panel:** es un sitio estático. `pnpm --filter admin build` con las variables del remoto y se sube `admin/dist/` a Vercel (`admin/public/vercel.json` manda todas las rutas a `index.html` y pide que no se indexe).
+- **Publicar el panel:** es un sitio estático en Vercel, publicado en <https://carnavalero-admin.vercel.app> (proyecto `carnavalero-admin`, equipo `carlosgardel1891s-projects`). No se despliega solo: después de cambiar el panel se compila con las variables del remoto (`admin/.env.remoto`, fuera del repo) y se sube `admin/dist/` (`admin/public/vercel.json` manda todas las rutas a `index.html` y pide que no se indexe). Hace falta `npx vercel login` una vez; como compilar vacía `dist/`, hay que volver a enlazarlo cada vez:
+
+```bash
+pnpm --filter admin build --mode remoto
+cd admin/dist
+npx vercel link --yes --project carnavalero-admin --scope carlosgardel1891s-projects
+npx vercel deploy --prod --yes --scope carlosgardel1891s-projects
+```
 
 ## Variables de entorno
 

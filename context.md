@@ -103,7 +103,7 @@ El análisis completo está en `docs/competencia-carnaval-app.md`.
 | 4 · Conjuntos, Seguir y push | 24 – 30 nov | **Código terminado** (2026-11-11), ya en `develop`; falta un aviso real (Firebase, Apple) |
 | 5 · Calendario y Concurso | 1 – 7 dic | **Código terminado** (2026-11-11), ya en `develop`; falta el fixture real, que no se publicó |
 | 6 · Modo Llamadas | 8 – 13 dic | **Código terminado** (2026-11-11), ya en `develop`; faltan el orden de desfile real y el recorrido y los cortes oficiales |
-| 7 · Datos y panel admin | 1 dic – 10 ene (en paralelo) | **Código terminado** (2026-11-12) en `admin`; faltan el proyecto remoto y publicar el panel |
+| 7 · Datos y panel admin | 1 dic – 10 ene (en paralelo) | **Código terminado** (2026-11-12) en `admin`; el panel está publicado; falta armar el proyecto remoto |
 | 8 · QA, beta y publicación | 14 dic – 20 ene | Sin empezar |
 | 9 · Operación en temporada | 21 ene – 7 mar | — |
 
@@ -213,7 +213,7 @@ LEEME.md           Cómo arrancar
 
 **Scripts nuevos:** `pnpm admin:alta`, `admin:baja` y `admin:lista` (admins del panel) y `pnpm remoto:chequeo` (controla un proyecto remoto).
 
-**Lo que no existe aún:** un aviso push real (falta Firebase), el fixture real del Concurso (no se publicó), los resultados y el historial, el orden de desfile real y el recorrido oficial de las Llamadas, la grilla real y las coordenadas de los escenarios (ya hay con qué cargarlas), el proyecto remoto de Supabase y el panel publicado.
+**Lo que no existe aún:** un aviso push real (falta Firebase), el fixture real del Concurso (no se publicó), los resultados y el historial, el orden de desfile real y el recorrido oficial de las Llamadas, la grilla real y las coordenadas de los escenarios (ya hay con qué cargarlas), y el proyecto remoto de Supabase armado (está creado, vacío). El panel ya está publicado en <https://carnavalero-admin.vercel.app>, pero hasta que el remoto esté armado no se puede entrar.
 
 ## 8. Datos semilla (`research/`)
 
@@ -357,7 +357,7 @@ Nativo: `pnpm --filter app android` (o `android:local` para usar el Supabase loc
 - **AUDECA:** pedir el orden de desfile y contenido de Llamadas (borrador 8.2).
 - **Conjuntos y comparsas:** mensaje directo por Instagram (borrador 8.3).
 - **Instagram de la app:** cuenta profesional vinculada a una Página de Facebook.
-- **Supabase remoto** (São Paulo): crearlo y armarlo con los siete pasos de `CLAUDE.md`, «Proyecto remoto». Después, publicar el panel en Vercel y dar de alta a los admins.
+- **Supabase remoto** (São Paulo): está creado (`carnavalero`, plan Free) y vacío; falta armarlo con los pasos 2 a 7 de `CLAUDE.md`, «Proyecto remoto», y dar de alta a los admins. Necesita `pnpm supabase login` en una terminal propia.
 - **Una muestra real de la tabla de DAECPU** («Programación de hoy», en temporada), para confirmar que el importador la lee tal como se copia.
 - **Key de MapTiler:** ponerla en `app/.env` y restringirla por origen en MapTiler Cloud (los orígenes están en `CLAUDE.md`). Con una key real todavía no se probó el mapa.
 - **GitHub Actions:** quien administra la cuenta dueña del repo tiene que resolver el pago fallido o subir el límite de gasto (Settings → Billing & plans) para que el CI arranque.
