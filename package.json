@@ -21,6 +21,9 @@
     "db:noche-real": "node scripts/db-grilla.mjs --real",
     "db:fixture": "node scripts/db-grilla.mjs --fixture",
     "db:llamadas": "node scripts/db-grilla.mjs --llamadas",
+    "admin:alta": "node scripts/admin-user.mjs alta",
+    "admin:baja": "node scripts/admin-user.mjs baja",
+    "admin:lista": "node scripts/admin-user.mjs lista",
     "gen:types": "supabase gen types typescript --local --schema public > packages/shared/src/database.types.ts && prettier --write packages/shared/src/database.types.ts"
   },
   "type": "module",
