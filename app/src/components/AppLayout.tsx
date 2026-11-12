@@ -1,6 +1,6 @@
-import { lazy, Suspense, useRef } from 'react'
+import { lazy, Suspense, useLayoutEffect, useRef, type RefObject } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Outlet } from 'react-router'
+import { Outlet, useLocation, useNavigationType } from 'react-router'
 import { useSessionSync } from '../features/follow/useFollow'
 import { usePushSync } from '../features/push/usePush'
 import { useOpenInLlamadas } from '../features/llamadas/useOpenInLlamadas'
@@ -39,6 +39,28 @@ function SimulatedClock() {
 }
 
 /**
+ * Todas las pantallas comparten el contenedor que scrollea: al entrar a una pantalla nueva
+ * arranca arriba, y al volver atrás queda donde estaba. Cambiar un filtro (misma pantalla, otra
+ * búsqueda en la URL) no mueve nada.
+ */
+function useScrollPerScreen(scrollRef: RefObject<HTMLElement | null>): void {
+  const { pathname } = useLocation()
+  const navigation = useNavigationType()
+  const positions = useRef(new Map<string, number>())
+  useLayoutEffect(() => {
+    const element = scrollRef.current
+    if (!element) return
+    const saved = positions.current
+    element.scrollTop = navigation === 'POP' ? (saved.get(pathname) ?? 0) : 0
+    const remember = () => saved.set(pathname, element.scrollTop)
+    element.addEventListener('scroll', remember, { passive: true })
+    return () => element.removeEventListener('scroll', remember)
+    // Sólo al cambiar de pantalla: `navigation` se lee en ese momento.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pathname, scrollRef])
+}
+
+/**
  * Marco de todas las pantallas: el contenido scrollea por debajo de la barra de pestañas, que
  * flota. Cada pantalla se ocupa de su parte de arriba (el encabezado con degradé llega hasta el
  * borde); abajo se deja libre el lugar de la barra.
@@ -49,6 +71,7 @@ export function AppLayout() {
   useOpenInLlamadas()
   usePrefetchLlamadas()
   const scrollRef = useRef<HTMLDivElement>(null)
+  useScrollPerScreen(scrollRef)
   return (
     <div className="relative h-dvh">
       <div

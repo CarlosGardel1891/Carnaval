@@ -16,9 +16,9 @@ import { BLANK_STYLE, initialStyle, type BlankReason } from './mapStyle'
 setWorkerUrl(workerUrl)
 
 /** Los colores del recorrido y de los cortes: los mismos que la referencia de la pantalla. */
-export const ROUTE_COLOR = '#fbbf24'
-export const CLOSURE_COLOR = '#fca5a5'
-export const NO_PARKING_COLOR = '#cbd5e1'
+export const ROUTE_COLOR = '#0448a7'
+export const CLOSURE_COLOR = '#ef4444'
+export const NO_PARKING_COLOR = '#5b6b82'
 
 /** Si las calles no cargaron en este tiempo (red saturada), el mapa pasa al fondo liso. */
 const STREETS_TIMEOUT_MS = 8000
@@ -70,21 +70,21 @@ function addParadeLayers(map: MapLibreMap, data: Feature[]): void {
     'line-width': 4,
     'line-dasharray': [0.5, 2],
   })
-  layer('cortes', 'corte', { 'line-color': CLOSURE_COLOR, 'line-width': 9, 'line-opacity': 0.7 })
+  layer('cortes', 'corte', { 'line-color': CLOSURE_COLOR, 'line-width': 9, 'line-opacity': 0.45 })
   layer('recorrido', 'recorrido', { 'line-color': ROUTE_COLOR, 'line-width': 5 })
 }
 
 function pill(text: string): HTMLElement {
   const el = document.createElement('div')
   el.className =
-    'bg-accent text-accent-ink rounded-full px-3 py-1 text-sm font-bold shadow whitespace-nowrap'
+    'bg-brand rounded-full border-2 border-white px-3 py-1 text-sm font-bold whitespace-nowrap text-white shadow-[0_3px_10px_rgb(15_23_42/0.3)]'
   el.textContent = text
   return el
 }
 
 function dot(label: string): HTMLElement {
   const el = document.createElement('div')
-  el.className = 'size-3 rounded-full border-2 border-white bg-slate-900'
+  el.className = 'bg-brand size-3 rounded-full border-2 border-white'
   el.title = label
   el.setAttribute('role', 'img')
   el.setAttribute('aria-label', label)
@@ -118,6 +118,9 @@ export function ParadeMap({ corners, closures }: ParadeMapProps) {
       style: start.style,
       center: [-56.1845, -34.911],
       zoom: 15,
+      // El mapa va dentro de una pantalla que scrollea: con un dedo se mueve la pantalla y con
+      // dos, el mapa. Si no, el mapa atrapa el gesto y no se llega a lo que hay debajo.
+      cooperativeGestures: true,
     })
     instance.addControl(new NavigationControl({ showCompass: false }))
 
@@ -183,7 +186,7 @@ export function ParadeMap({ corners, closures }: ParadeMapProps) {
         aria-label={t('llamadas.route.mapLabel')}
       />
       {blank && (
-        <p className="bg-surface/90 text-soft border-line absolute inset-x-3 bottom-3 rounded-xl border p-2 text-center text-sm">
+        <p className="bg-brand-soft text-brand absolute top-3 right-16 left-3 rounded-2xl px-3 py-2 text-sm font-semibold">
           {t(blank === 'no-key' ? 'llamadas.route.missingKey' : 'llamadas.route.noStreets')}
         </p>
       )}

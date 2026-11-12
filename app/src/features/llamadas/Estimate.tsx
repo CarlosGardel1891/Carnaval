@@ -8,7 +8,13 @@ import { useLocale } from '../../lib/useLocale'
  * Una hora estimada. Nunca se muestra una hora sola (decisión 63): lleva «≈» adelante y,
  * para quien no ve la pantalla, dice «hora estimada».
  */
-export function EstimatedTime({ time, className = '' }: { time: Date; className?: string }) {
+export function EstimatedTime({
+  time,
+  className = 'font-bold',
+}: {
+  time: Date
+  className?: string
+}) {
   const { t } = useTranslation()
   const locale = useLocale()
   const text = formatTime(time.toISOString(), locale)
@@ -16,7 +22,7 @@ export function EstimatedTime({ time, className = '' }: { time: Date; className?
     <time
       dateTime={time.toISOString()}
       aria-label={t('llamadas.estimatedAt', { time: text })}
-      className={`font-semibold tabular-nums ${className}`}
+      className={`tabular-nums ${className}`}
     >
       ≈ {text}
     </time>
@@ -28,9 +34,9 @@ export function EstimateNote({ night }: { night: ParadeEvent }) {
   const { t } = useTranslation()
   const rules = paradeRules(night)
   return (
-    <div className="text-soft space-y-1 py-2">
+    <div className="text-soft space-y-1 px-1 pb-3 text-sm">
       <p>
-        <span className="text-ink font-semibold">{t('llamadas.estimated')}.</span>{' '}
+        <span className="text-ink font-bold">{t('llamadas.estimated')}.</span>{' '}
         {t('llamadas.estimateNote', {
           start: rules.start.slice(0, 5),
           interval: rules.intervalMin,
@@ -38,7 +44,7 @@ export function EstimateNote({ night }: { night: ParadeEvent }) {
         })}
       </p>
       {rules.delayMin > 0 && (
-        <p className="text-accent font-semibold">
+        <p className="bg-amber-soft text-amber rounded-2xl px-4 py-2.5 font-bold">
           {t('llamadas.delay', { count: rules.delayMin })}
         </p>
       )}

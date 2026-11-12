@@ -3,8 +3,16 @@ import { useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { Link, useSearchParams } from 'react-router'
 import { passTime, paradeRules } from '@cuerda/shared'
-import { Button } from '../../components/Button'
-import { Chip } from '../../components/Chip'
+import { ChevronRightIcon, HeartIcon, NearIcon } from '../../components/ui/icons'
+import { EmptyStageArt, OfflineArt } from '../../components/ui/illustrations'
+import {
+  Card,
+  EmptyState,
+  FilterChip,
+  Pill,
+  PrimaryButton,
+  SectionHeader,
+} from '../../components/ui/primitives'
 import { useUserLocation } from '../location/locationContext'
 import { useDistanceLabel } from '../location/useDistanceLabel'
 import { useFollowed } from '../follow/useFollow'
@@ -14,8 +22,6 @@ import { EstimatedTime, EstimateNote } from './Estimate'
 import { useLlamadasNight } from './llamadasContext'
 import { blocksOf, nearestBlock, passTimes, type Block } from './parade'
 import { paradeOrderQuery, paradeRouteQuery } from './useLlamadas'
-
-const badge = 'rounded-md border px-2 py-0.5 text-sm font-semibold'
 
 /**
  * A qué hora pasa cada comparsa por una cuadra. La cuadra se elige de la lista o con
@@ -65,29 +71,34 @@ export function BlockView() {
     }
   }
 
-  if (route.isPending) return <p className="text-soft py-4">{t('llamadas.loading')}</p>
+  if (route.isPending) return <p className="text-soft py-6 text-center">{t('llamadas.loading')}</p>
   if (route.isError && !route.data) {
     return (
-      <div role="alert" className="space-y-3 py-4">
-        <p className="text-lg">{t('llamadas.routeError')}</p>
-        <Button onClick={() => void route.refetch()}>{t('today.retry')}</Button>
+      <div role="alert">
+        <EmptyState
+          illustration={<OfflineArt />}
+          title={t('llamadas.routeError')}
+          action={
+            <PrimaryButton onClick={() => void route.refetch()}>{t('today.retry')}</PrimaryButton>
+          }
+        />
       </div>
     )
   }
-  if (blocks.length === 0) return <p className="py-4 text-lg">{t('llamadas.noRoute')}</p>
+  if (blocks.length === 0) {
+    return <EmptyState illustration={<EmptyStageArt />}>{t('llamadas.noRoute')}</EmptyState>
+  }
 
   return (
-    <section aria-labelledby="por-cuadra" className="space-y-3 pt-2">
-      <h2 id="por-cuadra" className="text-xl font-bold">
-        {t('llamadas.block.title')}
-      </h2>
-      <div className="flex flex-wrap items-center gap-2">
+    <section aria-labelledby="por-cuadra">
+      <SectionHeader id="por-cuadra" title={t('llamadas.block.title')} />
+      <div className="flex flex-wrap items-center gap-2 pb-3">
         <label className="min-w-0 flex-1">
           <span className="sr-only">{t('llamadas.block.label')}</span>
           <select
             value={block ? String(block.number) : ''}
             onChange={(event) => choose(event.target.value)}
-            className="bg-surface border-line min-h-12 w-full rounded-xl border px-3 text-lg"
+            className="bg-surface shadow-card text-ink min-h-13 w-full rounded-2xl px-4 text-[1.0625rem] font-bold"
           >
             <option value="">{t('llamadas.block.choose')}</option>
             {blocks.map((b) => (
@@ -97,9 +108,14 @@ export function BlockView() {
             ))}
           </select>
         </label>
-        <Chip pressed={near} disabled={status === 'locating'} onClick={() => void toggleNear()}>
+        <FilterChip
+          pressed={near}
+          disabled={status === 'locating'}
+          icon={<NearIcon className="size-4.5" />}
+          onClick={() => void toggleNear()}
+        >
           {t('nearby.label')}
-        </Chip>
+        </FilterChip>
       </div>
       <NearbyNotice
         status={status}
@@ -108,57 +124,75 @@ export function BlockView() {
         onRetry={() => void toggleNear()}
       />
       {night.recorrido_estado === 'estimado' && (
-        <p className="text-soft">{t('llamadas.routeEstimated')}</p>
+        <p className="text-soft px-1 pb-3 text-sm">{t('llamadas.routeEstimated')}</p>
       )}
 
       {block && (
-        <div className="space-y-1">
-          <h3 className="text-lg font-bold">{name(block)}</h3>
+        <div>
+          <h3 className="px-1 text-[1.1875rem] leading-tight font-extrabold tracking-tight">
+            {name(block)}
+          </h3>
           {nearest && (
-            <p className="text-accent font-semibold">
+            <p className="text-accent px-1 pt-1 text-sm font-bold">
               {t('llamadas.block.nearest', { distance: distanceLabel(nearest.distanceM) })}
             </p>
           )}
-          <EstimateNote night={night} />
-          <p className="text-soft">{t('llamadas.block.middle')}</p>
+          <div className="pt-2">
+            <EstimateNote night={night} />
+          </div>
+          <p className="text-soft px-1 pb-3 text-sm">{t('llamadas.block.middle')}</p>
           {order.isPending ? (
             <p className="text-soft py-2">{t('llamadas.loading')}</p>
           ) : slots.length === 0 ? (
             // Sin orden, igual se puede decir cuándo llega el desfile a esa cuadra.
-            <div className="space-y-2 py-2">
-              <p className="text-lg">{t('llamadas.block.noOrder')}</p>
-              <p className="text-lg">
+            <Card className="space-y-2 p-4">
+              <p className="font-bold">{t('llamadas.block.noOrder')}</p>
+              <p>
                 {t('llamadas.block.first')}{' '}
                 <EstimatedTime
                   time={passTime(night.fecha_inicio, 1, block.middleM, paradeRules(night))}
+                  className="text-brand font-extrabold"
                 />
               </p>
-            </div>
+            </Card>
           ) : (
-            <ol className="bg-surface border-line divide-line divide-y rounded-2xl border px-4">
-              {slots.map((slot) => (
-                <li key={slot.conjunto_id} className="flex items-center gap-3 py-3">
-                  <EstimatedTime time={slot.time} className="w-24 shrink-0 text-lg" />
-                  <div className="min-w-0 flex-1">
-                    <p className="text-lg font-semibold">
-                      <Link
-                        to={groupPath(slot.conjunto_slug)}
-                        className="decoration-soft underline underline-offset-4"
-                      >
-                        {slot.conjunto_nombre}
-                      </Link>
-                    </p>
-                    {followed.has(slot.conjunto_id) && (
-                      <p className="mt-1">
-                        <span className={`${badge} border-accent text-accent`}>
-                          {t('llamadas.following')}
-                        </span>
-                      </p>
-                    )}
-                  </div>
-                </li>
-              ))}
-            </ol>
+            <Card>
+              <ol className="divide-line divide-y">
+                {slots.map((slot) => {
+                  const mine = followed.has(slot.conjunto_id)
+                  return (
+                    <li
+                      key={slot.conjunto_id}
+                      className={`relative flex items-center gap-3 px-4 py-3 ${mine ? 'bg-brand-soft/60' : ''}`}
+                    >
+                      <EstimatedTime
+                        time={slot.time}
+                        className="text-brand w-[5.25rem] shrink-0 text-[1.0625rem] font-extrabold"
+                      />
+                      <div className="min-w-0 flex-1">
+                        <p className="text-[1.0625rem] leading-snug font-bold">
+                          <Link
+                            to={groupPath(slot.conjunto_slug)}
+                            className="after:absolute after:inset-0"
+                          >
+                            {slot.conjunto_nombre}
+                          </Link>
+                        </p>
+                        {mine && (
+                          <p className="mt-1">
+                            <Pill tone="brand" className="gap-1">
+                              <HeartIcon filled className="size-3.5" />
+                              {t('llamadas.following')}
+                            </Pill>
+                          </p>
+                        )}
+                      </div>
+                      <ChevronRightIcon className="text-soft size-5 shrink-0 opacity-40" />
+                    </li>
+                  )
+                })}
+              </ol>
+            </Card>
           )}
         </div>
       )}

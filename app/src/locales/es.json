@@ -161,7 +161,7 @@
     "route": {
       "title": "Recorrido",
       "mapLabel": "Mapa del recorrido del desfile",
-      "missingKey": "Falta la key de MapTiler (VITE_MAPTILER_KEY): se ve el recorrido, pero no las calles.",
+      "missingKey": "Todavía no podemos mostrar las calles, pero el recorrido está en su lugar.",
       "noStreets": "No pudimos cargar las calles del mapa: se ve el recorrido sobre fondo liso.",
       "start": "Salida",
       "end": "Llegada",
@@ -182,7 +182,16 @@
       "until": "hasta el {{when}}",
       "estimated": "Estimado según años anteriores",
       "osm": "Coordenadas: © colaboradores de OpenStreetMap."
-    }
+    },
+    "fromTime": "desde las {{time}}",
+    "yourBlock": "Tu cuadra",
+    "yourBlockHint": "Elegila para ver a qué hora pasa cada comparsa.",
+    "chooseBlock": "Elegir",
+    "change": "Cambiar",
+    "passesYourBlock": "Pasa por tu cuadra",
+    "seeRoute": "Ver recorrido",
+    "whatIs": "¿Qué es…?",
+    "seeGlossary": "Ver glosario"
   },
   "glossary": {
     "title": "Glosario",
@@ -268,6 +277,12 @@
         "term": "Medialuna y estrella",
         "text": "Los emblemas que se llevan en lo alto de una vara, al frente de la comparsa."
       }
+    },
+    "groups": {
+      "basics": "Lo básico",
+      "drums": "Los tambores",
+      "characters": "Los personajes",
+      "symbols": "Los símbolos"
     }
   },
   "follow": {

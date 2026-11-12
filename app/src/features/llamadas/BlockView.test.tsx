@@ -72,6 +72,31 @@ describe('Llamadas: por cuadra', () => {
     expect(document.querySelector('main time')).toBeNull()
   })
 
+  it('la cuadra elegida vale también en el orden: «Tu cuadra» y a qué hora pasa cada comparsa', async () => {
+    const { router } = renderApp('/llamadas')
+    // Sin cuadra elegida, la tarjeta invita a elegirla y el orden no dice por dónde pasa.
+    const pick = await screen.findByRole('link', { name: 'Elegir' })
+    await screen.findByRole('region', { name: 'Orden de desfile' })
+    expect(screen.queryByText(/Pasa por tu cuadra/)).not.toBeInTheDocument()
+
+    await userEvent.click(pick)
+    await userEvent.selectOptions(await screen.findByRole('combobox', { name: 'Cuadra' }), '3')
+    await userEvent.click(screen.getByRole('link', { name: 'Orden' }))
+    expect(router.state.location.pathname).toBe('/llamadas')
+    expect(router.state.location.search).toBe('?cuadra=3')
+
+    expect(await screen.findByText('Isla de Flores, de Aquiles Lanza a Ejido')).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Cambiar' })).toBeInTheDocument()
+    const order = within(await screen.findByRole('region', { name: 'Orden de desfile' }))
+    const first = order.getAllByRole('listitem')[0]!
+    expect(first).toHaveTextContent('Pasa por tu cuadra')
+    // Primero la salida, después el paso por la cuadra; las dos, estimadas.
+    expect([...first.querySelectorAll('time')].map((time) => time.textContent)).toEqual([
+      '≈ 20:00',
+      '≈ 20:25',
+    ])
+  })
+
   it('eligiendo una cuadra se ve a qué hora pasa cada comparsa, y queda en la URL', async () => {
     const { router } = renderApp('/llamadas/cuadra')
     await userEvent.selectOptions(await screen.findByRole('combobox', { name: 'Cuadra' }), '3')
