@@ -16,11 +16,11 @@ React 19 + TypeScript (strict) + Vite + Capacitor 8 + Tailwind 4, Supabase (Post
 ## Estructura
 
 - `app/` — app móvil (Vite + Capacitor). `app/android/` y `app/ios/` son los proyectos nativos generados por Capacitor.
-- `admin/` — panel web de carga de datos (por ahora, login placeholder).
-- `supabase/` — `config.toml`, `migrations/`, `seeds/` (`01_temporadas.sql` y `02_research.sql`, generado: no editar a mano), `local/` (grilla ficticia, fixture ficticio del Concurso, orden ficticio de las Llamadas y noche real del 28/02/2026; sólo para el Supabase local) y `functions/` (las Edge Functions de avisos: `avisos-del-dia`, `avisos-de-cambios` y lo común en `_shared/`).
+- `admin/` — panel web interno de carga de datos (ver «Panel admin»).
+- `supabase/` — `config.toml`, `migrations/`, `seeds/` (`01_temporadas.sql` y `02_research.sql`, generado: no editar a mano), `local/` (grilla ficticia, fixture ficticio del Concurso, orden ficticio de las Llamadas y noche real del 28/02/2026; sólo para el Supabase local) `functions/` (las Edge Functions de avisos: `avisos-del-dia`, `avisos-de-cambios` y lo común en `_shared/`) y `remoto/` (`programar_avisos.sql`, que se corre a mano en el proyecto remoto).
 - `packages/shared/` (`@cuerda/shared`) — tipos de la base (`database.types.ts`, generado), fechas (`nocheLogica`, `modoLlamadasActivo`, `calendarDateInMontevideo`), `norm` para matching de nombres, la hora estimada del Desfile de Llamadas (`llamadas.ts`) y los avisos push sin la base ni Firebase: textos (`noticeTexts.ts`), agrupado (`notices.ts`), envío (`delivery.ts`) y FCM (`fcm.ts`).
 - `packages/db-tests/` (`@cuerda/db-tests`) — tests de integración de la base (RLS, funciones, invariantes del esquema) contra el Supabase local. Corren con `pnpm test:db`, aparte de `pnpm test`.
-- `scripts/` — generadores: `gen_seed.py` (el seed, desde los CSV de `research/`), `gen-norm-marks.mjs` (migración de `public.norm`) y `gen_norm_cases.py` (fixture de casos de `norm`); y `db-grilla.mjs`, que carga la grilla ficticia y la noche real de prueba. `norm` vive en tres lugares (TypeScript, Python y SQL) y tienen que dar lo mismo (decisión 22).
+- `scripts/` — generadores: `gen_seed.py` (el seed, desde los CSV de `research/`), `gen-norm-marks.mjs` (migración de `public.norm`) y `gen_norm_cases.py` (fixture de casos de `norm`); `db-grilla.mjs`, que carga la grilla ficticia y la noche real de prueba; `admin-user.mjs` (admins del panel) y `remoto-chequeo.mjs` (chequeo del proyecto remoto). `norm` vive en tres lugares (TypeScript, Python y SQL) y tienen que dar lo mismo (decisión 22).
 - `research/` — datos semilla de la Fase 0, más `fixture_2027.csv` (el fixture del Concurso, vacío hasta que se publique) y los tres `llamadas_…_2027.csv` (recorrido y cortes estimados, y el orden de desfile, vacío hasta que se publique). **No editar a mano sin correr `python research/validate.py` después.** Si cambia un CSV, regenerar también el seed (`pnpm gen:seed`) y el fixture de `norm` (`python scripts/gen_norm_cases.py`); el CI falla si quedaron viejos.
 - `docs/`, `prompts/` — plan, decisiones y prompts.
 
@@ -66,12 +66,15 @@ pnpm db:noche-real           # carga la noche real del 2026-02-28 (admite hoy, u
 pnpm db:fixture              # carga el fixture ficticio del Concurso desde el 2027-01-25 (admite hoy, una fecha y --quitar)
 pnpm db:llamadas             # carga el orden de desfile ficticio de las dos noches de Llamadas (admite --quitar)
 pnpm supabase functions serve  # sirve las Edge Functions en http://127.0.0.1:55321/functions/v1/
+pnpm admin:alta <email>      # crea un admin del panel y muestra su contraseña (ver «Panel admin»)
+pnpm admin:baja <email>      # le quita el permiso (con --borrar, borra el usuario)
+pnpm admin:lista             # quiénes son admin
 pnpm supabase stop
 ```
 
 Studio local: http://127.0.0.1:55323. API: http://127.0.0.1:55321.
 
-Seed (decisión 26): `pnpm gen:seed` corre antes `research/validate.py` y no escribe nada si hay errores; con `--post-prueba` le pasa esa opción (para después del 17/11), y con `--check` sólo avisa si el seed quedó viejo. El seed se puede volver a correr sobre una base con datos.
+Seed (decisión 26): `pnpm gen:seed` corre antes `research/validate.py` y no escribe nada si hay errores; con `--post-prueba` le pasa esa opción (para después del 17/11), y con `--check` sólo avisa si el seed quedó viejo. El seed se puede volver a correr sobre una base con datos. Los alias de conjuntos y escenarios se unen con los que ya haya en la base (decisión 75): uno agregado desde el panel no se pierde, y uno que se saca del CSV no se borra solo.
 
 Grilla ficticia (decisión 27): conjuntos reales en escenarios inventados (`ficticio-…`), con `fuente = 'ficticia'`. Sirve para desarrollar pantallas mientras no haya grilla real. `pnpm db:grilla` entra por `docker exec` a la base local; no hay forma de apuntarlo al proyecto remoto, y `pnpm supabase db reset` la borra.
 
@@ -80,8 +83,9 @@ Fixture del Concurso (decisión 57): una noche del Concurso es una fila de `etap
 - **De prueba:** `pnpm db:fixture` carga las tres ruedas con conjuntos reales y noches inventadas, todo con `fuente = 'fixture-ficticio'`. Tiene las mismas barreras que la grilla ficticia, la app avisa que es de prueba, y `pnpm test:db` lo quita.
 - **El real, cuando se publique:** completar `research/fixture_2027.csv` con una fila por conjunto y noche (`rueda`: primera, segunda o liguilla; `numero` de etapa; `fecha` de la noche; `hora` de Montevideo en HH:MM; `conjunto`: el slug de `conjuntos.csv`; `fuente_url`). Una hora anterior a las 06:00 es de la madrugada siguiente y sigue siendo de esa noche: una actuación a las 00:15 de la etapa del 25/01 lleva `fecha` 2027-01-25. Después `python research/validate.py` y `pnpm gen:seed`, y aplicar el seed (`pnpm supabase db reset` en local; en remoto, como el resto del seed). Antes, quitar el de prueba con `pnpm db:fixture --quitar`. Para probar un borrador sin tocar el repo: `python research/validate.py --fixture <archivo>`.
 - El seed inserta o actualiza y no borra: si un conjunto sale de una noche, hay que borrar esa actuación a mano. Cambiar una hora en el CSV y volver a aplicar el seed manda el aviso de cambio a quienes siguen al conjunto.
+- **O desde el panel** (decisión 75): en `/concurso` se cargan las etapas y los conjuntos de cada una; una cartelera del Teatro de Verano importada en una noche con etapa queda en esa etapa.
 
-Modo Llamadas (decisiones 62 a 68): todo lo del desfile es dato de la base, por evento (cada noche es un evento de tipo `llamadas`), y la app lo lee con `orden_del_desfile`, `recorrido_del_desfile` y `cortes_del_desfile`. Nada de eso necesita otra versión de la app.
+Modo Llamadas (decisiones 62 a 68): todo lo del desfile es dato de la base, por evento (cada noche es un evento de tipo `llamadas`), y la app lo lee con `orden_del_desfile`, `recorrido_del_desfile` y `cortes_del_desfile`. Nada de eso necesita otra versión de la app. Todo se puede cargar también desde el panel, en `/llamadas` (el orden, el horario y el atraso, el recorrido y los cortes): lo de abajo es el camino por CSV y por SQL.
 
 - **Orden de prueba:** `pnpm db:llamadas` carga las 46 comparsas clasificadas en un orden inventado, con `fuente = 'orden-ficticio'`. Mismas barreras que la grilla ficticia, la app avisa que es de prueba, y `pnpm test:db` lo quita.
 - **El orden real, cuando se publique:** completar `research/llamadas_orden_2027.csv` (`noche`: 1 o 2; `posicion`; `conjunto`: el slug; `fuente_url`), después `python research/validate.py` y `pnpm gen:seed`, y aplicar el seed. Antes, `pnpm db:llamadas --quitar`. Para probar un borrador: `python research/validate.py --orden <archivo>`. El seed inserta o actualiza y no borra: si una comparsa sale del orden, hay que borrar su fila de `orden_desfile` a mano.
@@ -100,7 +104,7 @@ update public.eventos
 update public.eventos set desfile_atraso_min = 40 where slug = 'llamadas-noche-1-2027';
 ```
 
-Venta de entradas (decisión 60): es un dato de cada evento, `eventos.entradas_url` y `eventos.entradas_texto`, y no sale del seed. Se carga cuando se anuncia la venta, desde el SQL editor del proyecto (o Studio en local); en la Fase 7, desde el panel. La del Concurso va en su evento de tipo `concurso` (`concurso-inicio-2027`):
+Venta de entradas (decisión 60): es un dato de cada evento, `eventos.entradas_url` y `eventos.entradas_texto`, y no sale del seed. Se carga cuando se anuncia la venta, desde el panel (`/eventos`) o desde el SQL editor del proyecto (o Studio en local). La del Concurso va en su evento de tipo `concurso` (`concurso-inicio-2027`):
 
 ```sql
 update public.eventos
@@ -113,7 +117,7 @@ Mientras las dos columnas estén vacías, la app no muestra nada de entradas. La
 
 Noche real (decisión 39): la cartelera publicada del sábado 28/02/2026, para probar con una noche de tamaño real (`/?noche=2026-02-28`). Va con `fuente = 'cartelera-2026-02-28'`, sólo en el Supabase local. Cada línea se resuelve por `norm` contra los nombres y alias del seed; lo que no coincide no se carga y `pnpm db:noche-real` lo lista. Los escenarios reales no tienen coordenadas: no aparecen en el mapa ni en «cerca mío».
 
-Supabase remoto (São Paulo): `pnpm supabase login`, `pnpm supabase link --project-ref <ref>`, `pnpm supabase db push`. El seed no se aplica solo en remoto: correr `supabase/seeds/01_temporadas.sql` y después `supabase/seeds/02_research.sql` con el SQL editor o con `psql` (o `pnpm supabase db push --include-seed`, que corre los seeds de `config.toml`). `supabase/local/` nunca se corre en remoto.
+Supabase remoto (São Paulo): `pnpm supabase login`, `pnpm supabase link --project-ref <ref>`, `pnpm supabase db push`. El seed no se aplica solo en remoto: correr `supabase/seeds/01_temporadas.sql` y después `supabase/seeds/02_research.sql` con el SQL editor o con `psql` (o `pnpm supabase db push --include-seed`, que corre los seeds de `config.toml`). `supabase/local/` nunca se corre en remoto. El paso a paso completo está en «Proyecto remoto».
 
 Al crear el proyecto remoto hay que activar a mano los inicios de sesión anónimos (Authentication → Sign In / Providers → Allow anonymous sign-ins): `config.toml` sólo vale para el Supabase local. Antes del lanzamiento, revisar también los límites de auth por IP (decisión 23).
 
@@ -140,6 +144,7 @@ En el emulador Android, la app reescribe `127.0.0.1`/`localhost` a `10.0.2.2` pa
 - La noche que se muestra sale de `nocheLogica()` o de `?noche=YYYY-MM-DD`; los filtros viven en la URL.
 - Las fechas de los eventos y de las etapas son fechas puras (`YYYY-MM-DD`): se comparan como texto y se formatean en UTC (`formatIsoDate`, `formatNight`, `formatMonth`, `formatDayParts` en `lib/format.ts`). «Hoy» es siempre `nocheLogica()`. Una fecha con `estado = 'estimado'` nunca se muestra sin su marca (decisión 56).
 - El Concurso está en `/calendario/concurso`, antes que `/calendario/:slug` en `routes.tsx`. Un fixture sin etapas no es una lista vacía: es «todavía no se publicó».
+- Para compilar la app contra el proyecto remoto: `app/.env.remoto` (ver «Proyecto remoto»).
 - `/mapa` se carga aparte (`features/map/LazyMapPage.tsx`), así «Hoy» arranca sin MapLibre. Fuera de `features/map/`, nadie importa `MapPage` ni `MontevideoMap`.
 - Las consultas se guardan en el teléfono 24 horas (`app/src/lib/queryCache.ts`, decisión 37). Si cambia la forma de lo que devuelve una consulta, subir `CACHE_VERSION`. Una consulta que lleve la posición del usuario va con `meta: { persist: false }`.
 - Lo del modo Llamadas se guarda una semana (decisión 65): son las consultas cuya clave empieza con `llamadas` (`features/llamadas/useLlamadas.ts`), y `usePrefetchLlamadas` las baja al abrir la app en temporada. Una consulta nueva del modo tiene que llevar esa clave y sumarse ahí.
@@ -165,11 +170,28 @@ pnpm --filter app android:local --target emulator-5554
 
 - **Sin red en el emulador:** `adb shell svc wifi disable` y `adb shell svc data disable` (y `enable` para volver). Abrir la app una vez con red antes, para que baje el modo Llamadas.
 
+## Panel admin
+
+Web interna de carga de datos (decisiones 51 y 69 a 77), en `admin/`. `pnpm dev:admin` la levanta en http://localhost:5174. Va sólo en español, con todos los textos en `admin/src/locales/es.json` (decisión 70).
+
+- **Entrar:** email y contraseña de un usuario de Supabase Auth con `app_metadata.rol = 'admin'`. `pnpm admin:alta <email>` lo crea y muestra la contraseña una sola vez; `pnpm admin:baja <email>` le quita el permiso (tarda hasta una hora en hacerse efectivo) y `pnpm admin:lista` los lista. Sin variables trabajan contra el Supabase local. Contra el remoto: `--remoto`, con `SUPABASE_URL` y `SUPABASE_SERVICE_ROLE_KEY` definidas en la terminal sólo para ese comando.
+- **La service role nunca llega al navegador.** El panel usa la key pública y la sesión del admin: todo pasa por la RLS, y lo que necesita más (publicar, suspender) son funciones de la base que chequean `es_admin()`. `admin/src/build.test.ts` compila el panel y controla que la service role no quede en lo que se publica. En `admin/.env` sólo van variables `VITE_…`.
+- **Pantallas** (`admin/src/features/`): `import/` (`/grilla/importar`), `night/` (`/grilla?noche=`), `groups/`, `stages/`, `events/`, `contest/`, `parade/` (`/llamadas?evento=`), `log/` (`/registro`) y `map/` (el selector de ubicación). Las secciones del menú están en `admin/src/nav.ts`.
+- Todo lo que habla con Supabase está en `admin/src/lib/api.ts`. Los tests de pantallas usan `vi.mock('…/lib/api')`, que toma el doble de `admin/src/lib/__mocks__/api.ts`: al agregar una función hay que sumarla ahí. `renderAdmin()` (`test-utils.tsx`) monta el panel entero con una sesión de admin.
+- **Importar una grilla** (decisión 71): el parser (`features/import/parser.ts`) es una función pura que lee el texto pegado o el CSV y lista lo que no entiende; `previsualizar_grilla` reconoce los nombres en la base (exacto, con `public.norm`) y `publicar_grilla` publica todo o nada. Reimportar no toca lo que está igual, una alta no avisa y un cambio de hora o de lugar deja la actuación en `cambiada` y encola su aviso. Las carteleras de prueba están en `features/import/fixtures/`; la tabla de DAECPU es un ejemplo armado (ver `LEEME.md` ahí).
+- **Suspender** (decisión 72): `suspender_noche` y `deshacer_suspension`. Después, el panel llama a `avisos-de-cambios` con la sesión del admin para que el aviso salga enseguida; si falla, sale con la pasada de cada minuto.
+- **Horas:** las que se escriben son de Montevideo. `nightInstant(noche, hora)` (`admin/src/lib/night.ts`) las pasa a un instante con la regla de las 06:00, y `formatTime` y `formatDateTime` (`lib/format.ts`) las muestran en Montevideo. Nunca la zona del navegador.
+- **Mapa:** `features/map/LocationPicker.tsx` (tocar, arrastrar o buscar la dirección con el geocoder de MapTiler). MapLibre se baja aparte (`LocationMap.tsx`) y en los tests se reemplaza con `vi.mock('../map/LocationMap')`: jsdom no tiene WebGL. En i18next, `lng` es una opción reservada: un texto con una longitud usa otro nombre (`lon`).
+- **Registro de cambios** (decisión 73): `registro_cambios` lo llena un trigger en cada tabla de datos. Una tabla de datos nueva tiene que llevar su trigger `…_registrar_cambio` con las columnas de su clave primaria.
+- **Publicar el panel:** es un sitio estático. `pnpm --filter admin build` con las variables del remoto y se sube `admin/dist/` a Vercel (`admin/public/vercel.json` manda todas las rutas a `index.html` y pide que no se indexe).
+
 ## Variables de entorno
 
 Copiar `app/.env.example` a `app/.env`: `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` (publishable key), `VITE_MAPTILER_KEY`, `VITE_PUSH_ENABLED` (vacío hasta tener Firebase; ver «Avisos push») y `VITE_AHORA` (vacío; ver «Simular la fecha»). Nunca subir `.env` al repo; mantener `.env.example` al día.
 
-La key de MapTiler queda dentro de la app, así que hay que restringirla por origen en MapTiler Cloud (Account → API keys → Allowed HTTP origins). Los orígenes de la app son: `http://localhost:5173` (desarrollo), `https://localhost` (Android) y `capacitor://localhost` (iOS). Sin key, el mapa muestra los marcadores sobre un fondo liso y avisa que falta.
+El panel tiene el suyo: copiar `admin/.env.example` a `admin/.env`, con `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` y `VITE_MAPTILER_KEY`. Ahí no va la service role ni ninguna otra key privada: todo lo que empieza con `VITE_` termina dentro del sitio.
+
+La key de MapTiler queda dentro de la app, así que hay que restringirla por origen en MapTiler Cloud (Account → API keys → Allowed HTTP origins). Los orígenes de la app son: `http://localhost:5173` (desarrollo), `https://localhost` (Android) y `capacitor://localhost` (iOS); los del panel, `http://localhost:5174` y la dirección donde esté publicado. Sin key, el mapa muestra los marcadores sobre un fondo liso y avisa que falta.
 
 ## Avisos push
 
@@ -177,6 +199,7 @@ Decisiones 45 a 49. Tres piezas, cada una con sus tests:
 
 - **Quién recibe qué: la base.** Un trigger en `actuaciones` encola los cambios de hora, lugar o estado en `cambios_actuacion` (las altas no encolan). `tomar_avisos_del_dia(noche)` (las actuaciones de la noche y, en las Llamadas, las comparsas seguidas que desfilan; decisión 68) y `tomar_avisos_de_cambios(noche, hasta)` devuelven las filas ya reclamadas en `avisos_enviados`, así el mismo aviso no sale dos veces; `cerrar_avisos(ids)` marca los que salieron. Sólo las ejecuta la service role. Tests: `packages/db-tests/src/avisos.test.ts`.
 - **Textos y envío: `@cuerda/shared`.** `buildDailyNotices` y `buildChangeNotices` arman una notificación por dispositivo, en su idioma y con las horas de Montevideo; los textos están en `noticeTexts.ts` (es y en, mismas claves). `deliver` manda con un `Sender`: `createFcmSender` (FCM HTTP v1) o `dryRunSender`.
+- **Quién las llama:** sólo la service role. `avisos-de-cambios` acepta además la sesión de un admin (decisión 72), para el botón de suspender del panel, y por eso responde CORS.
 - **Edge Functions: sólo juntan y mandan.** Importan los archivos de `packages/shared/src/` por ruta relativa y con extensión `.ts` (Deno); por eso `notices.ts`, `delivery.ts`, `fcm.ts`, `dates.ts`, `llamadas.ts` y `noticeTexts.ts` sólo pueden tener imports relativos con `.ts` (lo controla `denoImports.test.ts`).
 
 Probarlas en local, sin Firebase (simulacro: devuelven los avisos armados y no mandan nada):
@@ -201,7 +224,39 @@ curl -X POST http://127.0.0.1:55321/functions/v1/avisos-de-cambios \
 - iOS (hace falta una Mac): agregar la app iOS, bajar `GoogleService-Info.plist`, sumarlo al target desde Xcode, activar la capability Push Notifications y subir la key de APNs a Firebase (Project settings → Cloud Messaging).
 - Cuenta de servicio para mandar: Project settings → Service accounts → Generate new private key. El JSON entero va como secret `FIREBASE_SERVICE_ACCOUNT`: en local, en `supabase/functions/.env` (una línea, `FIREBASE_SERVICE_ACCOUNT='{…}'`) y `pnpm supabase functions serve --env-file supabase/functions/.env`; en remoto, `pnpm supabase secrets set`.
 - En la app: `VITE_PUSH_ENABLED=1` en `app/.env`. Sin `google-services.json`, dejarlo vacío: el plugin se instala igual y la app arranca, pero pedir el token falla.
-- En el proyecto remoto falta programar las funciones con `pg_cron` y `pg_net`: `avisos-del-dia` cada 30 minutos y `avisos-de-cambios` cada minuto, con la service role key guardada en Vault.
+- En el proyecto remoto las funciones se programan con `pg_cron` y `pg_net`: `avisos-del-dia` cada 30 minutos y `avisos-de-cambios` cada minuto, con la service role key guardada en Vault. Es `supabase/remoto/programar_avisos.sql` (ver «Proyecto remoto»).
+
+## Proyecto remoto
+
+Decisión 77. Para armarlo desde cero, en este orden:
+
+1. Crear el proyecto en la región de São Paulo (`sa-east-1`). `pnpm supabase login` y `pnpm supabase link --project-ref <ref>`.
+2. `pnpm supabase db push --include-seed`: aplica las migraciones y los dos seeds de `config.toml`. Nada de `supabase/local/`.
+3. En el panel de Supabase: Authentication → Sign In / Providers → **Allow anonymous sign-ins**; y Authentication → Rate Limits, revisar los límites por IP (decisión 23).
+4. `pnpm supabase functions deploy avisos-del-dia` y `pnpm supabase functions deploy avisos-de-cambios`. Sin el secret `FIREBASE_SERVICE_ACCOUNT` corren en simulacro (ver «Avisos push»).
+5. En el SQL editor: guardar en Vault la dirección del proyecto y la service role key, y correr `supabase/remoto/programar_avisos.sql` (las instrucciones están en el encabezado del archivo).
+6. Dar de alta el primer admin: `pnpm admin:alta <email> --remoto`, con `SUPABASE_URL` y `SUPABASE_SERVICE_ROLE_KEY` definidas en la terminal sólo para ese comando.
+7. `pnpm remoto:chequeo` (con `SUPABASE_URL`, `SUPABASE_ANON_KEY` y `SUPABASE_SERVICE_ROLE_KEY` en la terminal): controla el seed, que no haya nada de prueba, la auth anónima y que las funciones respondan.
+
+En PowerShell, las variables para un solo comando se definen antes y se sacan después:
+
+```powershell
+$env:SUPABASE_URL = "https://<ref>.supabase.co"
+$env:SUPABASE_SERVICE_ROLE_KEY = "<service role key>"
+pnpm admin:alta ana@ejemplo.com --remoto
+Remove-Item Env:SUPABASE_URL, Env:SUPABASE_SERVICE_ROLE_KEY
+```
+
+La app contra el remoto: crear `app/.env.remoto` (no va al repo: `.gitignore` excluye `.env.*`) con la dirección y la key pública del proyecto remoto y compilar en ese modo. El reloj simulado no anda contra el remoto (decisión 66).
+
+```bash
+pnpm --filter app build --mode remoto        # el sitio, para probar
+pnpm --filter app exec vite --mode remoto    # pnpm dev, pero contra el remoto
+```
+
+Para el teléfono, después de ese build: `pnpm --filter app exec cap sync android` y `pnpm --filter app exec cap run android`.
+
+Después de cada migración nueva: `pnpm supabase db push`. Después de cambiar una Edge Function o algo de `packages/shared/src/` que ellas importan: volver a desplegarla.
 
 ## Nombre e identificador
 
@@ -225,8 +280,10 @@ El ícono de los avisos de Android es `app/android/app/src/main/res/drawable/ic_
 
 - Zona horaria siempre `America/Montevideo`, nunca la del dispositivo: usar las funciones de `@cuerda/shared`. Una actuación antes de las 06:00 es de la noche anterior.
 - Tablas y columnas en español snake_case; código en inglés; commits en español.
-- Nada de texto hardcodeado en la UI: todo por i18n (`src/locales/{es,en}.json`, mismas claves; hay un test que lo controla).
+- Nada de texto hardcodeado en la UI: todo por i18n (`src/locales/{es,en}.json`, mismas claves; hay un test que lo controla). El panel también, pero sólo en español (decisión 70).
 - RLS en todas las tablas: lectura pública de lo publicado, escritura sólo service role o admin. Los usuarios anónimos tienen el rol `authenticated`: las policies de escritura exigen `es_admin()`, nunca sólo el rol. En el MVP todo lo que está en las tablas públicas está publicado (decisión 24).
+- La service role nunca va en el panel ni en la app: sólo en las Edge Functions, en Vault y en la terminal de quien corre un script.
+- Todo lo que se carga lleva su fuente, y las fuentes de los datos de prueba (`ficticia`, `fixture-ficticio`, `orden-ficticio`) no entran por el panel (decisión 76).
 - Nunca subir keys al repo: usar `.env` y mantener `.env.example`. Tampoco `google-services.json`, `GoogleService-Info.plist` ni la cuenta de servicio de Firebase.
 - Ningún texto de un aviso push va escrito en la lógica: sale de `packages/shared/src/noticeTexts.ts`, en los dos idiomas.
 - `packages/shared/src/database.types.ts` y `supabase/seeds/02_research.sql` son generados: se regeneran con `pnpm gen:types` y `pnpm gen:seed`, nunca a mano.

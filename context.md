@@ -1,6 +1,6 @@
 # Carnavalero · contexto completo del proyecto
 
-Documento para poner al día a alguien que llega de cero. Estado al **2026-11-11**. Repo: <https://github.com/Emiliano-Vanzini/Carnaval>, rama de trabajo `llamadas` (Fase 6); `develop` tiene hasta la Fase 5.
+Documento para poner al día a alguien que llega de cero. Estado al **2026-11-12**. Repo: <https://github.com/Emiliano-Vanzini/Carnaval>, rama de trabajo `admin` (Fase 7); `develop` tiene hasta la Fase 6.
 
 Si algo de acá choca con los documentos del repo, mandan ellos, en este orden: `docs/DECISIONES.md`, `docs/PLAN.md`, `CLAUDE.md`.
 
@@ -102,12 +102,12 @@ El análisis completo está en `docs/competencia-carnaval-app.md`.
 | 3 · Hoy y escenarios | 10 – 23 nov | **Terminada** (2026-11-10), ya en `develop` |
 | 4 · Conjuntos, Seguir y push | 24 – 30 nov | **Código terminado** (2026-11-11), ya en `develop`; falta un aviso real (Firebase, Apple) |
 | 5 · Calendario y Concurso | 1 – 7 dic | **Código terminado** (2026-11-11), ya en `develop`; falta el fixture real, que no se publicó |
-| 6 · Modo Llamadas | 8 – 13 dic | **Código terminado** (2026-11-11) en `llamadas`; faltan el orden de desfile real y el recorrido y los cortes oficiales |
-| 7 · Datos y panel admin | 1 dic – 10 ene (en paralelo) | **Es lo que sigue** |
+| 6 · Modo Llamadas | 8 – 13 dic | **Código terminado** (2026-11-11), ya en `develop`; faltan el orden de desfile real y el recorrido y los cortes oficiales |
+| 7 · Datos y panel admin | 1 dic – 10 ene (en paralelo) | **Código terminado** (2026-11-12) en `admin`; faltan el proyecto remoto y publicar el panel |
 | 8 · QA, beta y publicación | 14 dic – 20 ene | Sin empezar |
 | 9 · Operación en temporada | 21 ene – 7 mar | — |
 
-En una frase: **la app ya muestra la noche, los conjuntos, el calendario de la temporada, el Concurso y el Desfile de Llamadas (orden, hora estimada por cuadra, recorrido y glosario, también sin señal); deja seguir conjuntos sin registrarse y tiene armados los avisos push, que todavía no salieron nunca de verdad.** Lo hace sobre datos de prueba (la grilla ficticia o la cartelera real del 28/02/2026): todavía no hay grilla real, los escenarios reales no tienen coordenadas y falta Firebase para mandar un aviso real.
+En una frase: **la app ya muestra la noche, los conjuntos, el calendario de la temporada, el Concurso y el Desfile de Llamadas (orden, hora estimada por cuadra, recorrido y glosario, también sin señal); deja seguir conjuntos sin registrarse y tiene armados los avisos push, que todavía no salieron nunca de verdad.** Lo hace sobre datos de prueba (la grilla ficticia o la cartelera real del 28/02/2026): todavía no hay grilla real, los escenarios reales no tienen coordenadas y falta Firebase para mandar un aviso real. **Desde la Fase 7 hay con qué cargar todo eso: un panel web interno que importa la cartelera de una noche pegando su texto, suspende por lluvia con su aviso, ubica los escenarios en el mapa y opera las Llamadas.**
 
 Lo que falta confirmar de la Fase 1:
 
@@ -137,7 +137,7 @@ La app se llama Carnavalero y su identificador es `uy.carnavalero.app` (decisió
 
 ```
 app/               App móvil (Vite + Capacitor). android/ e ios/ son los proyectos nativos
-admin/             Panel web de carga de datos (hoy, sólo un login de adorno)
+admin/             Panel web interno de carga de datos
 packages/shared/   @cuerda/shared: tipos de la base, fechas y normalización de nombres
 packages/db-tests/ Tests de integración de la base contra el Supabase local (pnpm test:db)
 supabase/          config.toml, migraciones, seeds/ y local/ (datos de prueba: grilla, fixture, orden de Llamadas, noche real)
@@ -179,7 +179,7 @@ LEEME.md           Cómo arrancar
 
 **`packages/db-tests`**
 
-- 259 tests contra el Supabase local: permisos tabla por tabla con usuarios anónimos, admin y falso admin; funciones; invariantes del esquema; seed contra los CSV; grilla ficticia y noche real; los avisos (quién recibe cada uno, sin repetidos) y el fixture del Concurso (la consulta, el de prueba y la carga del real).
+- 334 tests contra el Supabase local: permisos tabla por tabla con usuarios anónimos, admin y falso admin; funciones; invariantes del esquema; seed contra los CSV; grilla ficticia y noche real; los avisos (quién recibe cada uno, sin repetidos); el fixture del Concurso (la consulta, el de prueba y la carga del real); y lo del panel: importar una grilla (coincidencias, alias, móviles, reimportar sin duplicar, todo o nada, alta sin aviso y cambio con aviso), suspender y deshacer (un aviso por dispositivo), el registro de cambios, la ubicación de un escenario y la carga del desfile.
 
 **`app`**
 
@@ -203,9 +203,17 @@ LEEME.md           Cómo arrancar
 
 **`admin`**
 
-- El panel de carga: una web interna, sólo para el equipo. Hoy es una pantalla de login que sólo muestra un aviso y no se conecta a nada. 1 test.
+- El panel de carga (Fase 7): una web interna, sólo para el equipo y sólo en español. Se entra con email y contraseña, y sólo pasa quien tiene el permiso de admin; la service role nunca llega al navegador.
+- **Importar grilla:** se pega la cartelera de una noche (o se sube un CSV) y el panel muestra cada línea como nueva, cambia, igual o sin coincidencia antes de guardar nada. Un nombre que no coincide se resuelve a mano (uno existente, un alias nuevo o uno nuevo), sin sugerencias por parecido. Un encabezado como «ESCENARIOS MÓVILES» pide elegir el móvil y la parada. Publicar es todo o nada, y reimportar la misma noche no cambia nada. Probado con la cartelera real del 28/02/2026: sus 82 líneas quedan publicadas en menos de un minuto.
+- **Noche:** editar, agregar y borrar actuaciones, y **suspender** la noche entera o algunos escenarios, con un solo aviso por teléfono y la posibilidad de deshacerlo.
+- **Catálogo:** conjuntos (con sus alias y su participación en la temporada) y escenarios, con la **ubicación en el mapa** (tocando, arrastrando o buscando la dirección).
+- **Eventos** (con la venta de entradas), **Concurso** (etapas y conjuntos) y **Llamadas** (orden de desfile, horario y atraso, recorrido y cortes).
+- **Registro de cambios:** quién cambió qué y cuándo, llenado por la base.
+- 110 tests, entre ellos uno que compila el panel y controla que la service role no quede en lo que se publica.
 
-**Lo que no existe aún:** un aviso push real (falta Firebase), el fixture real del Concurso (no se publicó), los resultados y el historial, el orden de desfile real y el recorrido oficial de las Llamadas, el panel de carga, la grilla real y las coordenadas de los escenarios.
+**Scripts nuevos:** `pnpm admin:alta`, `admin:baja` y `admin:lista` (admins del panel) y `pnpm remoto:chequeo` (controla un proyecto remoto).
+
+**Lo que no existe aún:** un aviso push real (falta Firebase), el fixture real del Concurso (no se publicó), los resultados y el historial, el orden de desfile real y el recorrido oficial de las Llamadas, la grilla real y las coordenadas de los escenarios (ya hay con qué cargarlas), el proyecto remoto de Supabase y el panel publicado.
 
 ## 8. Datos semilla (`research/`)
 
@@ -349,7 +357,8 @@ Nativo: `pnpm --filter app android` (o `android:local` para usar el Supabase loc
 - **AUDECA:** pedir el orden de desfile y contenido de Llamadas (borrador 8.2).
 - **Conjuntos y comparsas:** mensaje directo por Instagram (borrador 8.3).
 - **Instagram de la app:** cuenta profesional vinculada a una Página de Facebook.
-- **Supabase remoto** (São Paulo), si todavía no está creado.
+- **Supabase remoto** (São Paulo): crearlo y armarlo con los siete pasos de `CLAUDE.md`, «Proyecto remoto». Después, publicar el panel en Vercel y dar de alta a los admins.
+- **Una muestra real de la tabla de DAECPU** («Programación de hoy», en temporada), para confirmar que el importador la lee tal como se copia.
 - **Key de MapTiler:** ponerla en `app/.env` y restringirla por origen en MapTiler Cloud (los orígenes están en `CLAUDE.md`). Con una key real todavía no se probó el mapa.
 - **GitHub Actions:** quien administra la cuenta dueña del repo tiene que resolver el pago fallido o subir el límite de gasto (Settings → Billing & plans) para que el CI arranque.
 - **Firebase:** crear el proyecto, confirmar el identificador de la app y bajar `google-services.json`; con eso se prueba un aviso real en el emulador (pasos en `CLAUDE.md`, «Avisos push»).
@@ -357,9 +366,9 @@ Nativo: `pnpm --filter app android` (o `android:local` para usar el Supabase loc
 - **Fixture del Concurso:** cuando se publique, cargarlo en `research/fixture_2027.csv` (pasos en `CLAUDE.md`).
 - **Llamadas:** cuando la IM publique el orden de desfile, cargarlo en `research/llamadas_orden_2027.csv`; cuando publique el recorrido y los cortes, corregir los dos CSV estimados y marcar el recorrido como confirmado (pasos en `CLAUDE.md`, «Modo Llamadas»). Confirmar de qué punta sale el desfile.
 - **Venta de entradas del Concurso:** cuando se anuncie la de 2027, cargarla en el evento del Concurso (`eventos.entradas_url`; pasos en `CLAUDE.md`). En 2026 fue por Abitab y la boletería del Teatro de Verano, desde tres días antes.
-- **Avisos en el proyecto remoto:** desplegar las dos Edge Functions y programarlas con `pg_cron`.
+- **Avisos en el proyecto remoto:** desplegar las dos Edge Functions y programarlas con `supabase/remoto/programar_avisos.sql`.
 - **17/11:** cargar el resultado de la Prueba de Admisión en `research/conjuntos.csv`, correr `python research/validate.py --post-prueba` y regenerar el seed con `pnpm gen:seed --post-prueba`.
-- **Coordenadas de los escenarios** y las cinco direcciones que faltan.
+- **Coordenadas de los escenarios** y las cinco direcciones que faltan: se cargan desde el panel, en Escenarios.
 - **Decisión abierta:** monetización en la primera temporada (gratis sin anuncios, o un sponsor).
 
 ## 14. Por dónde seguir leyendo

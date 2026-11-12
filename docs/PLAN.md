@@ -240,6 +240,16 @@ Listo cuando (agregado el 2026-11-12; el plan no lo traía):
 - Un usuario que no es admin no puede escribir nada.
 - El proyecto remoto tiene las migraciones, el seed, las funciones programadas y la auth anónima, y el panel está publicado.
 
+Estado al 2026-11-12: el código está hecho en la rama `admin`, con las decisiones 69 a 77. Probado de punta a punta en el navegador contra el Supabase local: la cartelera real del 28/02/2026 queda publicada desde el texto pegado en menos de un minuto (82 líneas, con las tres de «ESCENARIOS MÓVILES» resueltas y un nombre corregido), reimportarla no cambia nada, suspender la noche arma un solo aviso por teléfono y la app la muestra suspendida, y deshacerlo la devuelve a como estaba. Cómo quedó cada paso:
+
+- **1 y 2:** hechos. El login es con email y contraseña (decisión 69); los admins se dan de alta con `pnpm admin:alta`.
+- **3:** hecho, con texto pegado y CSV. El formato de tabla de DAECPU se armó a partir de las columnas de su web: fuera de temporada no hay una muestra real para confirmarlo.
+- **4:** hecho, por noche o por escenario, y se puede deshacer (decisión 72).
+- **5:** hecho: orden de desfile, horario y atraso, recorrido y cortes.
+- **Además:** registro de cambios (decisión 73), ubicación de los escenarios desde el mapa con buscador de direcciones (decisión 74) y los enlaces de entradas.
+- **Falta, y depende de cuentas:** crear el proyecto remoto de Supabase y armarlo (los pasos están en `CLAUDE.md`, «Proyecto remoto»), y publicar el panel en Vercel. Las Edge Functions van a quedar en simulacro hasta que esté Firebase.
+- **Carga inicial:** el seed ya está; el fixture del Concurso y el orden de las Llamadas, cuando se publiquen, por CSV o por el panel.
+
 ## Fase 8 · QA, beta y publicación (14 dic – 20 ene)
 
 La fecha que no se mueve: enviar a revisión de Apple y Google antes del 5 de enero, para tener dos semanas de margen antes del Inaugural.
