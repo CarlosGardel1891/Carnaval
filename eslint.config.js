@@ -24,7 +24,7 @@ export default tseslint.config(
     languageOptions: { globals: { ...globals.browser, ...globals.node } },
   },
   {
-    files: ['scripts/**/*.mjs'],
+    files: ['scripts/**/*.mjs', 'sitio/**/*.mjs'],
     languageOptions: { globals: globals.node },
   },
   {

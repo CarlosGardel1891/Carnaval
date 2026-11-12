@@ -1,6 +1,7 @@
 packages:
   - app
   - admin
+  - sitio
   - packages/*
 allowBuilds:
   '@firebase/util': false
