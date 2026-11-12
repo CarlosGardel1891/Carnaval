@@ -207,3 +207,125 @@ export async function publishGrid(request: PublishRequest): Promise<PublishSumma
   if (!summary) throw new Error('La base no devolvió el resumen de la publicación.')
   return summary
 }
+
+// ---------------------------------------------------------------- una noche
+
+export interface NightAct {
+  id: number
+  inicio: string
+  estado: EstadoActuacion
+  direccion_texto: string | null
+  fuente: string
+  fuente_url: string | null
+  actualizado_en: string
+  escenario: { id: number; nombre: string; itinerante: boolean | null }
+  conjunto: { id: number; nombre: string }
+}
+
+/** Todas las actuaciones de una noche lógica, por hora. */
+export async function fetchNightActs(noche: string): Promise<NightAct[]> {
+  const { data, error } = await supabase
+    .from('actuaciones')
+    .select(
+      'id, inicio, estado, direccion_texto, fuente, fuente_url, actualizado_en, escenario:escenarios!inner(id, nombre, itinerante), conjunto:conjuntos!inner(id, nombre)',
+    )
+    .eq('noche', noche)
+    .order('inicio')
+    .order('id')
+  if (error) throw error
+  return data
+}
+
+export interface ActPatch {
+  inicio?: string
+  escenario_id?: number
+  direccion_texto?: string | null
+  estado?: EstadoActuacion
+}
+
+/** Cambia una actuación. Un cambio de hora, lugar o estado encola su aviso (decisión 48). */
+export async function updateAct(id: number, patch: ActPatch): Promise<void> {
+  const { data, error } = await supabase.from('actuaciones').update(patch).eq('id', id).select('id')
+  if (error) throw new Error(error.message, { cause: error })
+  if (data.length === 0)
+    throw new Error('No se guardó: la actuación ya no existe o no hay permiso.')
+}
+
+export interface NewAct {
+  escenario_id: number
+  conjunto_id: number
+  inicio: string
+  direccion_texto: string | null
+  fuente: string
+  fuente_url: string | null
+}
+
+export async function addAct(act: NewAct): Promise<void> {
+  const { error } = await supabase.from('actuaciones').insert(act)
+  if (error) throw new Error(error.message, { cause: error })
+}
+
+export async function deleteAct(id: number): Promise<void> {
+  const { data, error } = await supabase.from('actuaciones').delete().eq('id', id).select('id')
+  if (error) throw new Error(error.message, { cause: error })
+  if (data.length === 0) throw new Error('No se borró: la actuación ya no existe o no hay permiso.')
+}
+
+/**
+ * Pide que los avisos de cambio salgan ya, sin la espera de un minuto (decisión 72). Si
+ * falla no se pierde nada: salen con la pasada de cada minuto. Devuelve si pudo.
+ */
+export async function sendChangeNotices(): Promise<boolean> {
+  try {
+    const { error } = await supabase.functions.invoke('avisos-de-cambios', {
+      body: { sin_espera: true },
+    })
+    return !error
+  } catch {
+    return false
+  }
+}
+
+export interface Suspension {
+  id: number
+  motivo: string | null
+  creado_email: string | null
+  creado_en: string
+  deshecha_en: string | null
+  actuaciones: number
+}
+
+export async function fetchSuspensions(noche: string): Promise<Suspension[]> {
+  const { data, error } = await supabase
+    .from('suspensiones')
+    .select('id, motivo, creado_email, creado_en, deshecha_en, suspension_actuaciones(count)')
+    .eq('noche', noche)
+    .order('id', { ascending: false })
+  if (error) throw error
+  return data.map(({ suspension_actuaciones, ...row }) => ({
+    ...row,
+    actuaciones: suspension_actuaciones[0]?.count ?? 0,
+  }))
+}
+
+/** Suspende la noche: todos los escenarios (`null`) o los que se pasan. Devuelve cuántas tocó. */
+export async function suspendNight(
+  noche: string,
+  stageIds: number[] | null,
+  motivo: string,
+): Promise<number> {
+  const { data, error } = await supabase.rpc('suspender_noche', {
+    p_noche: noche,
+    ...(stageIds ? { p_escenarios: stageIds } : {}),
+    ...(motivo.trim() ? { p_motivo: motivo.trim() } : {}),
+  })
+  if (error) throw new Error(error.message, { cause: error })
+  return data[0]?.actuaciones ?? 0
+}
+
+/** Deshace una suspensión. Devuelve cuántas actuaciones volvieron a como estaban. */
+export async function undoSuspension(id: number): Promise<number> {
+  const { data, error } = await supabase.rpc('deshacer_suspension', { p_suspension_id: id })
+  if (error) throw new Error(error.message, { cause: error })
+  return data
+}

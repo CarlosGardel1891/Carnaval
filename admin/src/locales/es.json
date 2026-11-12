@@ -7,7 +7,8 @@
   },
   "nav": {
     "home": "Inicio",
-    "import": "Importar grilla"
+    "import": "Importar grilla",
+    "night": "Noche"
   },
   "login": {
     "title": "Carnavalero · Admin",
@@ -24,7 +25,8 @@
     "title": "Inicio",
     "intro": "Elegí qué querés cargar.",
     "cards": {
-      "import": "Pegá la cartelera de una noche o subí un CSV, revisá la vista previa y publicá."
+      "import": "Pegá la cartelera de una noche o subí un CSV, revisá la vista previa y publicá.",
+      "night": "Las actuaciones de una noche: corregir una hora, agregar, borrar y suspender por lluvia."
     }
   },
   "category": {
@@ -153,5 +155,68 @@
     "publishedCatalog": "Además: {{conjuntos_creados}} conjuntos creados, {{escenarios_creados}} escenarios creados y {{alias_agregados}} alias agregados.",
     "seeNight": "Ver la noche cargada",
     "another": "Importar otra cartelera"
+  },
+  "night": {
+    "title": "Actuaciones de una noche",
+    "intro": "Lo que la app muestra esa noche. Cambiar la hora, el lugar o el estado de una actuación le avisa a quien sigue a ese conjunto.",
+    "night": "Noche",
+    "goImport": "Importar una cartelera",
+    "loadFailed": "No se pudo cargar la noche.",
+    "summary_one": "{{count}} actuación en {{stages}} escenarios; {{suspended}} suspendidas.",
+    "summary_other": "{{count}} actuaciones en {{stages}} escenarios; {{suspended}} suspendidas.",
+    "edit": "Editar {{conjunto}}",
+    "delete": "Borrar {{conjunto}}",
+    "confirmDelete": "Sí, borrar {{conjunto}}",
+    "source": "Fuente: {{fuente}}",
+    "updated": "actualizada el {{when}}",
+    "field": {
+      "time": "Hora",
+      "stage": "Escenario",
+      "stop": "Parada o dirección de esa noche",
+      "state": "Estado"
+    },
+    "editHint": "Si cambiás la hora o el lugar de una actuación programada, queda como «Cambió». Borrar no avisa: para una función que no se hace, usá «Suspendida».",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "saved": "Guardado.",
+    "nothingChanged": "No había nada para cambiar.",
+    "deleted": "Actuación borrada.",
+    "added": "Actuación agregada.",
+    "add": {
+      "title": "Agregar una actuación",
+      "stage": "Escenario",
+      "group": "Conjunto",
+      "time": "Hora",
+      "stop": "Parada o dirección (itinerantes)",
+      "source": "Fuente",
+      "sourceUrl": "Enlace a la fuente (opcional)",
+      "hint": "La hora es de Montevideo. Antes de las 06:00 es la madrugada de esa misma noche.",
+      "submit": "Agregar"
+    }
+  },
+  "suspend": {
+    "title": "Suspender",
+    "open": "Suspender la noche…",
+    "nothing": "No hay actuaciones para suspender.",
+    "choose": "Elegí qué se suspende. Con todos los escenarios marcados se suspende la noche entera.",
+    "stage_one": "{{nombre}} ({{count}} actuación)",
+    "stage_other": "{{nombre}} ({{count}} actuaciones)",
+    "reason": "Motivo (opcional)",
+    "confirmNight_one": "Se suspende la noche entera: {{count}} actuación. Se manda un solo aviso a cada teléfono.",
+    "confirmNight_other": "Se suspende la noche entera: {{count}} actuaciones. Se manda un solo aviso a cada teléfono.",
+    "confirmStages_one": "Se suspende {{count}} actuación en {{stages}} escenarios. Se manda un solo aviso a cada teléfono.",
+    "confirmStages_other": "Se suspenden {{count}} actuaciones en {{stages}} escenarios. Se manda un solo aviso a cada teléfono.",
+    "confirm": "Confirmar la suspensión",
+    "suspended_one": "{{count}} actuación suspendida.",
+    "suspended_other": "{{count}} actuaciones suspendidas.",
+    "undone_one": "{{count}} actuación volvió a como estaba.",
+    "undone_other": "{{count}} actuaciones volvieron a como estaban.",
+    "notified": "Los avisos ya salieron.",
+    "notifyLater": "No se pudo pedir el aviso ahora: sale solo en el próximo minuto.",
+    "entry_one": "{{count}} actuación suspendida el {{when}} por {{who}}",
+    "entry_other": "{{count}} actuaciones suspendidas el {{when}} por {{who}}",
+    "system": "el sistema",
+    "undoneAt": "deshecha el {{when}}",
+    "undo": "Deshacer"
   }
 }

@@ -2,4 +2,5 @@
 export const sections: { to: string; label: string }[] = [
   { to: '/', label: 'home' },
   { to: '/grilla/importar', label: 'import' },
+  { to: '/grilla', label: 'night' },
 ]

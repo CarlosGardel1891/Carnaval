@@ -35,3 +35,6 @@ export const formatDateTime = (instant: string | Date) => dateTimeFormat.format(
 export const formatNight = (date: string) => nightFormat.format(new Date(`${date}T00:00:00Z`))
 
 export const isIsoDate = (text: string) => /^\d{4}-\d{2}-\d{2}$/.test(text)
+
+/** «HH:MM» de un campo de hora, o null si no lo es. */
+export const isTime = (text: string) => /^([01]\d|2[0-3]):[0-5]\d$/.test(text)
