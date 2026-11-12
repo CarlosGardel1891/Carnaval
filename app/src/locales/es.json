@@ -425,6 +425,13 @@
     "retry": "Volver al inicio"
   },
   "dev": {
-    "simulatedClock": "Reloj simulado: {{date}}, {{time}}"
+    "simulatedClock": "Reloj simulado: {{date}}, {{time}}",
+    "look": {
+      "label": "Diseño",
+      "actual": "Actual",
+      "clara": "Clara",
+      "tablado": "Tablado",
+      "festiva": "Festiva"
+    }
   }
 }

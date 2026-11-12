@@ -83,7 +83,7 @@ export function TabBar() {
   return (
     <nav
       aria-label={t('nav.label')}
-      className="border-line bg-surface border-t pb-[env(safe-area-inset-bottom)]"
+      className="look-tabbar border-line bg-surface border-t pb-[env(safe-area-inset-bottom)]"
     >
       <ul className="flex">
         <Tab to="/" label={t('nav.today')} icon={<TodayIcon />} />

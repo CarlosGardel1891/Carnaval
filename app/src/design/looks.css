@@ -1,0 +1,308 @@
+/*
+ * Las tres direcciones visuales del rediseño, para elegir (sólo en desarrollo). Cada una
+ * redefine los colores de la app y suma lo suyo. Se prenden con `data-look` en <html>, que pone
+ * `useLook` mientras se mira la pantalla Hoy. Sin `data-look`, la app se ve como hasta ahora.
+ *
+ * Cuando se elija una, sus valores pasan a `index.css` y este archivo se borra.
+ */
+
+/* Las tipografías van dentro de la app, para que anden sin señal: sólo el subconjunto latino. */
+@font-face {
+  font-family: 'Inter Variable';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 900;
+  src: url('@fontsource-variable/inter/files/inter-latin-wght-normal.woff2')
+    format('woff2-variations');
+}
+@font-face {
+  font-family: 'Bricolage Grotesque Variable';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 200 800;
+  src: url('@fontsource-variable/bricolage-grotesque/files/bricolage-grotesque-latin-wght-normal.woff2')
+    format('woff2-variations');
+}
+@font-face {
+  font-family: 'Fraunces Variable';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 900;
+  src: url('@fontsource-variable/fraunces/files/fraunces-latin-wght-normal.woff2')
+    format('woff2-variations');
+}
+@font-face {
+  font-family: 'Unbounded Variable';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 200 900;
+  src: url('@fontsource-variable/unbounded/files/unbounded-latin-wght-normal.woff2')
+    format('woff2-variations');
+}
+
+html[data-look] {
+  --look-body: 'Inter Variable', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  /* Un color por categoría, igual en las tres: se lee la grilla de un vistazo. */
+  --cat-murga: #e5484d;
+  --cat-parodistas: #8e5bd9;
+  --cat-humoristas: #e8a400;
+  --cat-revista: #e0409f;
+  --cat-comparsa: #0fa3a0;
+  --cat-samba: #4f9d2d;
+  --cat-otro: #7b8794;
+  font-family: var(--look-body);
+}
+
+html[data-look] body {
+  font-family: var(--look-body);
+  font-feature-settings: 'cv11', 'ss01';
+}
+
+/* ------------------------------------------------------------------ 1 · clara
+ * Luminosa, muy de iPhone: fondo gris claro agrupado, tarjetas blancas, azul del logo.
+ */
+html[data-look='clara'] {
+  color-scheme: light;
+  --color-ground: #f2f3f8;
+  --color-surface: #ffffff;
+  --color-raised: #eef1f7;
+  --color-line: #e1e5ee;
+  --color-ink: #0b1b33;
+  --color-soft: #5b6779;
+  --color-accent: #0448a7;
+  --color-accent-ink: #ffffff;
+  --color-danger: #c62828;
+  --color-ok: #1b7f3b;
+  --look-display: 'Bricolage Grotesque Variable', var(--look-body);
+  --look-card-title: var(--look-display);
+  --look-bar: #f2f3f8;
+  --look-title: #0448a7;
+  --look-header: transparent;
+  --look-header-ink: #0b1b33;
+  --look-header-soft: #5b6779;
+  --look-card-shadow: 0 1px 2px rgb(11 27 51 / 0.06), 0 6px 20px rgb(11 27 51 / 0.05);
+  --look-seg: #e4e7f0;
+  --look-seg-on: #ffffff;
+  --look-seg-on-ink: #0b1b33;
+  --look-live: #e5484d;
+  --look-live-ink: #ffffff;
+  --look-live-row: #fff1f0;
+  --look-chip: #ffffff;
+  --look-chip-ink: #0b1b33;
+  --look-chip-line: #d8dde8;
+  --look-chip-on: #0448a7;
+  --look-chip-on-ink: #ffffff;
+  --look-tab: rgb(255 255 255 / 0.82);
+  background-color: #f2f3f8;
+}
+
+/* ------------------------------------------------------------------ 2 · tablado
+ * Noche de tablado: azul noche profundo, luz cálida de bombitas y colores de papel picado.
+ */
+html[data-look='tablado'] {
+  color-scheme: dark;
+  --color-ground: #0b1430;
+  --color-surface: #16224a;
+  --color-raised: #1f2e60;
+  --color-line: #2c3c75;
+  --color-ink: #fff8ea;
+  --color-soft: #b9c3e6;
+  --color-accent: #ffc247;
+  --color-accent-ink: #231600;
+  --color-danger: #ff8f8f;
+  --color-ok: #8ee6a8;
+  --look-display: 'Fraunces Variable', Georgia, serif;
+  --look-card-title: var(--look-display);
+  --look-bar: #14245a;
+  --look-title: #fff8ea;
+  --look-header:
+    radial-gradient(120% 90% at 50% -30%, rgb(255 194 71 / 0.32), transparent 62%),
+    linear-gradient(180deg, #14245a 0%, #0b1430 100%);
+  --look-header-ink: #fff8ea;
+  --look-header-soft: #c9d2f0;
+  --look-card-shadow: 0 1px 0 rgb(255 255 255 / 0.05) inset, 0 10px 30px rgb(0 0 0 / 0.35);
+  --look-seg: #0f1a3d;
+  --look-seg-on: #ffc247;
+  --look-seg-on-ink: #231600;
+  --look-live: #ffc247;
+  --look-live-ink: #231600;
+  --look-live-row: rgb(255 194 71 / 0.12);
+  --look-chip: #16224a;
+  --look-chip-ink: #fff8ea;
+  --look-chip-line: #33448a;
+  --look-chip-on: #ffc247;
+  --look-chip-on-ink: #231600;
+  --look-tab: rgb(11 20 48 / 0.82);
+  --cat-murga: #ff7a70;
+  --cat-parodistas: #b79bff;
+  --cat-humoristas: #ffd24a;
+  --cat-revista: #ff7cc4;
+  --cat-comparsa: #4fd6cf;
+  --cat-samba: #9bdc6a;
+  --cat-otro: #a9b4cc;
+  background-color: #0b1430;
+}
+
+/* ------------------------------------------------------------------ 3 · festiva
+ * Audaz: el azul del logo a pleno arriba, papelitos, y color fuerte en todo lo que se toca.
+ */
+html[data-look='festiva'] {
+  color-scheme: light;
+  --color-ground: #eaf3ff;
+  --color-surface: #ffffff;
+  --color-raised: #dbe9ff;
+  --color-line: #cfe0fa;
+  --color-ink: #06204d;
+  --color-soft: #47608a;
+  --color-accent: #ff3d6e;
+  --color-accent-ink: #ffffff;
+  --color-danger: #c62828;
+  --color-ok: #1b7f3b;
+  --look-display: 'Unbounded Variable', var(--look-body);
+  /* Unbounded es muy ancha para un nombre de escenario: en las tarjetas va la de lectura. */
+  --look-card-title: var(--look-body);
+  --look-bar: #0448a7;
+  --look-title: #ffffff;
+  --look-header: linear-gradient(160deg, #0448a7 0%, #0a66d8 55%, #2aa5ff 100%);
+  --look-header-ink: #ffffff;
+  --look-header-soft: #d6e8ff;
+  --look-card-shadow: 0 2px 0 rgb(4 72 167 / 0.1), 0 12px 28px rgb(4 72 167 / 0.14);
+  --look-seg: rgb(255 255 255 / 0.22);
+  --look-seg-on: #ffffff;
+  --look-seg-on-ink: #0448a7;
+  --look-live: #ff3d6e;
+  --look-live-ink: #ffffff;
+  --look-live-row: #fff0f4;
+  --look-chip: #ffffff;
+  --look-chip-ink: #06204d;
+  --look-chip-line: #bcd4f7;
+  --look-chip-on: #ffd23f;
+  --look-chip-on-ink: #06204d;
+  --look-tab: rgb(255 255 255 / 0.86);
+  --cat-humoristas: #f2a900;
+  background-color: #eaf3ff;
+}
+
+/* ------------------------------------------------------------------ piezas comunes */
+
+.look-display {
+  font-family: var(--look-display);
+}
+
+.look-card-title {
+  font-family: var(--look-card-title);
+}
+
+.look-header {
+  background: var(--look-header);
+  color: var(--look-header-ink);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Clara: una tira finita con los colores de las categorías, como banderines. */
+html[data-look='clara'] .look-header::after {
+  content: '';
+  position: absolute;
+  inset: auto 16px 0 16px;
+  height: 4px;
+  border-radius: 4px;
+  background: linear-gradient(
+    90deg,
+    var(--cat-murga) 0 20%,
+    var(--cat-humoristas) 20% 40%,
+    var(--cat-comparsa) 40% 60%,
+    var(--cat-parodistas) 60% 80%,
+    var(--cat-revista) 80% 100%
+  );
+}
+
+.look-card {
+  background: var(--color-surface);
+  border-radius: 20px;
+  box-shadow: var(--look-card-shadow);
+}
+
+.look-seg {
+  background: var(--look-seg);
+  border-radius: 12px;
+  padding: 3px;
+}
+.look-seg button {
+  border-radius: 9px;
+  min-height: 38px;
+  transition:
+    background-color 160ms ease,
+    color 160ms ease,
+    box-shadow 160ms ease;
+}
+.look-seg button[aria-pressed='true'] {
+  background: var(--look-seg-on);
+  color: var(--look-seg-on-ink);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.18);
+}
+
+.look-chip {
+  background: var(--look-chip);
+  color: var(--look-chip-ink);
+  border: 1px solid var(--look-chip-line);
+  transition:
+    background-color 140ms ease,
+    color 140ms ease,
+    transform 140ms ease;
+}
+.look-chip:active {
+  transform: scale(0.96);
+}
+.look-chip[aria-pressed='true'] {
+  background: var(--look-chip-on);
+  color: var(--look-chip-on-ink);
+  border-color: transparent;
+}
+
+/* «Ahora en escena»: un punto que late, suave. Sin animación si el teléfono pide menos movimiento. */
+.look-live {
+  background: var(--look-live);
+  color: var(--look-live-ink);
+}
+.look-live-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: currentColor;
+  position: relative;
+}
+.look-live-dot::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: 999px;
+  border: 2px solid currentColor;
+  opacity: 0;
+  animation: look-pulse 1.8s ease-out infinite;
+}
+@keyframes look-pulse {
+  0% {
+    transform: scale(0.6);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(1.6);
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .look-live-dot::after {
+    animation: none;
+  }
+}
+
+.look-live-row {
+  background: var(--look-live-row);
+}
+
+.look-tabbar {
+  background: var(--look-tab);
+  -webkit-backdrop-filter: saturate(180%) blur(18px);
+  backdrop-filter: saturate(180%) blur(18px);
+}

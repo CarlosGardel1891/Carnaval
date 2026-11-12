@@ -1,4 +1,5 @@
 @import 'tailwindcss';
+@import './design/looks.css';
 
 /*
  * Un solo tema, oscuro: la app se usa de noche y en la calle. Fondo casi negro, texto
