@@ -819,6 +819,19 @@ export type Database = {
           rueda: Database['public']['Enums']['rueda_concurso']
         }[]
       }
+      fuente_reservada: { Args: { p_fuente: string }; Returns: boolean }
+      grilla_sobrante: {
+        Args: { p_filas: Json; p_noche: string }
+        Returns: {
+          actuacion_id: number
+          conjunto_id: number
+          conjunto_nombre: string
+          escenario_id: number
+          escenario_nombre: string
+          estado: Database['public']['Enums']['estado_actuacion']
+          inicio: string
+        }[]
+      }
       mis_favoritos: { Args: Record<PropertyKey, never>; Returns: number[] }
       norm: { Args: { t: string }; Returns: string }
       norm_lista: { Args: { t: string[] }; Returns: string[] }
@@ -831,6 +844,26 @@ export type Database = {
           conjunto_slug: string
           fuente: string
           posicion: number
+        }[]
+      }
+      previsualizar_grilla: {
+        Args: { p_filas: Json; p_noche: string }
+        Returns: {
+          actuacion_id: number
+          conjunto_id: number
+          conjunto_nombre: string
+          direccion: string
+          direccion_actual: string
+          escenario_id: number
+          escenario_itinerante: boolean
+          escenario_nombre: string
+          estado: string
+          estado_actual: Database['public']['Enums']['estado_actuacion']
+          inicio: string
+          inicio_actual: string
+          lat: number
+          lng: number
+          n: number
         }[]
       }
       proximas_de_conjunto: {
@@ -855,6 +888,27 @@ export type Database = {
           precio_texto: string
         }[]
       }
+      publicar_grilla: {
+        Args: {
+          p_alias?: Json
+          p_filas: Json
+          p_fuente: string
+          p_fuente_url: string
+          p_noche: string
+          p_nuevos?: Json
+          p_sobrantes?: Json
+        }
+        Returns: {
+          alias_agregados: number
+          borradas: number
+          cambiadas: number
+          conjuntos_creados: number
+          escenarios_creados: number
+          iguales: number
+          nuevas: number
+          suspendidas: number
+        }[]
+      }
       recorrido_del_desfile: {
         Args: { p_evento_id: number }
         Returns: {
@@ -874,6 +928,7 @@ export type Database = {
         }
         Returns: undefined
       }
+      slug_de: { Args: { p_nombre: string }; Returns: string }
       tomar_avisos_de_cambios: {
         Args: { p_hasta: string; p_noche: string }
         Returns: {
