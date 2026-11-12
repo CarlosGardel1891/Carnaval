@@ -6,7 +6,8 @@
     "signedInAs": "Sesión de {{email}}"
   },
   "nav": {
-    "home": "Inicio"
+    "home": "Inicio",
+    "import": "Importar grilla"
   },
   "login": {
     "title": "Carnavalero · Admin",
@@ -21,6 +22,136 @@
   },
   "home": {
     "title": "Inicio",
-    "intro": "Elegí qué querés cargar."
+    "intro": "Elegí qué querés cargar.",
+    "cards": {
+      "import": "Pegá la cartelera de una noche o subí un CSV, revisá la vista previa y publicá."
+    }
+  },
+  "category": {
+    "murga": "Murga",
+    "parodistas": "Parodistas",
+    "humoristas": "Humoristas",
+    "revista": "Revista",
+    "comparsa": "Comparsa",
+    "samba": "Escuela de samba",
+    "otro": "Otro"
+  },
+  "stageType": {
+    "teatro_verano": "Teatro de Verano",
+    "privado": "Tablado privado",
+    "popular": "Escenario popular",
+    "movil": "Escenario móvil",
+    "gratuito": "Escenario gratuito",
+    "barrio_a_barrio": "Barrio a Barrio"
+  },
+  "status": {
+    "programada": "Programada",
+    "cambiada": "Cambió",
+    "suspendida": "Suspendida"
+  },
+  "import": {
+    "title": "Importar grilla",
+    "intro": "Pegá la cartelera de una noche tal como se publicó, o subí un CSV. Nada se guarda hasta que publiques.",
+    "night": "Noche",
+    "source": "Fuente",
+    "sourceHint": "De dónde salió: «DAECPU», «El Observador»…",
+    "sourceUrl": "Enlace a la fuente (opcional)",
+    "text": "Cartelera",
+    "textHint": "El nombre del escenario y, debajo, una línea por conjunto («20:00 - CABALLEROS»). También sirve una tabla copiada, con una fila por actuación.",
+    "read": "Leer la cartelera",
+    "csv": "O subí un CSV:",
+    "template": "Descargar la plantilla del CSV",
+    "readError": {
+      "empty": "No hay nada para leer en ese texto.",
+      "csvHeader": "El CSV tiene que empezar con el encabezado de la plantilla: escenario,hora,conjunto,direccion."
+    },
+    "nightMissing": "Elegí la noche.",
+    "outOfSeason": "El {{noche}} está fuera de la temporada. Se puede cargar igual: revisá que la noche sea la correcta.",
+    "otherDates": "La tabla trae otra fecha ({{dates}}) y la noche elegida es {{noche}}. Todo se carga en la noche elegida.",
+    "previewFailed": "No se pudo armar la vista previa. Revisá la conexión y volvé a leer la cartelera.",
+    "unread": {
+      "title_one": "Hay {{count}} línea que no se pudo leer. No se carga: revisala.",
+      "title_other": "Hay {{count}} líneas que no se pudieron leer. No se cargan: revisalas.",
+      "line": "Línea {{line}}:",
+      "reason": {
+        "noStage": "tiene hora pero no hay un escenario arriba",
+        "noActs": "no tiene actuaciones debajo",
+        "badTime": "la hora no existe",
+        "noGroup": "falta el conjunto",
+        "incomplete": "le falta el escenario, la hora o el conjunto"
+      }
+    },
+    "unmatched": {
+      "title": "Nombres sin coincidencia",
+      "intro": "Estos nombres no coinciden con ningún nombre ni alias cargado. Decí qué es cada uno: no se adivina por parecido.",
+      "stage_one": "· escenario, {{count}} línea",
+      "stage_other": "· escenario, {{count}} líneas",
+      "group_one": "· conjunto, {{count}} línea",
+      "group_other": "· conjunto, {{count}} líneas"
+    },
+    "resolve": {
+      "existing": {
+        "stage": "Es un escenario que ya está cargado",
+        "group": "Es un conjunto que ya está cargado"
+      },
+      "pick": {
+        "stage": "Qué escenario es «{{name}}»",
+        "group": "Qué conjunto es «{{name}}»"
+      },
+      "choose": "Elegí uno…",
+      "saveAlias": "Guardar «{{name}}» como alias",
+      "saveAliasHint": {
+        "stage": "Así la próxima cartelera lo reconoce sola. No lo marques si el nombre es genérico, como «ESCENARIOS MÓVILES», que no dice cuál es.",
+        "group": "Así la próxima cartelera lo reconoce sola."
+      },
+      "new": {
+        "stage": "Es un escenario nuevo",
+        "group": "Es un conjunto nuevo"
+      },
+      "newName": "Nombre con el que se crea «{{name}}»",
+      "category": "Categoría de «{{name}}»",
+      "stageType": "Tipo de «{{name}}»",
+      "itinerant": "Es itinerante: cada noche para en un lugar distinto"
+    },
+    "preview": {
+      "title": "Vista previa",
+      "summary": "{{total}} líneas: {{nueva}} nuevas, {{cambia}} que cambian, {{igual}} iguales, {{sin_coincidencia}} sin coincidencia y {{duplicada}} repetidas.",
+      "stageMissing": "escenario sin coincidencia",
+      "stop": "Parada de «{{name}}» esa noche",
+      "stopMissing": "Sin parada, la app no va a decir dónde es.",
+      "was": "estaba a las {{hora}}",
+      "suspended": "está suspendida y sigue suspendida",
+      "exclude": "Quitar {{hora}} {{conjunto}}"
+    },
+    "status": {
+      "nueva": "Nueva",
+      "cambia": "Cambia",
+      "igual": "Igual",
+      "sin_coincidencia": "Sin coincidencia",
+      "duplicada": "Repetida"
+    },
+    "excluded": {
+      "title": "Líneas que no se cargan",
+      "restore": "Volver a incluir {{hora}} {{conjunto}}"
+    },
+    "leftovers": {
+      "title": "Cargado antes y no viene en esta cartelera",
+      "intro": "Son actuaciones de esa noche en los mismos escenarios. Por defecto se dejan como están.",
+      "action": "Qué hacer con {{conjunto}} en {{escenario}}",
+      "keep": "Dejarla",
+      "suspend": "Suspenderla (avisa)",
+      "delete": "Borrarla"
+    },
+    "sourceMissing": "Falta la fuente: todo lo que se carga dice de dónde salió.",
+    "blocked": "No se puede publicar todavía: hay {{sin_coincidencia}} líneas sin coincidencia y {{duplicada}} repetidas. Resolvelas o quitalas.",
+    "willNotify_one": "{{count}} actuación ya publicada cambia: se le avisa a quien sigue a ese conjunto.",
+    "willNotify_other": "{{count}} actuaciones ya publicadas cambian: se les avisa a quienes siguen a esos conjuntos.",
+    "publish": "Publicar la noche",
+    "publishing": "Publicando…",
+    "publishFailed": "No se publicó nada. {{message}}",
+    "published": "Publicado el {{noche}}: {{nuevas}} nuevas, {{cambiadas}} cambiadas y {{iguales}} iguales; {{suspendidas}} suspendidas y {{borradas}} borradas.",
+    "publishedCatalog": "Además: {{conjuntos_creados}} conjuntos creados, {{escenarios_creados}} escenarios creados y {{alias_agregados}} alias agregados.",
+    "seeNight": "Ver la noche cargada",
+    "another": "Importar otra cartelera"
   }
 }
