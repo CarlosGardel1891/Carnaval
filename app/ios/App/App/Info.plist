@@ -24,8 +24,10 @@
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Carnavalero usa tu ubicación para ordenar los escenarios por cercanía y mostrarte en el mapa.</string>
+	<string>Carnavalero usa tu ubicación sólo en tu teléfono, para ordenar los escenarios por cercanía y mostrarte en el mapa. No se guarda ni se envía.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

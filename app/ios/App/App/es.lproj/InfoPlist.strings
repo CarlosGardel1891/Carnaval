@@ -1,0 +1,2 @@
+/* El texto del permiso de ubicación, en español (decisión 38). */
+"NSLocationWhenInUseUsageDescription" = "Carnavalero usa tu ubicación sólo en tu teléfono, para ordenar los escenarios por cercanía y mostrarte en el mapa. No se guarda ni se envía.";

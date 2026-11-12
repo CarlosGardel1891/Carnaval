@@ -1,0 +1,2 @@
+/* The location permission text, in English (decision 38). */
+"NSLocationWhenInUseUsageDescription" = "Carnavalero uses your location only on your phone, to sort stages by distance and show you on the map. It is never stored or sent.";
