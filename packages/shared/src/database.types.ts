@@ -655,6 +655,43 @@ export type Database = {
           },
         ]
       }
+      registro_cambios: {
+        Row: {
+          antes: Json | null
+          despues: Json | null
+          fila: string
+          hecho_en: string
+          id: number
+          operacion: string
+          tabla: string
+          usuario_email: string | null
+          usuario_id: string | null
+        }
+        ComputedFields: never
+        Insert: {
+          antes?: Json | null
+          despues?: Json | null
+          fila: string
+          hecho_en?: string
+          id?: never
+          operacion: string
+          tabla: string
+          usuario_email?: string | null
+          usuario_id?: string | null
+        }
+        Update: {
+          antes?: Json | null
+          despues?: Json | null
+          fila?: string
+          hecho_en?: string
+          id?: never
+          operacion?: string
+          tabla?: string
+          usuario_email?: string | null
+          usuario_id?: string | null
+        }
+        Relationships: []
+      }
       temporadas: {
         Row: {
           anio: number
