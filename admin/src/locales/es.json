@@ -10,7 +10,9 @@
     "import": "Importar grilla",
     "night": "Noche",
     "groups": "Conjuntos",
-    "stages": "Escenarios"
+    "stages": "Escenarios",
+    "events": "Eventos",
+    "contest": "Concurso"
   },
   "login": {
     "title": "Carnavalero · Admin",
@@ -30,7 +32,9 @@
       "import": "Pegá la cartelera de una noche o subí un CSV, revisá la vista previa y publicá.",
       "night": "Las actuaciones de una noche: corregir una hora, agregar, borrar y suspender por lluvia.",
       "groups": "El catálogo de conjuntos: nombres, alias, categoría y si participan en la temporada.",
-      "stages": "Los escenarios, con su dirección y su ubicación en el mapa."
+      "stages": "Los escenarios, con su dirección y su ubicación en el mapa.",
+      "events": "El calendario de la temporada y el enlace a la venta de entradas de cada evento.",
+      "contest": "El fixture del Concurso Oficial: las etapas de cada rueda y sus conjuntos."
     }
   },
   "category": {
@@ -299,5 +303,83 @@
     "none": "Sin ubicación.",
     "clear": "Quitar la ubicación",
     "hint": "Tocá el mapa para poner el punto y arrastralo para ajustarlo. El buscador sólo propone: mirá que el punto quede donde es."
+  },
+  "round": {
+    "primera": "Primera rueda",
+    "segunda": "Segunda rueda",
+    "liguilla": "Liguilla"
+  },
+  "eventType": {
+    "inaugural": "Desfile Inaugural",
+    "samba": "Escuelas de samba",
+    "llamadas": "Llamadas",
+    "corso": "Corso",
+    "admision": "Admisión",
+    "concurso": "Concurso Oficial",
+    "otro": "Otro evento"
+  },
+  "eventStatus": {
+    "confirmado": "Fecha confirmada",
+    "estimado": "Fecha estimada"
+  },
+  "events": {
+    "title": "Eventos",
+    "intro": "El calendario de la temporada. La venta de entradas se carga acá cuando se anuncia.",
+    "new": "Nuevo evento",
+    "newTitle": "Evento nuevo",
+    "loadFailed": "No se pudieron cargar los eventos.",
+    "saved": "Evento guardado.",
+    "hasTickets": "con entradas",
+    "badDates": "Revisá las fechas: la de fin no puede ser anterior a la de inicio.",
+    "goParade": "Orden, horario, recorrido y cortes de esta noche de Llamadas",
+    "field": {
+      "name": "Nombre",
+      "type": "Tipo",
+      "from": "Fecha de inicio",
+      "to": "Fecha de fin",
+      "toHint": "Vacía si es de un solo día.",
+      "state": "Fecha",
+      "stateHint": "Una fecha estimada se muestra siempre con su marca.",
+      "place": "Lugar",
+      "info": "Aclaraciones",
+      "sources": "Fuentes"
+    },
+    "tickets": {
+      "title": "Venta de entradas",
+      "intro": "La app no vende: lleva al sitio de la venta oficial. Mientras esto esté vacío, la app no dice nada de entradas. No cargues la venta de un año anterior.",
+      "url": "Dirección de la venta oficial",
+      "badUrl": "La dirección tiene que empezar con http:// o https:// y no llevar espacios.",
+      "text": "Dónde y desde cuándo se venden",
+      "textHint": "Opcional, en pocas palabras."
+    }
+  },
+  "contest": {
+    "title": "Concurso Oficial",
+    "intro": "Cada noche del Concurso es una etapa, y sus conjuntos son las actuaciones del Teatro de Verano de esa noche.",
+    "new": "Nueva etapa",
+    "newTitle": "Etapa nueva",
+    "loadFailed": "No se pudo cargar el fixture.",
+    "empty": "Todavía no hay etapas cargadas: la app dice que el fixture no se publicó.",
+    "saved": "Etapa guardada.",
+    "groupAdded": "Conjunto agregado a la etapa.",
+    "stage": "Etapa {{numero}}",
+    "groups_one": "{{count}} conjunto",
+    "groups_other": "{{count}} conjuntos",
+    "delete": "Borrar la etapa",
+    "confirmDelete": "Sí, borrar la etapa",
+    "dateWarning": "Cambiar la fecha de la etapa no mueve sus actuaciones: corregí la hora de cada una en la noche.",
+    "night": "Conjuntos del {{noche}}",
+    "noGroups": "Todavía no tiene conjuntos.",
+    "editNight": "Corregir horas, suspender o borrar: ir a la noche",
+    "addGroup": "Agregar un conjunto",
+    "addTime": "Hora",
+    "noTheater": "No hay ningún escenario de tipo «Teatro de Verano» cargado: creálo en Escenarios para poder agregar conjuntos.",
+    "field": {
+      "round": "Rueda",
+      "number": "Número de etapa",
+      "date": "Fecha de la noche",
+      "source": "Fuente",
+      "sourceUrl": "Enlace a la fuente (opcional)"
+    }
   }
 }

@@ -1,9 +1,13 @@
 // Todo lo que habla con Supabase desde el panel. Los tests de pantallas lo reemplazan con
 // `vi.mock('…/lib/api')`, que toma el doble de `__mocks__/api.ts`: al agregar una función
 // acá hay que sumarla ahí.
-import type { CategoriaConjunto, EstadoActuacion, Json, TipoEscenario } from '@cuerda/shared'
+import type { CategoriaConjunto, Enums, EstadoActuacion, Json, TipoEscenario } from '@cuerda/shared'
 import type { Session } from '@supabase/supabase-js'
 import { supabase } from './supabase'
+
+export type TipoEvento = Enums<'tipo_evento'>
+export type EstadoEvento = Enums<'estado_evento'>
+export type RuedaConcurso = Enums<'rueda_concurso'>
 
 export interface AdminSession {
   email: string
@@ -259,6 +263,8 @@ export interface NewAct {
   direccion_texto: string | null
   fuente: string
   fuente_url: string | null
+  /** La etapa del Concurso, si es una actuación del Teatro de Verano en una noche de concurso. */
+  etapa_id?: number
 }
 
 export async function addAct(act: NewAct): Promise<void> {
@@ -439,4 +445,105 @@ export async function saveStage(id: number | null, fields: StageFields): Promise
   const [saved] = data
   if (!saved) throw new Error('No se guardó: el escenario ya no existe o no hay permiso.')
   return saved.id
+}
+
+// ---------------------------------------------------------------- eventos
+
+export interface EventRow {
+  id: number
+  temporada_id: number
+  slug: string
+  tipo: TipoEvento
+  nombre: string
+  fecha_inicio: string
+  fecha_fin: string
+  lugar: string | null
+  estado: EstadoEvento
+  info: string | null
+  fuente_url: string[]
+  /** La venta de entradas es un dato de cada evento (decisión 60). */
+  entradas_url: string | null
+  entradas_texto: string | null
+}
+
+const EVENT_COLUMNS =
+  'id, temporada_id, slug, tipo, nombre, fecha_inicio, fecha_fin, lugar, estado, info, fuente_url, entradas_url, entradas_texto'
+
+export async function fetchEvents(): Promise<EventRow[]> {
+  const { data, error } = await supabase
+    .from('eventos')
+    .select(EVENT_COLUMNS)
+    .order('fecha_inicio')
+    .order('id')
+  if (error) throw error
+  return data
+}
+
+export type EventFields = Omit<EventRow, 'id'>
+
+/** Crea (sin `id`) o cambia un evento. Devuelve su id. */
+export async function saveEvent(id: number | null, fields: EventFields): Promise<number> {
+  const query = id
+    ? supabase.from('eventos').update(fields).eq('id', id).select('id')
+    : supabase.from('eventos').insert(fields).select('id')
+  const { data, error } = await query
+  if (error) throw new Error(error.message, { cause: error })
+  const [row] = data
+  if (!row) throw new Error('No se guardó: el evento ya no existe o no hay permiso.')
+  return row.id
+}
+
+// ---------------------------------------------------------------- Concurso
+
+export interface ContestStage {
+  id: number
+  temporada_id: number
+  rueda: RuedaConcurso
+  numero: number
+  fecha: string
+  fuente: string
+  fuente_url: string | null
+  /** Los conjuntos de esa noche: actuaciones del Teatro de Verano con esa etapa (decisión 57). */
+  actuaciones: {
+    id: number
+    inicio: string
+    estado: EstadoActuacion
+    conjunto: { nombre: string }
+  }[]
+}
+
+export async function fetchContest(): Promise<ContestStage[]> {
+  const { data, error } = await supabase
+    .from('etapas_concurso')
+    .select(
+      'id, temporada_id, rueda, numero, fecha, fuente, fuente_url, actuaciones(id, inicio, estado, conjunto:conjuntos!inner(nombre))',
+    )
+    .order('fecha')
+    .order('numero')
+    .order('inicio', { referencedTable: 'actuaciones' })
+  if (error) throw error
+  return data
+}
+
+export type ContestStageFields = Omit<ContestStage, 'id' | 'actuaciones'>
+
+export async function saveContestStage(
+  id: number | null,
+  fields: ContestStageFields,
+): Promise<number> {
+  const query = id
+    ? supabase.from('etapas_concurso').update(fields).eq('id', id).select('id')
+    : supabase.from('etapas_concurso').insert(fields).select('id')
+  const { data, error } = await query
+  if (error) throw new Error(error.message, { cause: error })
+  const [row] = data
+  if (!row) throw new Error('No se guardó: la etapa ya no existe o no hay permiso.')
+  return row.id
+}
+
+/** Borra una etapa. Sus actuaciones quedan en la grilla, sin etapa. */
+export async function deleteContestStage(id: number): Promise<void> {
+  const { data, error } = await supabase.from('etapas_concurso').delete().eq('id', id).select('id')
+  if (error) throw new Error(error.message, { cause: error })
+  if (data.length === 0) throw new Error('No se borró: la etapa ya no existe o no hay permiso.')
 }

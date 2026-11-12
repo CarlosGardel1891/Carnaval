@@ -5,4 +5,6 @@ export const sections: { to: string; label: string }[] = [
   { to: '/grilla', label: 'night' },
   { to: '/conjuntos', label: 'groups' },
   { to: '/escenarios', label: 'stages' },
+  { to: '/eventos', label: 'events' },
+  { to: '/concurso', label: 'contest' },
 ]
