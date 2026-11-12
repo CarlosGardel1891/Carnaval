@@ -1,0 +1,3 @@
+# Web interna: que no la indexe nadie.
+User-agent: *
+Disallow: /

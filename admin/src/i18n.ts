@@ -1,19 +1,14 @@
 import i18n from 'i18next'
-import LanguageDetector from 'i18next-browser-languagedetector'
 import { initReactI18next } from 'react-i18next'
-import en from './locales/en.json'
 import es from './locales/es.json'
 
-void i18n
-  .use(LanguageDetector)
-  .use(initReactI18next)
-  .init({
-    resources: { es: { translation: es }, en: { translation: en } },
-    fallbackLng: 'es',
-    supportedLngs: ['es', 'en'],
-    load: 'languageOnly',
-    detection: { order: ['localStorage', 'navigator'], caches: ['localStorage'] },
-    interpolation: { escapeValue: false },
-  })
+// El panel es una web interna y va sólo en español (decisión 70). Los textos igual salen de
+// acá, no de los componentes.
+void i18n.use(initReactI18next).init({
+  resources: { es: { translation: es } },
+  lng: 'es',
+  fallbackLng: 'es',
+  interpolation: { escapeValue: false },
+})
 
 export default i18n

@@ -1,8 +1,26 @@
 {
+  "app": {
+    "name": "Carnavalero · Admin",
+    "loading": "Cargando…",
+    "signOut": "Salir",
+    "signedInAs": "Sesión de {{email}}"
+  },
+  "nav": {
+    "home": "Inicio"
+  },
   "login": {
-    "title": "Carnavalero · Panel de carga",
+    "title": "Carnavalero · Admin",
+    "intro": "Panel interno de carga de datos.",
     "email": "Email",
+    "password": "Contraseña",
     "submit": "Entrar",
-    "placeholderNotice": "El login todavía no está conectado (llega en la Fase 7)."
+    "submitting": "Entrando…",
+    "wrong": "El email o la contraseña no son correctos.",
+    "denied": "Esa cuenta no tiene permiso de admin.",
+    "failed": "No se pudo iniciar la sesión. Probá de nuevo."
+  },
+  "home": {
+    "title": "Inicio",
+    "intro": "Elegí qué querés cargar."
   }
 }
