@@ -8,4 +8,5 @@ export const sections: { to: string; label: string }[] = [
   { to: '/eventos', label: 'events' },
   { to: '/concurso', label: 'contest' },
   { to: '/llamadas', label: 'parade' },
+  { to: '/registro', label: 'log' },
 ]

@@ -706,3 +706,46 @@ export async function deleteClosure(id: number): Promise<void> {
   if (error) throw new Error(error.message, { cause: error })
   if (data.length === 0) throw new Error('No se borró: el corte ya no existe o no hay permiso.')
 }
+
+// ---------------------------------------------------------------- registro de cambios
+
+export interface LogEntry {
+  id: number
+  tabla: string
+  fila: string
+  operacion: 'alta' | 'cambio' | 'baja'
+  antes: Record<string, unknown> | null
+  despues: Record<string, unknown> | null
+  usuario_email: string | null
+  hecho_en: string
+}
+
+export interface LogFilter {
+  tabla?: string
+  /** Sólo lo de una noche (actuaciones y suspensiones). */
+  noche?: string
+  /** Parte del email de quien hizo el cambio. */
+  email?: string
+  /** Para seguir: sólo lo anterior a este id. */
+  beforeId?: number
+}
+
+export const LOG_PAGE_SIZE = 50
+
+/** El registro de cambios (decisión 73), de lo más nuevo a lo más viejo, de a una página. */
+export async function fetchChangeLog(filter: LogFilter): Promise<LogEntry[]> {
+  let query = supabase
+    .from('registro_cambios')
+    .select('id, tabla, fila, operacion, antes, despues, usuario_email, hecho_en')
+    .order('id', { ascending: false })
+    .limit(LOG_PAGE_SIZE)
+  if (filter.tabla) query = query.eq('tabla', filter.tabla)
+  if (filter.noche)
+    query = query.or(`despues->>noche.eq.${filter.noche},antes->>noche.eq.${filter.noche}`)
+  if (filter.email)
+    query = query.ilike('usuario_email', `%${filter.email.replace(/[%_,()]/g, '')}%`)
+  if (filter.beforeId) query = query.lt('id', filter.beforeId)
+  const { data, error } = await query
+  if (error) throw error
+  return data as LogEntry[]
+}

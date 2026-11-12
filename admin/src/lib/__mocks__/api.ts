@@ -42,3 +42,5 @@ export const replaceParadeRoute = vi.fn<typeof real.replaceParadeRoute>()
 export const fetchClosures = vi.fn<typeof real.fetchClosures>()
 export const saveClosure = vi.fn<typeof real.saveClosure>()
 export const deleteClosure = vi.fn<typeof real.deleteClosure>()
+export const LOG_PAGE_SIZE = 50
+export const fetchChangeLog = vi.fn<typeof real.fetchChangeLog>()

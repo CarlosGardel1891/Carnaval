@@ -13,7 +13,8 @@
     "stages": "Escenarios",
     "events": "Eventos",
     "contest": "Concurso",
-    "parade": "Llamadas"
+    "parade": "Llamadas",
+    "log": "Registro"
   },
   "login": {
     "title": "Carnavalero · Admin",
@@ -36,7 +37,8 @@
       "stages": "Los escenarios, con su dirección y su ubicación en el mapa.",
       "events": "El calendario de la temporada y el enlace a la venta de entradas de cada evento.",
       "contest": "El fixture del Concurso Oficial: las etapas de cada rueda y sus conjuntos.",
-      "parade": "El Desfile de Llamadas, noche por noche: orden, horario y atraso, recorrido y cortes de calle."
+      "parade": "El Desfile de Llamadas, noche por noche: orden, horario y atraso, recorrido y cortes de calle.",
+      "log": "Quién cambió qué y cuándo."
     }
   },
   "category": {
@@ -481,6 +483,40 @@
         "pointsHint": "Un punto por línea: latitud, longitud.",
         "sources": "Fuentes"
       }
+    }
+  },
+  "log": {
+    "title": "Registro de cambios",
+    "intro": "Cada alta, cambio y baja de los datos, de lo más nuevo a lo más viejo. Lo que entra por el seed o por SQL figura como «el sistema».",
+    "loadFailed": "No se pudo cargar el registro.",
+    "empty": "No hay cambios con ese filtro.",
+    "system": "el sistema",
+    "more": "Ver más antiguos",
+    "showRow": "Ver la fila completa",
+    "hideRow": "Ocultar la fila",
+    "filter": {
+      "table": "Qué",
+      "all": "Todo",
+      "night": "Noche",
+      "nightHint": "Sólo las actuaciones de esa noche.",
+      "who": "Quién (email)"
+    },
+    "operation": {
+      "alta": "Alta",
+      "cambio": "Cambio",
+      "baja": "Baja"
+    },
+    "tables": {
+      "actuaciones": "Actuación",
+      "conjuntos": "Conjunto",
+      "conjunto_temporada": "Participación en la temporada",
+      "escenarios": "Escenario",
+      "eventos": "Evento",
+      "etapas_concurso": "Etapa del Concurso",
+      "orden_desfile": "Orden de desfile",
+      "desfile_esquinas": "Esquina del recorrido",
+      "cortes_calle": "Corte de calle",
+      "temporadas": "Temporada"
     }
   }
 }
