@@ -3,6 +3,10 @@ dist/
 .env
 .env.*
 !.env.example
+# Firma de Android: la clave de subida y sus contraseñas nunca van al repo (decisión 81).
+*.jks
+*.keystore
+keystore.properties
 .DS_Store
 *.log
 supabase/.branches/

@@ -6,8 +6,14 @@ interface ImportMetaEnv {
   readonly VITE_PUSH_ENABLED?: string
   /** Fija el reloj de la app al compilar (`AAAA-MM-DDTHH:MM`). Sólo con la base local. */
   readonly VITE_AHORA?: string
+  /** '1' activa el modo demostración. Sólo en el build `beta` (decisión 85). */
+  readonly VITE_DEMO?: string
 }
 
 interface ImportMeta {
   readonly env: ImportMetaEnv
 }
+
+/** La versión visible de la app y su número de build (`app/version.json`, decisión 81). */
+declare const __APP_VERSION__: string
+declare const __APP_BUILD__: number

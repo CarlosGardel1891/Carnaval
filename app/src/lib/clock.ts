@@ -1,4 +1,5 @@
 import { instantInMontevideo } from '@cuerda/shared'
+import { LOCAL_HOSTS } from './releaseEnv'
 
 /**
  * El reloj de la app. Normalmente es el del teléfono. Para probar lo que depende de la fecha
@@ -13,7 +14,6 @@ import { instantInMontevideo } from '@cuerda/shared'
  */
 
 const STORAGE_KEY = 'cuerda-ahora'
-const LOCAL_HOSTS = ['127.0.0.1', 'localhost', '[::1]', '10.0.2.2']
 
 let offsetMs = 0
 

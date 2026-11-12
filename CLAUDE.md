@@ -271,6 +271,26 @@ Límites de auth por IP, iguales en `config.toml` y en el remoto (decisión 79):
 
 Después de cada migración nueva: `pnpm supabase db push`. Después de cambiar una Edge Function o algo de `packages/shared/src/` que ellas importan: volver a desplegarla.
 
+## Publicación
+
+Decisiones 80 a 89; el calendario hasta el envío del 5/1 está en `docs/PLAN.md`, Fase 8.
+
+- **Versión:** `app/version.json` (`version`, la visible, y `build`, que sube en cada envío a una tienda). De ahí la leen `app/vite.config.ts` (`__APP_VERSION__`, `__APP_BUILD__`) y `app/android/app/build.gradle`. En iOS se pone a mano en Xcode, igual que ahí.
+- **Modos de compilación** (decisión 81): el común (`pnpm build`, Supabase local), `beta` (`app/.env.beta`: remoto y modo demostración) y `produccion` (`app/.env.produccion`: remoto, sin demostración ni reloj simulado). Los dos archivos están fuera del repo. `releaseEnvProblems` (`app/src/lib/releaseEnv.ts`) frena desde `vite.config.ts` un build `beta` o `produccion` que apunte a un Supabase local, y `app/src/build.test.ts` compila la app y lo controla.
+- **Release de Android**, desde PowerShell con `JAVA_HOME` (JDK 21) y `ANDROID_HOME`:
+
+```powershell
+pnpm android:release beta            # AAB firmado para la prueba cerrada
+pnpm android:release produccion      # AAB firmado para producción
+pnpm android:release beta --apk      # APK firmado, para probarlo antes en el emulador
+adb install -r app\android\app\build\outputs\apk\release\app-release.apk
+```
+
+El script compila en ese modo, sincroniza Capacitor sin el permiso de http del Supabase local y corre Gradle. El AAB queda en `app/android/app/build/outputs/bundle/release/app-release.aab`. Antes de subir uno nuevo a Play Console, subir `build` en `app/version.json`.
+
+- **Firma** (nada de esto va al repo): la clave de subida está en `C:\Users\<usuario>\.carnavalero\` (`carnavalero-upload.jks` y `keystore.properties`, con su contraseña y el alias `upload`); la creó `pnpm android:keystore`, que no pisa una que ya exista. `build.gradle` firma el release si encuentra ese `keystore.properties` (o el que diga `CARNAVALERO_KEYSTORE_PROPS`); sin él, el release sale sin firmar y el script se niega a seguir. Hay que guardar una copia de los dos archivos fuera de la máquina. Con Play App Signing la clave de la app la guarda Google: si la de subida se pierde, se crea otra y se pide el cambio en Play Console (Configuración → Integridad de la app → solicitar el restablecimiento de la clave de subida).
+- Si el emulador no carga nada, mirar que tenga red: `adb shell svc wifi enable` y `adb shell svc data enable` (quedan apagadas después de probar sin señal).
+
 ## Nombre e identificador
 
 La app se llama **Carnavalero** y su identificador es `uy.carnavalero.app` (decisión 54). El identificador está en cuatro lugares que tienen que coincidir: `appId` en `app/capacitor.config.ts`; `namespace` y `applicationId` en `app/android/app/build.gradle`; `package_name` y `custom_url_scheme` en `strings.xml`, más el paquete Java de `MainActivity` (`app/android/app/src/main/java/uy/carnavalero/app/`); y `PRODUCT_BUNDLE_IDENTIFIER` en `project.pbxproj`. El nombre visible está en `appName` (Capacitor), `strings.xml`, `Info.plist`, `app.name` de los locales y el `<title>` de `app/index.html` y `admin/index.html`.

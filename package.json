@@ -24,6 +24,8 @@
     "admin:alta": "node scripts/admin-user.mjs alta",
     "admin:baja": "node scripts/admin-user.mjs baja",
     "admin:lista": "node scripts/admin-user.mjs lista",
+    "android:release": "node scripts/android-release.mjs",
+    "android:keystore": "node scripts/android-release.mjs keystore",
     "remoto:chequeo": "node scripts/remoto-chequeo.mjs",
     "gen:types": "supabase gen types typescript --local --schema public > packages/shared/src/database.types.ts && prettier --write packages/shared/src/database.types.ts"
   },
