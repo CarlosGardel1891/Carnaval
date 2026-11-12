@@ -828,6 +828,7 @@ export type Database = {
         }[]
       }
       avisos_fallidos_desde: { Args: { p_desde: string }; Returns: number }
+      borrar_mis_datos: { Args: Record<PropertyKey, never>; Returns: undefined }
       buscar_por_nombre: {
         Args: { p_texto: string }
         Returns: {
@@ -997,6 +998,7 @@ export type Database = {
           suspendidas: number
         }[]
       }
+      purgar_anonimos_inactivos: { Args: { p_antes: string; p_limite?: number }; Returns: number }
       recorrido_del_desfile: {
         Args: { p_evento_id: number }
         Returns: {

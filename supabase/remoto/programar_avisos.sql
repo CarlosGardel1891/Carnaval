@@ -1,4 +1,5 @@
--- Programa las Edge Functions de avisos en el proyecto REMOTO (decisiones 47, 48 y 77).
+-- Programa las Edge Functions de avisos y la purga de usuarios anónimos inactivos en el
+-- proyecto REMOTO (decisiones 47, 48, 77 y 84).
 --
 -- No es una migración ni un seed: se corre a mano, una vez, en el SQL editor del proyecto
 -- remoto. Se puede volver a correr: reemplaza las dos tareas. En el Supabase local no se usa
@@ -65,8 +66,17 @@ select cron.schedule(
   $cron$
 );
 
+-- Purga de los usuarios anónimos sin actividad en 13 meses (decisión 84): una vez por día, a
+-- las 07:15 UTC (04:15 en Montevideo). No pasa por una Edge Function: es una función de la base.
+select cron.schedule(
+  'purga-anonimos',
+  '15 7 * * *',
+  $cron$ select public.purgar_anonimos_inactivos(now() - interval '13 months'); $cron$
+);
+
 -- Lo que quedó programado.
-select jobname, schedule, active from cron.job where jobname like 'avisos-%' order by jobname;
+select jobname, schedule, active from cron.job
+ where jobname like 'avisos-%' or jobname = 'purga-anonimos' order by jobname;
 
 -- Para mirar cómo vienen saliendo (las últimas corridas y la respuesta de cada función):
 --   select jobname, status, start_time from cron.job_run_details d join cron.job j using (jobid)
@@ -74,3 +84,4 @@ select jobname, schedule, active from cron.job where jobname like 'avisos-%' ord
 --   select status_code, content::text from net._http_response order by id desc limit 5;
 --
 -- Para sacarlas: select cron.unschedule('avisos-de-cambios'); select cron.unschedule('avisos-del-dia');
+--                 select cron.unschedule('purga-anonimos');
