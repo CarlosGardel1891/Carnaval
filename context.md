@@ -1,6 +1,6 @@
 # Carnavalero · contexto completo del proyecto
 
-Documento para poner al día a alguien que llega de cero. Estado al **2026-11-12**. Repo: <https://github.com/Emiliano-Vanzini/Carnaval>, rama de trabajo `admin` (Fase 7); `develop` tiene hasta la Fase 6.
+Documento para poner al día a alguien que llega de cero. Estado al **2026-11-12**. Repo: <https://github.com/Emiliano-Vanzini/Carnaval>, `develop` tiene hasta la Fase 7; la Fase 8 todavía no arrancó.
 
 Si algo de acá choca con los documentos del repo, mandan ellos, en este orden: `docs/DECISIONES.md`, `docs/PLAN.md`, `CLAUDE.md`.
 
@@ -103,7 +103,7 @@ El análisis completo está en `docs/competencia-carnaval-app.md`.
 | 4 · Conjuntos, Seguir y push | 24 – 30 nov | **Código terminado** (2026-11-11), ya en `develop`; falta un aviso real (Firebase, Apple) |
 | 5 · Calendario y Concurso | 1 – 7 dic | **Código terminado** (2026-11-11), ya en `develop`; falta el fixture real, que no se publicó |
 | 6 · Modo Llamadas | 8 – 13 dic | **Código terminado** (2026-11-11), ya en `develop`; faltan el orden de desfile real y el recorrido y los cortes oficiales |
-| 7 · Datos y panel admin | 1 dic – 10 ene (en paralelo) | **Código terminado** (2026-11-12) en `admin`; el panel está publicado; falta armar el proyecto remoto |
+| 7 · Datos y panel admin | 1 dic – 10 ene (en paralelo) | **Terminada** (2026-11-12), ya en `develop`: panel publicado y proyecto remoto armado |
 | 8 · QA, beta y publicación | 14 dic – 20 ene | Sin empezar |
 | 9 · Operación en temporada | 21 ene – 7 mar | — |
 
@@ -213,7 +213,9 @@ LEEME.md           Cómo arrancar
 
 **Scripts nuevos:** `pnpm admin:alta`, `admin:baja` y `admin:lista` (admins del panel) y `pnpm remoto:chequeo` (controla un proyecto remoto).
 
-**Lo que no existe aún:** un aviso push real (falta Firebase), el fixture real del Concurso (no se publicó), los resultados y el historial, el orden de desfile real y el recorrido oficial de las Llamadas, la grilla real y las coordenadas de los escenarios (ya hay con qué cargarlas), y el proyecto remoto de Supabase armado (está creado, vacío). El panel ya está publicado en <https://carnavalero-admin.vercel.app>, pero hasta que el remoto esté armado no se puede entrar.
+**Lo que no existe aún:** un aviso push real (falta Firebase), el fixture real del Concurso (no se publicó), los resultados y el historial, el orden de desfile real y el recorrido oficial de las Llamadas, la grilla real y las coordenadas de los escenarios (ya hay con qué cargarlas).
+
+**En la nube desde el 2026-11-12:** el proyecto remoto de Supabase (`carnavalero`, São Paulo, plan Free) tiene las migraciones, el seed, los inicios de sesión anónimos, las dos funciones de avisos desplegadas y programadas (en simulacro, hasta que esté Firebase) y el primer admin; y el panel está publicado en <https://carnavalero-admin.vercel.app>. No tiene nada de prueba. La app se compila contra él con `--mode remoto`.
 
 ## 8. Datos semilla (`research/`)
 
@@ -357,7 +359,7 @@ Nativo: `pnpm --filter app android` (o `android:local` para usar el Supabase loc
 - **AUDECA:** pedir el orden de desfile y contenido de Llamadas (borrador 8.2).
 - **Conjuntos y comparsas:** mensaje directo por Instagram (borrador 8.3).
 - **Instagram de la app:** cuenta profesional vinculada a una Página de Facebook.
-- **Supabase remoto** (São Paulo): está creado (`carnavalero`, plan Free) y vacío; falta armarlo con los pasos 2 a 7 de `CLAUDE.md`, «Proyecto remoto», y dar de alta a los admins. Necesita `pnpm supabase login` en una terminal propia.
+- **Supabase remoto** (São Paulo): está armado (`carnavalero`, plan Free). Falta pasarlo a Pro antes del Inaugural, decidir si se suben los límites de auth por IP y dar de alta al resto de los admins. Falta también la key de MapTiler en el panel publicado.
 - **Una muestra real de la tabla de DAECPU** («Programación de hoy», en temporada), para confirmar que el importador la lee tal como se copia.
 - **Key de MapTiler:** ponerla en `app/.env` y restringirla por origen en MapTiler Cloud (los orígenes están en `CLAUDE.md`). Con una key real todavía no se probó el mapa.
 - **GitHub Actions:** quien administra la cuenta dueña del repo tiene que resolver el pago fallido o subir el límite de gasto (Settings → Billing & plans) para que el CI arranque.

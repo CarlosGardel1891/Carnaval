@@ -12,8 +12,8 @@
 //
 // Sin variables de entorno trabaja contra el Supabase local (toma la URL y la key de
 // `supabase status`). Contra un proyecto remoto hay que pasar `--remoto` y definir en la
-// terminal, sólo para ese comando, SUPABASE_URL y SUPABASE_SERVICE_ROLE_KEY. La service role
-// no va en ningún archivo del repo ni en el `.env` de la app o del panel.
+// terminal, sólo para ese comando, SUPABASE_URL y SUPABASE_SERVICE_ROLE_KEY (en el remoto, la
+// secret key `sb_secret_…`; decisión 78). Esa key no va en ningún archivo del repo ni en el `.env` de la app o del panel.
 //
 // El alta muestra la contraseña una sola vez. Quitar el permiso tarda hasta una hora en
 // hacerse efectivo: lo que tarda en vencer la sesión que el usuario ya tenía abierta.

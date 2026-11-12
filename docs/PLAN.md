@@ -248,7 +248,8 @@ Estado al 2026-11-12: el código está hecho en la rama `admin`, con las decisio
 - **5:** hecho: orden de desfile, horario y atraso, recorrido y cortes.
 - **Además:** registro de cambios (decisión 73), ubicación de los escenarios desde el mapa con buscador de direcciones (decisión 74) y los enlaces de entradas.
 - **Panel publicado** (2026-11-12): <https://carnavalero-admin.vercel.app>, compilado contra el proyecto remoto y todavía sin la key de MapTiler.
-- **Falta, y depende de cuentas:** armar el proyecto remoto de Supabase, que está creado y vacío (los pasos están en `CLAUDE.md`, «Proyecto remoto»). Las Edge Functions van a quedar en simulacro hasta que esté Firebase.
+- **Proyecto remoto armado** (2026-11-12): `carnavalero`, en São Paulo, plan Free, con las migraciones, el seed, la auth anónima, las dos funciones desplegadas y programadas y el primer admin; `pnpm remoto:chequeo` da todo bien. Usa las keys nuevas de Supabase (decisión 78). Las Edge Functions quedan en simulacro hasta que esté Firebase.
+- **Falta:** la key de MapTiler en el panel publicado, pasar el proyecto a Pro antes del Inaugural y decidir los límites de auth por IP.
 - **Carga inicial:** el seed ya está; el fixture del Concurso y el orden de las Llamadas, cuando se publiquen, por CSV o por el panel.
 
 ## Fase 8 · QA, beta y publicación (14 dic – 20 ene)

@@ -9,8 +9,8 @@
 //   pnpm remoto:chequeo
 //
 // Necesita, definidas en la terminal sólo para este comando, SUPABASE_URL,
-// SUPABASE_ANON_KEY (la pública) y SUPABASE_SERVICE_ROLE_KEY. Ninguna va en un archivo del
-// repo. No cambia datos: crea y borra un usuario anónimo de prueba, y llama a las dos funciones
+// SUPABASE_ANON_KEY (la pública) y SUPABASE_SERVICE_ROLE_KEY (la secret key del proyecto,
+// `sb_secret_…`; decisión 78). Ninguna va en un archivo del repo. No cambia datos: crea y borra un usuario anónimo de prueba, y llama a las dos funciones
 // de avisos igual que las llama el cron (si hay avisos pendientes, salen en ese momento).
 
 const url = process.env.SUPABASE_URL?.replace(/\/$/, '')
@@ -136,7 +136,8 @@ for (const [name, body] of [
   await check(name, async () => {
     const res = await fetch(`${url}/functions/v1/${name}`, {
       method: 'POST',
-      headers: { ...service, 'content-type': 'application/json' },
+      // Como el cron: la key va sólo en `apikey` (decisión 78).
+      headers: { apikey: serviceKey, 'content-type': 'application/json' },
       body: JSON.stringify(body),
     })
     const data = await res.json().catch(() => ({}))

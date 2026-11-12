@@ -5,13 +5,15 @@
 -- (ahí las funciones se llaman a mano; ver CLAUDE.md).
 --
 -- Antes, una sola vez y también en el SQL editor, guardar en Vault la dirección del proyecto y
--- la service role key. Esos dos valores NO van en este archivo ni en ningún otro del repo:
+-- una secret key. Esos dos valores NO van en este archivo ni en ningún otro del repo:
 --
 --   select vault.create_secret('https://<ref>.supabase.co', 'project_url');
---   select vault.create_secret('<service role key>', 'service_role_key');
+--   select vault.create_secret('sb_secret_…', 'secret_key');
 --
--- La service role key es la misma que las funciones reciben en SUPABASE_SERVICE_ROLE_KEY (la
--- «service_role» de Project Settings → API keys): comparan el pedido contra ese valor.
+-- La secret key es la «default» de Project Settings → API keys → Secret keys (o
+-- `pnpm supabase projects api-keys --reveal`). Las funciones la reciben en SUPABASE_SECRET_KEYS
+-- y comparan el encabezado `apikey` del pedido contra ese valor. No es un JWT: no va en
+-- `Authorization` (decisión 78).
 --
 -- El cron corre en UTC y sólo despierta a las funciones: la hora de Montevideo y la ventana
 -- de 12:00 a 19:00 las decide cada función (decisión 47).
@@ -21,8 +23,8 @@ create extension if not exists pg_net;
 
 do $$
 begin
-  if (select count(*) from vault.decrypted_secrets where name in ('project_url', 'service_role_key')) <> 2 then
-    raise exception 'Faltan los secretos «project_url» y «service_role_key» en Vault: ver el encabezado de este archivo.';
+  if (select count(*) from vault.decrypted_secrets where name in ('project_url', 'secret_key')) <> 2 then
+    raise exception 'Faltan los secretos «project_url» y «secret_key» en Vault: ver el encabezado de este archivo.';
   end if;
 end
 $$;
@@ -37,8 +39,7 @@ select cron.schedule(
       || '/functions/v1/avisos-de-cambios',
     headers := jsonb_build_object(
       'Content-Type', 'application/json',
-      'Authorization', 'Bearer '
-        || (select decrypted_secret from vault.decrypted_secrets where name = 'service_role_key')
+      'apikey', (select decrypted_secret from vault.decrypted_secrets where name = 'secret_key')
     ),
     body := '{}'::jsonb,
     timeout_milliseconds := 30000
@@ -56,8 +57,7 @@ select cron.schedule(
       || '/functions/v1/avisos-del-dia',
     headers := jsonb_build_object(
       'Content-Type', 'application/json',
-      'Authorization', 'Bearer '
-        || (select decrypted_secret from vault.decrypted_secrets where name = 'service_role_key')
+      'apikey', (select decrypted_secret from vault.decrypted_secrets where name = 'secret_key')
     ),
     body := '{}'::jsonb,
     timeout_milliseconds := 30000

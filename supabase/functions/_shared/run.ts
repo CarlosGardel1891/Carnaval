@@ -55,6 +55,30 @@ async function isAdminToken(db: Db, authorization: string | null): Promise<boole
   return data.user.app_metadata?.rol === 'admin'
 }
 
+/**
+ * Las keys de servidor que valen para este proyecto. En el remoto son las «secret keys»
+ * (`SUPABASE_SECRET_KEYS`, un JSON por nombre; decisión 78); en el Supabase local, y mientras
+ * existan las keys viejas, también `SUPABASE_SERVICE_ROLE_KEY`. La primera es la que se usa
+ * para hablar con la base.
+ */
+function serverKeys(): string[] {
+  const keys: string[] = []
+  try {
+    const named: unknown = JSON.parse(Deno.env.get('SUPABASE_SECRET_KEYS') ?? '{}')
+    if (named && typeof named === 'object') {
+      const all = named as Record<string, unknown>
+      for (const key of [all.default, ...Object.values(all)]) {
+        if (typeof key === 'string' && key && !keys.includes(key)) keys.push(key)
+      }
+    }
+  } catch {
+    // Si no es un JSON, no hay secret keys.
+  }
+  const legacy = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
+  if (legacy && !keys.includes(legacy)) keys.push(legacy)
+  return keys
+}
+
 /** Con Firebase configurado manda de verdad; sin él, simulacro (decisión 49). */
 function pickSender(): Sender {
   const account = Deno.env.get('FIREBASE_SERVICE_ACCOUNT')
@@ -65,8 +89,9 @@ function pickSender(): Sender {
 const maskToken = (token: string) => `…${token.slice(-6)}`
 
 /**
- * Atiende un pedido: sólo POST y sólo con la service role key (o, con `allowAdmin`, con la
- * sesión de un admin). Corre `build` (que toma los avisos de la base y arma las
+ * Atiende un pedido: sólo POST y sólo con una key de servidor, en el encabezado `apikey` o
+ * en `Authorization: Bearer` (o, con `allowAdmin`, con la sesión de un admin). La plataforma
+ * no verifica nada antes (`verify_jwt = false` en `config.toml`): la barrera es ésta. Corre `build` (que toma los avisos de la base y arma las
  * notificaciones), las manda, cierra las que salieron y borra los tokens que el servicio de
  * push rechazó. La base se toca siempre con la service role, que no sale de acá.
  */
@@ -82,7 +107,8 @@ export async function handle(
   if (req.method !== 'POST') return json({ error: 'Sólo POST.' }, 405)
 
   const url = Deno.env.get('SUPABASE_URL')
-  const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
+  const keys = serverKeys()
+  const serviceKey = keys[0]
   if (!url || !serviceKey) return json({ error: 'Faltan las variables de Supabase.' }, 500)
 
   const db: Db = createClient<Database>(url, serviceKey, {
@@ -90,7 +116,8 @@ export async function handle(
   })
 
   const authorization = req.headers.get('authorization')
-  if (authorization !== `Bearer ${serviceKey}`) {
+  const presented = [req.headers.get('apikey'), authorization?.match(/^Bearer (.+)$/)?.[1]]
+  if (!presented.some((key) => key && keys.includes(key))) {
     if (!allowAdmin) return json({ error: 'Sólo la service role puede mandar avisos.' }, 403)
     if (!(await isAdminToken(db, authorization))) {
       return json({ error: 'Sólo la service role o un admin pueden mandar estos avisos.' }, 403)

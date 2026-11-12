@@ -174,7 +174,7 @@ pnpm --filter app android:local --target emulator-5554
 
 Web interna de carga de datos (decisiones 51 y 69 a 77), en `admin/`. `pnpm dev:admin` la levanta en http://localhost:5174. Va sólo en español, con todos los textos en `admin/src/locales/es.json` (decisión 70).
 
-- **Entrar:** email y contraseña de un usuario de Supabase Auth con `app_metadata.rol = 'admin'`. `pnpm admin:alta <email>` lo crea y muestra la contraseña una sola vez; `pnpm admin:baja <email>` le quita el permiso (tarda hasta una hora en hacerse efectivo) y `pnpm admin:lista` los lista. Sin variables trabajan contra el Supabase local. Contra el remoto: `--remoto`, con `SUPABASE_URL` y `SUPABASE_SERVICE_ROLE_KEY` definidas en la terminal sólo para ese comando.
+- **Entrar:** email y contraseña de un usuario de Supabase Auth con `app_metadata.rol = 'admin'`. `pnpm admin:alta <email>` lo crea y muestra la contraseña una sola vez; `pnpm admin:baja <email>` le quita el permiso (tarda hasta una hora en hacerse efectivo) y `pnpm admin:lista` los lista. Sin variables trabajan contra el Supabase local. Contra el remoto: `--remoto`, con `SUPABASE_URL` y `SUPABASE_SERVICE_ROLE_KEY` (la secret key, ver «Proyecto remoto») definidas en la terminal sólo para ese comando.
 - **La service role nunca llega al navegador.** El panel usa la key pública y la sesión del admin: todo pasa por la RLS, y lo que necesita más (publicar, suspender) son funciones de la base que chequean `es_admin()`. `admin/src/build.test.ts` compila el panel y controla que la service role no quede en lo que se publica. En `admin/.env` sólo van variables `VITE_…`.
 - **Pantallas** (`admin/src/features/`): `import/` (`/grilla/importar`), `night/` (`/grilla?noche=`), `groups/`, `stages/`, `events/`, `contest/`, `parade/` (`/llamadas?evento=`), `log/` (`/registro`) y `map/` (el selector de ubicación). Las secciones del menú están en `admin/src/nav.ts`.
 - Todo lo que habla con Supabase está en `admin/src/lib/api.ts`. Los tests de pantallas usan `vi.mock('…/lib/api')`, que toma el doble de `admin/src/lib/__mocks__/api.ts`: al agregar una función hay que sumarla ahí. `renderAdmin()` (`test-utils.tsx`) monta el panel entero con una sesión de admin.
@@ -206,7 +206,7 @@ Decisiones 45 a 49. Tres piezas, cada una con sus tests:
 
 - **Quién recibe qué: la base.** Un trigger en `actuaciones` encola los cambios de hora, lugar o estado en `cambios_actuacion` (las altas no encolan). `tomar_avisos_del_dia(noche)` (las actuaciones de la noche y, en las Llamadas, las comparsas seguidas que desfilan; decisión 68) y `tomar_avisos_de_cambios(noche, hasta)` devuelven las filas ya reclamadas en `avisos_enviados`, así el mismo aviso no sale dos veces; `cerrar_avisos(ids)` marca los que salieron. Sólo las ejecuta la service role. Tests: `packages/db-tests/src/avisos.test.ts`.
 - **Textos y envío: `@cuerda/shared`.** `buildDailyNotices` y `buildChangeNotices` arman una notificación por dispositivo, en su idioma y con las horas de Montevideo; los textos están en `noticeTexts.ts` (es y en, mismas claves). `deliver` manda con un `Sender`: `createFcmSender` (FCM HTTP v1) o `dryRunSender`.
-- **Quién las llama:** sólo la service role. `avisos-de-cambios` acepta además la sesión de un admin (decisión 72), para el botón de suspender del panel, y por eso responde CORS.
+- **Quién las llama:** sólo la service role (en el remoto, la secret key; decisión 78), en el encabezado `apikey` o en `Authorization: Bearer`. Van con `verify_jwt = false` (`supabase/config.toml`): la plataforma no verifica nada antes y la barrera es `_shared/run.ts`. `avisos-de-cambios` acepta además la sesión de un admin (decisión 72), para el botón de suspender del panel, y por eso responde CORS.
 - **Edge Functions: sólo juntan y mandan.** Importan los archivos de `packages/shared/src/` por ruta relativa y con extensión `.ts` (Deno); por eso `notices.ts`, `delivery.ts`, `fcm.ts`, `dates.ts`, `llamadas.ts` y `noticeTexts.ts` sólo pueden tener imports relativos con `.ts` (lo controla `denoImports.test.ts`).
 
 Probarlas en local, sin Firebase (simulacro: devuelven los avisos armados y no mandan nada):
@@ -223,7 +223,7 @@ curl -X POST http://127.0.0.1:55321/functions/v1/avisos-de-cambios \
 - `avisos-del-dia` sólo manda entre las 12:00 y las 19:00 de Montevideo; `forzar` saltea el horario.
 - `avisos-de-cambios` espera a que una actuación lleve un minuto sin tocarse; `sin_espera` lo saltea.
 - Para que haya a quién avisar hace falta un usuario que siga un conjunto (desde la app) y una fila suya en `dispositivos_push`. Tomar los avisos los reclama. Si no se enviaron (en simulacro nunca se envían), vuelven a salir: el del día, a los 5 minutos y hasta tres veces; el de cambio, al minuto y después cada vez más espaciado, hasta que la actuación empieza. Si empieza sin que haya salido queda en `avisos_enviados.fallido_en` y la respuesta lo cuenta en `perdidos`.
-- Las funciones no se despliegan en ningún proyecto remoto desde acá.
+- En el remoto están desplegadas desde el 2026-11-12, en simulacro. No se despliegan solas: ver «Proyecto remoto».
 
 **Firebase (pendiente: falta crear el proyecto y confirmar el identificador de la app, decisión 46).** Nada de esto va al repo; `.gitignore` ya lo excluye.
 
@@ -231,17 +231,21 @@ curl -X POST http://127.0.0.1:55321/functions/v1/avisos-de-cambios \
 - iOS (hace falta una Mac): agregar la app iOS, bajar `GoogleService-Info.plist`, sumarlo al target desde Xcode, activar la capability Push Notifications y subir la key de APNs a Firebase (Project settings → Cloud Messaging).
 - Cuenta de servicio para mandar: Project settings → Service accounts → Generate new private key. El JSON entero va como secret `FIREBASE_SERVICE_ACCOUNT`: en local, en `supabase/functions/.env` (una línea, `FIREBASE_SERVICE_ACCOUNT='{…}'`) y `pnpm supabase functions serve --env-file supabase/functions/.env`; en remoto, `pnpm supabase secrets set`.
 - En la app: `VITE_PUSH_ENABLED=1` en `app/.env`. Sin `google-services.json`, dejarlo vacío: el plugin se instala igual y la app arranca, pero pedir el token falla.
-- En el proyecto remoto las funciones se programan con `pg_cron` y `pg_net`: `avisos-del-dia` cada 30 minutos y `avisos-de-cambios` cada minuto, con la service role key guardada en Vault. Es `supabase/remoto/programar_avisos.sql` (ver «Proyecto remoto»).
+- En el proyecto remoto las funciones se programan con `pg_cron` y `pg_net`: `avisos-del-dia` cada 30 minutos y `avisos-de-cambios` cada minuto, con la secret key guardada en Vault. Es `supabase/remoto/programar_avisos.sql` (ver «Proyecto remoto»).
 
 ## Proyecto remoto
 
-Decisión 77. Para armarlo desde cero, en este orden:
+Decisiones 77 y 78. Está armado desde el 2026-11-12: proyecto `carnavalero`, ref `rtogqxqyjsmiilmiuuxp`, <https://rtogqxqyjsmiilmiuuxp.supabase.co>, plan Free (pasa a Pro antes del Inaugural), con las funciones en simulacro hasta que esté Firebase.
+
+**Keys (decisión 78):** en el remoto se usan las nuevas. La pública es la publishable key (`sb_publishable_…`) y la de servidor es la secret key (`sb_secret_…`); las viejas `anon` y `service_role` se dan de baja a fin de 2026 y las funciones no las aceptan. Donde un script pide `SUPABASE_SERVICE_ROLE_KEY`, contra el remoto va la secret key: sale de Project Settings → API keys, o de `pnpm supabase projects api-keys --reveal`. `pnpm supabase login` necesita una terminal propia (no anda con `!` dentro de una sesión de Claude Code) o un token (`pnpm supabase login --token …`).
+
+Para armarlo desde cero, en este orden:
 
 1. Crear el proyecto en la región de São Paulo (`sa-east-1`). `pnpm supabase login` y `pnpm supabase link --project-ref <ref>`.
 2. `pnpm supabase db push --include-seed`: aplica las migraciones y los dos seeds de `config.toml`. Nada de `supabase/local/`.
 3. En el panel de Supabase: Authentication → Sign In / Providers → **Allow anonymous sign-ins**; y Authentication → Rate Limits, revisar los límites por IP (decisión 23).
 4. `pnpm supabase functions deploy avisos-del-dia` y `pnpm supabase functions deploy avisos-de-cambios`. Sin el secret `FIREBASE_SERVICE_ACCOUNT` corren en simulacro (ver «Avisos push»).
-5. En el SQL editor: guardar en Vault la dirección del proyecto y la service role key, y correr `supabase/remoto/programar_avisos.sql` (las instrucciones están en el encabezado del archivo).
+5. En el SQL editor (o con `pnpm supabase db query --linked -f <archivo>`): guardar en Vault la dirección del proyecto y la secret key, y correr `supabase/remoto/programar_avisos.sql` (las instrucciones están en el encabezado del archivo).
 6. Dar de alta el primer admin: `pnpm admin:alta <email> --remoto`, con `SUPABASE_URL` y `SUPABASE_SERVICE_ROLE_KEY` definidas en la terminal sólo para ese comando.
 7. `pnpm remoto:chequeo` (con `SUPABASE_URL`, `SUPABASE_ANON_KEY` y `SUPABASE_SERVICE_ROLE_KEY` en la terminal): controla el seed, que no haya nada de prueba, la auth anónima y que las funciones respondan.
 
@@ -249,7 +253,7 @@ En PowerShell, las variables para un solo comando se definen antes y se sacan de
 
 ```powershell
 $env:SUPABASE_URL = "https://<ref>.supabase.co"
-$env:SUPABASE_SERVICE_ROLE_KEY = "<service role key>"
+$env:SUPABASE_SERVICE_ROLE_KEY = "<secret key: sb_secret_…>"
 pnpm admin:alta ana@ejemplo.com --remoto
 Remove-Item Env:SUPABASE_URL, Env:SUPABASE_SERVICE_ROLE_KEY
 ```
@@ -262,6 +266,8 @@ pnpm --filter app exec vite --mode remoto    # pnpm dev, pero contra el remoto
 ```
 
 Para el teléfono, después de ese build: `pnpm --filter app exec cap sync android` y `pnpm --filter app exec cap run android`.
+
+Límites de auth por IP en el remoto (los de fábrica, iguales a los de `config.toml`; decisión 23): 30 altas anónimas por hora, 150 refrescos de sesión cada 5 minutos y 30 inicios de sesión cada 5 minutos. `pnpm supabase config diff` compara `config.toml` con el remoto; no correr `config push` sin mirar ese diff, porque también lleva las direcciones locales de auth.
 
 Después de cada migración nueva: `pnpm supabase db push`. Después de cambiar una Edge Function o algo de `packages/shared/src/` que ellas importan: volver a desplegarla.
 
