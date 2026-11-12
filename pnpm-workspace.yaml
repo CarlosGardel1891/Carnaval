@@ -2,3 +2,6 @@ packages:
   - app
   - admin
   - packages/*
+allowBuilds:
+  '@firebase/util': false
+  protobufjs: false
