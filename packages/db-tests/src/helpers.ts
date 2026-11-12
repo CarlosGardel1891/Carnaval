@@ -56,12 +56,15 @@ export async function limpiar(): Promise<void> {
     await sql.query(`delete from public.escenarios where slug like 'zz-%'`)
     await sql.query(`delete from public.etapas_concurso where numero >= 90`)
     await sql.query(`delete from public.dispositivos_push where token like 'zz-%'`)
-    // Lo que los tests dejaron en el registro de cambios: todo lo de una fila con slug «zz-…»
-    // y lo de noches de 2031 en adelante.
+    // Lo que los tests dejaron en el registro de cambios: todo lo de una fila con slug «zz-…»,
+    // lo de noches de 2031 en adelante y lo de los datos de prueba de supabase/local/.
     await sql.query(
       `delete from public.registro_cambios
         where coalesce(despues, antes) ->> 'slug' like 'zz-%'
-           or coalesce(despues, antes) ->> 'noche' >= '2031-01-01'`,
+           or coalesce(despues, antes) ->> 'slug' like 'ficticio-%'
+           or coalesce(despues, antes) ->> 'noche' >= '2031-01-01'
+           or coalesce(despues, antes) ->> 'fuente' in
+              ('test', 'ficticia', 'fixture-ficticio', 'orden-ficticio', 'cartelera-2026-02-28')`,
     )
   })
 }
