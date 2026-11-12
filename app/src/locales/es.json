@@ -419,6 +419,11 @@
     },
     "version": "Versión {{version}} ({{build}})"
   },
+  "error": {
+    "title": "Algo salió mal",
+    "body": "Esta pantalla no se pudo mostrar. Ya quedó anotado para arreglarlo. Probá volver al inicio.",
+    "retry": "Volver al inicio"
+  },
   "dev": {
     "simulatedClock": "Reloj simulado: {{date}}, {{time}}"
   }

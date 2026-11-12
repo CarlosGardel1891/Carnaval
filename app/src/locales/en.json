@@ -419,6 +419,11 @@
     },
     "version": "Version {{version}} ({{build}})"
   },
+  "error": {
+    "title": "Something went wrong",
+    "body": "This screen couldn't be shown. It has been logged so we can fix it. Try going back to the start.",
+    "retry": "Back to start"
+  },
   "dev": {
     "simulatedClock": "Simulated clock: {{date}}, {{time}}"
   }

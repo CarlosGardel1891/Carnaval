@@ -1,5 +1,6 @@
 import { Navigate, type RouteObject } from 'react-router'
 import { AppLayout } from './components/AppLayout'
+import { RouteErrorScreen } from './components/ErrorScreen'
 import { AboutPage } from './features/about/AboutPage'
 import { CalendarPage } from './features/calendar/CalendarPage'
 import { EventPage } from './features/calendar/EventPage'
@@ -23,6 +24,7 @@ export const routes: RouteObject[] = [
   {
     path: '/',
     element: <AppLayout />,
+    errorElement: <RouteErrorScreen />,
     children: [
       { index: true, element: <TodayPage /> },
       { path: 'mapa', element: <LazyMapPage /> },

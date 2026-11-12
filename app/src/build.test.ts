@@ -19,6 +19,7 @@ const ENV_KEYS = [
   'VITE_DEMO',
   'VITE_PUSH_ENABLED',
   'VITE_MAPTILER_KEY',
+  'VITE_SENTRY_DSN',
 ] as const
 const saved = Object.fromEntries(ENV_KEYS.map((key) => [key, process.env[key]]))
 
@@ -101,6 +102,23 @@ describe('el modo demostración', () => {
   it('tampoco está en un build de la beta sin VITE_DEMO', async () => {
     const bundle = await bundleFor('beta', remote)
     expect(bundle).not.toContain(DEMO_TRACES[0])
+  }, 180_000)
+})
+
+// El reporte de errores (decisión 86) sólo va en los builds que traen su DSN.
+const DSN = 'https://clave-de-prueba@o000000.ingest.sentry.io/0000000'
+
+describe('el reporte de errores', () => {
+  it('sin DSN, el build no carga Sentry', async () => {
+    const bundle = await bundleFor('produccion', remote)
+    expect(bundle).not.toContain('sentry_key')
+    expect(bundle).not.toContain('ingest.sentry.io')
+  }, 180_000)
+
+  it('con DSN, lo lleva', async () => {
+    const bundle = await bundleFor('produccion', { ...remote, VITE_SENTRY_DSN: DSN })
+    expect(bundle).toContain(DSN)
+    expect(bundle).toContain('sentry_key')
   }, 180_000)
 })
 
