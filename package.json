@@ -25,6 +25,7 @@
     "admin:baja": "node scripts/admin-user.mjs baja",
     "admin:lista": "node scripts/admin-user.mjs lista",
     "escenarios:proponer": "node scripts/proponer-ubicaciones.mjs",
+    "gen:tiendas": "python scripts/gen_tiendas.py",
     "gen:demo": "node scripts/gen-demo.mjs",
     "android:release": "node scripts/android-release.mjs",
     "android:keystore": "node scripts/android-release.mjs keystore",

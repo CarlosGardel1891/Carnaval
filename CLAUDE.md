@@ -7,6 +7,7 @@ App para iPhone y Android con la información del carnaval en Uruguay, con foco 
 - `docs/PLAN.md` — el plan por fases (qué hacer y cuándo).
 - `docs/OPERACION.md` — el manual para quien carga los datos en temporada, y qué hacer si algo falla.
 - `docs/IOS.md` — de la Mac a TestFlight.
+- `docs/QA.md` — el plan de pruebas, la lista de verificación antes de cada envío y cómo quedó cada pasada.
 - `docs/DECISIONES.md` — decisiones tomadas; mandan sobre el plan.
 - `research/CAMBIOS.md` — estado de los datos semilla y pendientes.
 - `prompts/` — el prompt de cada fase, tal como se usó.
@@ -25,6 +26,7 @@ React 19 + TypeScript (strict) + Vite + Capacitor 8 + Tailwind 4, Supabase (Post
 - `packages/db-tests/` (`@cuerda/db-tests`) — tests de integración de la base (RLS, funciones, invariantes del esquema) contra el Supabase local. Corren con `pnpm test:db`, aparte de `pnpm test`.
 - `scripts/` — generadores: `gen_seed.py` (el seed, desde los CSV de `research/`), `gen-norm-marks.mjs` (migración de `public.norm`) y `gen_norm_cases.py` (fixture de casos de `norm`); `db-grilla.mjs`, que carga la grilla ficticia y la noche real de prueba; `admin-user.mjs` (admins del panel) y `remoto-chequeo.mjs` (chequeo del proyecto remoto). `norm` vive en tres lugares (TypeScript, Python y SQL) y tienen que dar lo mismo (decisión 22).
 - `research/` — datos semilla de la Fase 0, más `fixture_2027.csv` (el fixture del Concurso, vacío hasta que se publique) y los tres `llamadas_…_2027.csv` (recorrido y cortes estimados, y el orden de desfile, vacío hasta que se publique). **No editar a mano sin correr `python research/validate.py` después.** Si cambia un CSV, regenerar también el seed (`pnpm gen:seed`) y el fixture de `norm` (`python scripts/gen_norm_cases.py`); el CI falla si quedaron viejos.
+- `tiendas/` — lo que se carga en Play Console y App Store Connect: `fichas.json` (los textos en español y en inglés; `sitio/fichas.test.mjs` controla sus largos), `DECLARACIONES.md` (las respuestas de los formularios de datos, edad y cifrado, las notas para la revisión y las fuentes oficiales) y `graficos/` (el ícono de 512 y el gráfico destacado de Google Play, generados con `pnpm gen:tiendas`).
 - `docs/`, `prompts/` — plan, decisiones y prompts.
 
 ## Comandos
