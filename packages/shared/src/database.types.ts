@@ -692,6 +692,74 @@ export type Database = {
         }
         Relationships: []
       }
+      suspension_actuaciones: {
+        Row: {
+          actuacion_id: number
+          estado_anterior: Database['public']['Enums']['estado_actuacion']
+          suspension_id: number
+        }
+        ComputedFields: never
+        Insert: {
+          actuacion_id: number
+          estado_anterior: Database['public']['Enums']['estado_actuacion']
+          suspension_id: number
+        }
+        Update: {
+          actuacion_id?: number
+          estado_anterior?: Database['public']['Enums']['estado_actuacion']
+          suspension_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'suspension_actuaciones_actuacion_id_fkey'
+            columns: ['actuacion_id']
+            isOneToOne: false
+            referencedRelation: 'actuaciones'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'suspension_actuaciones_suspension_id_fkey'
+            columns: ['suspension_id']
+            isOneToOne: false
+            referencedRelation: 'suspensiones'
+            referencedColumns: ['id']
+          },
+        ]
+      }
+      suspensiones: {
+        Row: {
+          creado_email: string | null
+          creado_en: string
+          creado_por: string | null
+          deshecha_en: string | null
+          deshecha_por: string | null
+          id: number
+          motivo: string | null
+          noche: string
+        }
+        ComputedFields: never
+        Insert: {
+          creado_email?: string | null
+          creado_en?: string
+          creado_por?: string | null
+          deshecha_en?: string | null
+          deshecha_por?: string | null
+          id?: never
+          motivo?: string | null
+          noche: string
+        }
+        Update: {
+          creado_email?: string | null
+          creado_en?: string
+          creado_por?: string | null
+          deshecha_en?: string | null
+          deshecha_por?: string | null
+          id?: never
+          motivo?: string | null
+          noche?: string
+        }
+        Relationships: []
+      }
       temporadas: {
         Row: {
           anio: number
@@ -784,6 +852,7 @@ export type Database = {
           tipo: Database['public']['Enums']['tipo_corte']
         }[]
       }
+      deshacer_suspension: { Args: { p_suspension_id: number }; Returns: number }
       es_admin: { Args: Record<PropertyKey, never>; Returns: boolean }
       escenarios_cercanos: {
         Args: { p_lat: number; p_lng: number; p_noche: string; p_radio_m: number }
@@ -929,6 +998,13 @@ export type Database = {
         Returns: undefined
       }
       slug_de: { Args: { p_nombre: string }; Returns: string }
+      suspender_noche: {
+        Args: { p_escenarios?: number[]; p_motivo?: string; p_noche: string }
+        Returns: {
+          actuaciones: number
+          suspension_id: number
+        }[]
+      }
       tomar_avisos_de_cambios: {
         Args: { p_hasta: string; p_noche: string }
         Returns: {

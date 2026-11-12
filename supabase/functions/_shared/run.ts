@@ -25,11 +25,35 @@ export interface RunResult {
   info?: Record<string, unknown>
 }
 
-const json = (body: unknown, status = 200) =>
+export interface HandleOptions {
+  /**
+   * Si además de la service role puede llamarla un admin con su sesión (decisión 72). Es
+   * para el panel, que corre en un navegador: por eso también responde al preflight de CORS.
+   */
+  allowAdmin?: boolean
+}
+
+// El panel llama desde otro origen. No hay cookies: lo que autoriza es el token.
+const corsHeaders = {
+  'access-control-allow-origin': '*',
+  'access-control-allow-methods': 'POST, OPTIONS',
+  'access-control-allow-headers': 'authorization, x-client-info, apikey, content-type',
+}
+
+const respond = (body: unknown, status = 200, extraHeaders: Record<string, string> = {}) =>
   new Response(JSON.stringify(body, null, 2), {
     status,
-    headers: { 'content-type': 'application/json; charset=utf-8' },
+    headers: { 'content-type': 'application/json; charset=utf-8', ...extraHeaders },
   })
+
+/** Si el token es el de la sesión de un usuario con `app_metadata.rol = 'admin'` (decisión 23). */
+async function isAdminToken(db: Db, authorization: string | null): Promise<boolean> {
+  const token = authorization?.match(/^Bearer (.+)$/)?.[1]
+  if (!token) return false
+  const { data, error } = await db.auth.getUser(token)
+  if (error || !data.user) return false
+  return data.user.app_metadata?.rol === 'admin'
+}
 
 /** Con Firebase configurado manda de verdad; sin él, simulacro (decisión 49). */
 function pickSender(): Sender {
@@ -41,21 +65,36 @@ function pickSender(): Sender {
 const maskToken = (token: string) => `…${token.slice(-6)}`
 
 /**
- * Atiende un pedido: sólo POST y sólo con la service role key. Corre `build` (que toma los
- * avisos de la base y arma las notificaciones), las manda, cierra las que salieron y borra
- * los tokens que el servicio de push rechazó.
+ * Atiende un pedido: sólo POST y sólo con la service role key (o, con `allowAdmin`, con la
+ * sesión de un admin). Corre `build` (que toma los avisos de la base y arma las
+ * notificaciones), las manda, cierra las que salieron y borra los tokens que el servicio de
+ * push rechazó. La base se toca siempre con la service role, que no sale de acá.
  */
 export async function handle(
   req: Request,
   build: (context: RunContext) => Promise<RunResult>,
+  { allowAdmin = false }: HandleOptions = {},
 ): Promise<Response> {
+  const cors = allowAdmin ? corsHeaders : {}
+  const json = (body: unknown, status = 200) => respond(body, status, cors)
+
+  if (allowAdmin && req.method === 'OPTIONS') return new Response('ok', { headers: cors })
   if (req.method !== 'POST') return json({ error: 'Sólo POST.' }, 405)
 
   const url = Deno.env.get('SUPABASE_URL')
   const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
   if (!url || !serviceKey) return json({ error: 'Faltan las variables de Supabase.' }, 500)
-  if (req.headers.get('authorization') !== `Bearer ${serviceKey}`) {
-    return json({ error: 'Sólo la service role puede mandar avisos.' }, 403)
+
+  const db: Db = createClient<Database>(url, serviceKey, {
+    auth: { persistSession: false, autoRefreshToken: false },
+  })
+
+  const authorization = req.headers.get('authorization')
+  if (authorization !== `Bearer ${serviceKey}`) {
+    if (!allowAdmin) return json({ error: 'Sólo la service role puede mandar avisos.' }, 403)
+    if (!(await isAdminToken(db, authorization))) {
+      return json({ error: 'Sólo la service role o un admin pueden mandar estos avisos.' }, 403)
+    }
   }
 
   let options: Record<string, unknown> = {}
@@ -67,10 +106,6 @@ export async function handle(
   } catch {
     // Sin cuerpo (o con uno que no es JSON): sin opciones.
   }
-
-  const db: Db = createClient<Database>(url, serviceKey, {
-    auth: { persistSession: false, autoRefreshToken: false },
-  })
 
   try {
     const startedAt = new Date()
