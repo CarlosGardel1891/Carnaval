@@ -64,9 +64,9 @@ const GROUPS: Group[] = [
 ]
 
 const shownNames = () =>
-  within(screen.getByRole('main'))
+  within(screen.getByRole('list', { name: 'Conjuntos' }))
     .getAllByRole('link')
-    .map((link) => link.querySelector('span')?.textContent)
+    .map((link) => link.textContent)
 
 function rowOf(name: string): HTMLElement {
   const row = screen.getByText(name).closest('li')
@@ -101,7 +101,8 @@ describe('lista de conjuntos', () => {
     const c1080 = within(rowOf('C 1080'))
     expect(c1080.getByText('En las Llamadas')).toBeInTheDocument()
     expect(c1080.queryByText('En concurso')).not.toBeInTheDocument()
-    expect(c1080.getByText('Comparsa · Barrio Sur')).toBeInTheDocument()
+    expect(c1080.getByText('Comparsa')).toBeInTheDocument()
+    expect(c1080.getByText('Barrio Sur')).toBeInTheDocument()
     // Sin barrio, la línea no deja un separador colgando.
     expect(within(rowOf('Doña Bastarda')).getByText('Murga')).toBeInTheDocument()
   })

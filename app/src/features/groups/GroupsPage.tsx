@@ -3,8 +3,18 @@ import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router'
 import { Constants, nocheLogica, type CategoriaConjunto } from '@cuerda/shared'
 import { Button } from '../../components/Button'
-import { Chip } from '../../components/Chip'
-import { joinParts } from '../../lib/labels'
+import { ChevronRightIcon, CloseIcon, SearchIcon } from '../../components/ui/icons'
+import { EmptySearchArt, OfflineArt } from '../../components/ui/illustrations'
+import {
+  Avatar,
+  Card,
+  CategoryPill,
+  EmptyState,
+  FilterChip,
+  PrimaryButton,
+} from '../../components/ui/primitives'
+import { CompactTitle } from '../../components/ui/scroll'
+import { TabHeader } from '../../components/ui/TabHeader'
 import { useNow } from '../../lib/useNow'
 import { useCurrentSeason } from '../season/useCurrentSeason'
 import { GroupBadges } from './GroupBadges'
@@ -38,85 +48,132 @@ export function GroupsPage() {
   }, [groups, filters.categories])
 
   return (
-    <main className="mx-auto max-w-2xl px-4 pb-6">
-      <header className="pt-4 pb-2">
-        <h1 className="text-3xl font-bold">{t('groups.title')}</h1>
-      </header>
+    <main className="mx-auto max-w-2xl pb-6">
+      <CompactTitle title={t('groups.title')} />
+      <TabHeader
+        title={t('groups.title')}
+        subtitle={
+          <span aria-live="polite">
+            {ready && visible.length > 0 ? t('groups.count', { count: visible.length }) : '\u00a0'}
+          </span>
+        }
+      >
+        <label className="flex min-h-13 items-center gap-3 rounded-full bg-white pr-2 pl-5 shadow-[0_8px_24px_rgb(4_40_100/0.18)] focus-within:outline-3 focus-within:outline-white/70">
+          <SearchIcon className="text-soft size-5 shrink-0" />
+          <span className="sr-only">{t('groups.search')}</span>
+          <input
+            type="search"
+            value={filters.text}
+            onChange={(event) => setText(event.target.value)}
+            placeholder={t('groups.search')}
+            autoComplete="off"
+            autoCorrect="off"
+            spellCheck={false}
+            enterKeyHint="search"
+            // El foco lo marca la píldora entera, no el campo de adentro.
+            style={{ outline: 'none' }}
+            className="text-ink placeholder:text-soft min-w-0 flex-1 bg-transparent py-3 text-[1.0625rem] font-semibold [&::-webkit-search-cancel-button]:hidden"
+          />
+          {filters.text !== '' && (
+            <button
+              type="button"
+              aria-label={t('search.clear')}
+              onClick={() => setText('')}
+              className="text-soft flex size-11 shrink-0 items-center justify-center rounded-full"
+            >
+              <CloseIcon className="size-5" />
+            </button>
+          )}
+        </label>
+      </TabHeader>
 
-      {groupsQuery.isError && !groups ? (
-        <div role="alert" className="space-y-3 py-4">
-          <p className="text-lg">{t('groups.error')}</p>
-          <Button onClick={() => void groupsQuery.refetch()}>{t('today.retry')}</Button>
-        </div>
-      ) : (
-        !ready && <p className="text-soft py-4">{t('groups.loading')}</p>
-      )}
+      <div className="px-4">
+        {groupsQuery.isError && !groups ? (
+          <div role="alert">
+            <EmptyState
+              illustration={<OfflineArt />}
+              title={t('groups.error')}
+              action={
+                <PrimaryButton onClick={() => void groupsQuery.refetch()}>
+                  {t('today.retry')}
+                </PrimaryButton>
+              }
+            />
+          </div>
+        ) : (
+          !ready && <p className="text-soft py-6 text-center">{t('groups.loading')}</p>
+        )}
 
-      {ready && (
-        <>
-          <div className="space-y-2 pb-3">
-            <label className="block">
-              <span className="sr-only">{t('groups.search')}</span>
-              <input
-                type="search"
-                value={filters.text}
-                onChange={(event) => setText(event.target.value)}
-                placeholder={t('groups.search')}
-                autoComplete="off"
-                autoCorrect="off"
-                spellCheck={false}
-                enterKeyHint="search"
-                className="bg-surface border-line placeholder:text-soft min-h-12 w-full rounded-xl border px-4 text-lg"
-              />
-            </label>
+        {ready && (
+          <>
             <div
               role="group"
               aria-label={t('filters.label')}
-              className="-mx-4 flex gap-2 overflow-x-auto px-4 py-1"
+              className="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4 py-4"
             >
               {categories.map((category) => (
-                <Chip
+                <FilterChip
                   key={category}
+                  category={category}
                   pressed={filters.categories.includes(category)}
                   onClick={() => toggleCategory(category)}
                 >
                   {t(`category.${category}`)}
-                </Chip>
+                </FilterChip>
               ))}
             </div>
-          </div>
 
-          {visible.length === 0 ? (
-            <div className="space-y-3 py-2">
-              <p className="text-lg">{active ? t('groups.noResults') : t('groups.empty')}</p>
-              {active && (
-                <Button variant="secondary" onClick={clear}>
-                  {t('filters.clear')}
-                </Button>
-              )}
-            </div>
-          ) : (
-            <>
-              <p className="text-soft pb-2" aria-live="polite">
-                {t('groups.count', { count: visible.length })}
-              </p>
-              <ul className="bg-surface border-line divide-line divide-y rounded-2xl border px-4">
-                {visible.map((group) => (
-                  <li key={group.id}>
-                    <Link to={groupPath(group.slug)} className="block py-3">
-                      <span className="block text-lg font-semibold">{group.nombre}</span>
-                      <span className="text-soft block">
-                        {joinParts([t(`category.${group.categoria}`), group.barrio])}
-                      </span>
-                      <GroupBadges season={seasonOf(group, seasonId)} />
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </>
-          )}
-        </>
-      )}
+            {visible.length === 0 ? (
+              <EmptyState
+                illustration={<EmptySearchArt />}
+                action={
+                  active && (
+                    <Button variant="secondary" onClick={clear}>
+                      {t('filters.clear')}
+                    </Button>
+                  )
+                }
+              >
+                {active ? t('groups.noResults') : t('groups.empty')}
+              </EmptyState>
+            ) : (
+              <Card>
+                <ul aria-label={t('groups.title')} className="divide-line divide-y">
+                  {visible.map((group) => (
+                    <li
+                      key={group.id}
+                      className="relative flex min-h-16 items-center gap-3 px-4 py-3"
+                    >
+                      <Avatar
+                        name={group.nombre}
+                        category={group.categoria}
+                        photoUrl={group.foto_url}
+                      />
+                      <div className="min-w-0 flex-1">
+                        <p className="text-[1.0625rem] leading-snug font-bold">
+                          <Link to={groupPath(group.slug)} className="after:absolute after:inset-0">
+                            {group.nombre}
+                          </Link>
+                        </p>
+                        <p className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1">
+                          <CategoryPill category={group.categoria}>
+                            {t(`category.${group.categoria}`)}
+                          </CategoryPill>
+                          {group.barrio && (
+                            <span className="text-soft text-sm">{group.barrio}</span>
+                          )}
+                        </p>
+                        <GroupBadges season={seasonOf(group, seasonId)} />
+                      </div>
+                      <ChevronRightIcon className="text-soft size-5 shrink-0 opacity-40" />
+                    </li>
+                  ))}
+                </ul>
+              </Card>
+            )}
+          </>
+        )}
+      </div>
     </main>
   )
 }
