@@ -65,17 +65,15 @@ describe('caché guardada en el teléfono', () => {
     expect(restored.getQueryState(key)?.dataUpdatedAt).toBe(START.getTime())
   })
 
-  it('no guarda las consultas que llevan la posición del usuario', async () => {
+  it('la consulta de la noche no lleva la posición del usuario, ni en la clave ni en lo guardado', async () => {
+    // Con «cerca mío» la distancia se calcula en el teléfono (decisión 90): no hay consulta
+    // con la posición, así que tampoco hay nada de eso para guardar.
     const queryClient = await clientWithNight()
-    await queryClient.fetchQuery({
-      ...nightActsQuery(NOCHE, { origin: { lat: -34.9058, lng: -56.1913 } }),
-      queryFn: () => Promise.resolve(ACTS as never),
-    })
-    expect(keys(queryClient)).toHaveLength(2)
+    expect(keys(queryClient)).toEqual([nightActsQuery(NOCHE).queryKey])
+    expect(JSON.stringify(nightActsQuery(NOCHE).queryKey)).not.toMatch(/lat|lng|origin/)
     await save(queryClient)
 
-    expect(await stored()).not.toContain('-34.9058')
-    expect(keys(await restore())).toEqual([nightActsQuery(NOCHE).queryKey])
+    expect(await stored()).not.toMatch(/origin/)
   })
 
   it('guarda lo último que cargó aunque la actualización siguiente haya fallado', async () => {

@@ -28,7 +28,7 @@ export function cacheMaxAge(queryKey: QueryKey): number {
  * Versión de lo guardado. Subirla cuando cambie la forma de lo que devuelven las
  * consultas: al abrir, la app descarta lo que guardó una versión anterior.
  */
-export const CACHE_VERSION = '3'
+export const CACHE_VERSION = '4'
 
 /** La clave bajo la que se guarda la caché en `@capacitor/preferences`. */
 export const CACHE_KEY = 'cuerda-cache'

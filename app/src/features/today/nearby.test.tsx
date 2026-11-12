@@ -28,12 +28,20 @@ const DISTANCES: Record<number, number> = {
   6: 300,
 }
 
-/** Como la base: con origen, cada actuación con ubicación trae su distancia. */
-function nightFrom(origin: unknown): Act[] {
-  return nightFixture().map((act) => ({
-    ...act,
-    distancia_m: origin ? (DISTANCES[act.actuacion_id] ?? null) : null,
-  }))
+/** Metros por grado de latitud. */
+const M_PER_DEGREE = 111_195
+
+/**
+ * La noche como la devuelve la base: sin distancias, y con cada actuación con ubicación
+ * puesta al norte de `HERE`, a los metros de `DISTANCES`. La distancia la calcula la app.
+ */
+function night(): Act[] {
+  return nightFixture().map((act) => {
+    const meters = DISTANCES[act.actuacion_id]
+    return meters === undefined
+      ? { ...act, distancia_m: null }
+      : { ...act, lat: HERE.lat + meters / M_PER_DEGREE, lng: HERE.lng, distancia_m: null }
+  })
 }
 
 const groupNames = () =>
@@ -49,7 +57,7 @@ describe('«cerca mío»', () => {
   beforeEach(async () => {
     vi.useFakeTimers({ toFake: ['Date'] })
     vi.setSystemTime(new Date('2027-01-28T19:00:00-03:00'))
-    vi.mocked(fetchNightActs).mockImplementation(({ origin }) => Promise.resolve(nightFrom(origin)))
+    vi.mocked(fetchNightActs).mockImplementation(() => Promise.resolve(night()))
     vi.mocked(fetchCurrentSeason).mockResolvedValue(null)
     vi.mocked(hasLocationPermission).mockResolvedValue(false)
     vi.mocked(currentPosition).mockResolvedValue({ coords: HERE, approximate: false })
@@ -98,10 +106,11 @@ describe('«cerca mío»', () => {
     expect(screen.getByText(HIDDEN)).toBeInTheDocument()
     expect(screen.queryByText(APPROXIMATE)).not.toBeInTheDocument()
 
-    // A la base va la posición redondeada (~11 m); a la URL, sólo que está prendido.
-    expect(fetchNightActs).toHaveBeenLastCalledWith(
-      expect.objectContaining({ origin: { lat: -34.9058, lng: -56.1913 } }),
-    )
+    // A la base no va la posición (decisión 90); a la URL, sólo que está prendido.
+    const sent = JSON.stringify(vi.mocked(fetchNightActs).mock.calls)
+    expect(sent).not.toContain('origin')
+    expect(sent).not.toContain('-34.9')
+    expect(sent).not.toContain('-56.1')
     expect(router.state.location.search).toBe('?cerca=1')
   })
 

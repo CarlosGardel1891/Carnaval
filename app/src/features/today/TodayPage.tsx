@@ -33,8 +33,8 @@ export function TodayPage() {
   const { noche, isTonight, now } = useNoche()
   const { filters, active, update, toggleCategory, clear } = useBoardFilters()
   const { coords, approximate, status, request, restore, dismiss } = useUserLocation()
-  // «Gratis» lo filtra la base; la categoría, la app. Con «cerca mío», la base además
-  // devuelve la distancia a cada escenario.
+  // «Gratis» lo filtra la base; la categoría, la app. Con «cerca mío», la distancia a cada
+  // escenario se calcula acá, en el teléfono: la posición no viaja (decisión 90).
   const origin = filters.nearby ? coords : null
   const followed = useFollowed()
   const query = useNightActs(noche, {
@@ -43,8 +43,7 @@ export function TodayPage() {
     origin,
   })
   const acts = query.data
-  // Mientras llega la consulta con distancias se sigue viendo el orden anterior.
-  const byDistance = origin !== null && !query.isPlaceholderData
+  const byDistance = origin !== null
 
   // Abrir con `?cerca=1` vale sólo si ya había permiso: si no, se apaga sin preguntar.
   // El permiso se pide únicamente cuando el usuario toca «Cerca mío».

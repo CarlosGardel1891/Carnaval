@@ -397,7 +397,7 @@
     "open": "About Carnavalero, privacy and your data",
     "privacy": {
       "title": "Privacy",
-      "summary": "Carnavalero doesn't ask for your name, email or sign-up. Your location is used only for “Near me” and the map, when you ask for it: it is checked on the spot to work out distances and is never stored.",
+      "summary": "Carnavalero doesn't ask for your name, email or sign-up. Your location is used only on your phone, for “Near me” and the map: it is never stored or sent.",
       "link": "Read the privacy policy"
     },
     "data": {

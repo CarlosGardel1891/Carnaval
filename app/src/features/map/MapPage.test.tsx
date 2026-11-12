@@ -116,9 +116,7 @@ describe('mapa', () => {
       'Escenario Móvil · Escenario móvil · 22:15 · Esquina ficticia 2',
     ])
     expect(fetchLocatedStages).toHaveBeenCalledWith('2027-01-28')
-    expect(fetchNightActs).toHaveBeenCalledWith(
-      expect.objectContaining({ noche: '2027-01-28', origin: null }),
-    )
+    expect(fetchNightActs).toHaveBeenCalledWith(expect.objectContaining({ noche: '2027-01-28' }))
   })
 
   it('las referencias nombran sólo los tipos que están en el mapa', async () => {

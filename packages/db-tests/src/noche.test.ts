@@ -20,8 +20,6 @@ const dePrueba = <T extends { escenario_slug: string }>(filas: T[]) =>
 async function deLaNoche(
   db: Db,
   args: {
-    p_lat?: number
-    p_lng?: number
     p_solo_gratis?: boolean
     p_solo_favoritos?: boolean
   } = {},
@@ -174,7 +172,7 @@ describe('actuaciones_de_la_noche', () => {
       'programada',
       'suspendida',
     ])
-    expect(filas.every((f) => f.distancia_m === null && f.es_favorito === false)).toBe(true)
+    expect(filas.every((f) => f.es_favorito === false)).toBe(true)
   })
 
   it('trae los datos del conjunto, del escenario y de la etapa', async () => {
@@ -210,22 +208,32 @@ describe('actuaciones_de_la_noche', () => {
     ])
   })
 
-  it('con lat y lng calcula la distancia; el itinerante usa el punto de la actuación', async () => {
-    const filas = await deLaNoche(anonClient(), { p_lat: ORIGEN.lat, p_lng: ORIGEN.lng })
+  it('devuelve el punto de cada actuación; el itinerante usa el de la actuación', async () => {
+    const filas = await deLaNoche(anonClient())
     const de = (escenario: string, conjunto: string) =>
       filas.find((f) => f.escenario_slug === escenario && f.conjunto_slug === conjunto)!
-    expect(de('zz-cerca', 'zz-uno').distancia_m).toBeGreaterThan(100)
-    expect(de('zz-cerca', 'zz-uno').distancia_m).toBeLessThan(160)
-    expect(de('zz-lejos', 'zz-dos').distancia_m).toBeGreaterThan(10_000)
+    expect(de('zz-cerca', 'zz-uno').lat).not.toBeNull()
+    expect(de('zz-lejos', 'zz-dos').lng).not.toBeNull()
     const movil = de('zz-movil', 'zz-tres')
     expect(movil.direccion).toBe('Plaza de Prueba')
     expect(movil.lat).toBeCloseTo(-34.905, 6)
     expect(movil.lng).toBeCloseTo(-56.17, 6)
-    expect(movil.distancia_m).toBeGreaterThan(650)
-    expect(movil.distancia_m).toBeLessThan(790)
     const sinPunto = de('zz-sin-punto', 'zz-uno')
-    expect([sinPunto.lat, sinPunto.lng, sinPunto.distancia_m]).toEqual([null, null, null])
+    expect([sinPunto.lat, sinPunto.lng]).toEqual([null, null])
     expect(sinPunto.direccion).toBe('Calle Sin Punto 3')
+  })
+
+  it('no recibe la posición del usuario ni devuelve distancias (decisión 90)', async () => {
+    const conPosicion = await anonClient().rpc('actuaciones_de_la_noche', {
+      p_noche: NOCHE,
+      p_lat: ORIGEN.lat,
+      p_lng: ORIGEN.lng,
+    } as never)
+    expect(conPosicion.error).not.toBeNull()
+
+    const filas = await deLaNoche(anonClient())
+    expect(filas.length).toBeGreaterThan(0)
+    expect(filas.every((f) => !('distancia_m' in f))).toBe(true)
   })
 
   it('solo_gratis deja sólo los escenarios que se sabe que son gratis', async () => {

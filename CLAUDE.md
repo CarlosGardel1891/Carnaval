@@ -147,12 +147,13 @@ En el emulador Android, la app reescribe `127.0.0.1`/`localhost` a `10.0.2.2` pa
 - El Concurso está en `/calendario/concurso`, antes que `/calendario/:slug` en `routes.tsx`. Un fixture sin etapas no es una lista vacía: es «todavía no se publicó».
 - Para compilar la app contra el proyecto remoto: `app/.env.remoto` (ver «Proyecto remoto»).
 - `/mapa` se carga aparte (`features/map/LazyMapPage.tsx`), así «Hoy» arranca sin MapLibre. Fuera de `features/map/`, nadie importa `MapPage` ni `MontevideoMap`.
-- Las consultas se guardan en el teléfono 24 horas (`app/src/lib/queryCache.ts`, decisión 37). Si cambia la forma de lo que devuelve una consulta, subir `CACHE_VERSION`. Una consulta que lleve la posición del usuario va con `meta: { persist: false }`.
+- Las consultas se guardan en el teléfono 24 horas (`app/src/lib/queryCache.ts`, decisión 37). Si cambia la forma de lo que devuelve una consulta, subir `CACHE_VERSION`. La posición del usuario no va en ninguna consulta (decisión 90).
 - Lo del modo Llamadas se guarda una semana (decisión 65): son las consultas cuya clave empieza con `llamadas` (`features/llamadas/useLlamadas.ts`), y `usePrefetchLlamadas` las baja al abrir la app en temporada. Una consulta nueva del modo tiene que llevar esa clave y sumarse ahí.
 - Con el modo Llamadas activo, la app abre en `/llamadas` (`useOpenInLlamadas`, sólo en el arranque en `/`). Toda hora del desfile sale de `@cuerda/shared` (`departureTime`, `passTime`) y se muestra con `EstimatedTime`, que le pone el «≈»: nunca una hora estimada sola (decisión 63).
 - El glosario son textos de la app (`llamadas.glossary` en los locales); la lista y el orden de los términos están en `features/llamadas/glossary.ts`.
 - El mapa del recorrido es `features/map/ParadeMap.tsx`, que se carga aparte (`LazyParadeMap`). Sin key, o si el estilo no carga, dibuja sobre el fondo liso (`mapStyle.ts`).
 - «Ahora» es siempre `useNow()` o `now()` de `lib/clock.ts`, nunca `new Date()`: así vale el reloj simulado.
+- **La ubicación no sale del teléfono** (decisión 90): `useNightActs` recibe la posición y calcula ahí las distancias (`withDistances`, `lib/distance.ts`); ni `fetchNightActs` ni ninguna otra función de `api.ts` la reciben. No sumar parámetros de posición a una función de la base.
 - Toda distancia que se muestra pasa por `useDistanceLabel` (`features/location/`): con una ubicación aproximada va redondeada al kilómetro (decisión 42).
 - «App al frente», refresco al volver y botón «atrás» de Android: `app/src/lib/lifecycle.ts` (decisiones 32 y 33).
 - El color de fondo está en tres lugares que tienen que coincidir: `--color-ground` (`app/src/index.css`), `GROUND` (`app/capacitor.config.ts`) y `ground` (`app/android/app/src/main/res/values/colors.xml`, lo que se ve detrás de las barras del sistema; decisión 41).

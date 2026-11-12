@@ -12,8 +12,12 @@ type Nullable<T, K extends keyof T> = Omit<T, K> & { [P in K]: T[P] | null }
 /**
  * Una actuación de la noche. Los tipos generados marcan todas las columnas de las
  * funciones como no nulas; acá se corrigen las que en la base pueden venir vacías.
+ * `distancia_m` no viene de la base: la calcula la app en el teléfono cuando «cerca mío» está
+ * prendido (`withDistances`, decisión 90); si no, es null.
  */
-export type Act = Nullable<
+export type Act = ActRow & { distancia_m: number | null }
+
+type ActRow = Nullable<
   Functions['actuaciones_de_la_noche']['Returns'][number],
   | 'etapa_rueda'
   | 'etapa_numero'
@@ -26,7 +30,6 @@ export type Act = Nullable<
   | 'itinerante'
   | 'lat'
   | 'lng'
-  | 'distancia_m'
 >
 
 /** Un escenario con ubicación: su punto fijo o, si es itinerante, una parada de la noche. */
@@ -59,8 +62,6 @@ export interface NightActsParams {
   onlyFree?: boolean
   /** Sólo los conjuntos que sigue el usuario de la sesión. Sin sesión no vuelve nada. */
   onlyFollowed?: boolean
-  /** Si viene, la base devuelve `distancia_m` desde ese punto. */
-  origin?: Coords | null
 }
 
 export async function fetchCurrentSeason(noche: string): Promise<Temporada | null> {
@@ -75,21 +76,22 @@ export async function fetchCurrentSeason(noche: string): Promise<Temporada | nul
   return data
 }
 
-/** Las actuaciones de una noche lógica, ordenadas por hora. */
+/**
+ * Las actuaciones de una noche lógica, ordenadas por hora. La posición del usuario no viaja
+ * (decisión 90): la base devuelve el punto de cada actuación y la distancia se calcula acá.
+ */
 export async function fetchNightActs({
   noche,
   onlyFree = false,
   onlyFollowed = false,
-  origin = null,
 }: NightActsParams): Promise<Act[]> {
   const { data, error } = await supabase.rpc('actuaciones_de_la_noche', {
     p_noche: noche,
     p_solo_gratis: onlyFree,
     p_solo_favoritos: onlyFollowed,
-    ...(origin ? { p_lat: origin.lat, p_lng: origin.lng } : {}),
   })
   if (error) throw error
-  return data
+  return (data as ActRow[]).map((row) => ({ ...row, distancia_m: null }))
 }
 
 /** Centro de Montevideo: desde acá se mide para traer «todos» los escenarios con ubicación. */

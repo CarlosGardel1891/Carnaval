@@ -54,7 +54,6 @@ describe('pizarrón Hoy', () => {
       noche: '2027-01-28',
       onlyFree: false,
       onlyFollowed: false,
-      origin: null,
     })
     expect(screen.getByText('jueves, 28 de enero')).toBeInTheDocument()
     expect(

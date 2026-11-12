@@ -794,13 +794,7 @@ export type Database = {
     }
     Functions: {
       actuaciones_de_la_noche: {
-        Args: {
-          p_lat?: number
-          p_lng?: number
-          p_noche: string
-          p_solo_favoritos?: boolean
-          p_solo_gratis?: boolean
-        }
+        Args: { p_noche: string; p_solo_favoritos?: boolean; p_solo_gratis?: boolean }
         Returns: {
           actuacion_id: number
           conjunto_categoria: Database['public']['Enums']['categoria_conjunto']
@@ -809,7 +803,6 @@ export type Database = {
           conjunto_nombre: string
           conjunto_slug: string
           direccion: string
-          distancia_m: number
           es_favorito: boolean
           escenario_barrio: string
           escenario_id: number

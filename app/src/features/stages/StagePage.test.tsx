@@ -131,7 +131,6 @@ describe('ficha de escenario', () => {
       noche: '2027-01-28',
       onlyFree: false,
       onlyFollowed: false,
-      origin: null,
     })
   })
 
