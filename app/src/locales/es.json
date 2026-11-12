@@ -397,7 +397,7 @@
     "open": "Acerca de Carnavalero, privacidad y tus datos",
     "privacy": {
       "title": "Privacidad",
-      "summary": "Carnavalero no te pide nombre, mail ni registro. Tu ubicación se usa sólo en tu teléfono, para «Cerca mío» y el mapa: no se guarda ni se envía.",
+      "summary": "Carnavalero no te pide nombre, mail ni registro. Tu ubicación se usa sólo para «Cerca mío» y el mapa, cuando vos lo pedís: se consulta en el momento para calcular distancias y no se guarda.",
       "link": "Leer la política de privacidad"
     },
     "data": {
