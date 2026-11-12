@@ -5,7 +5,9 @@ import {
   countStagesWithoutLocation,
   filterByCategories,
   groupByStage,
+  nowIndex,
   onStageNow,
+  priceFitsBeside,
   sortByDistance,
   sortByFirstStart,
 } from './board'
@@ -160,5 +162,37 @@ describe('countStagesWithoutLocation', () => {
         makeAct({ escenario_id: 9, lat: null, lng: null }),
       ]),
     ).toBe(1)
+  })
+})
+
+describe('nowIndex', () => {
+  const acts = [
+    { actuacion_id: 1, inicio: '2027-01-29T00:00:00Z' },
+    { actuacion_id: 2, inicio: '2027-01-29T01:00:00Z' },
+    { actuacion_id: 3, inicio: '2027-01-29T02:00:00Z' },
+  ]
+
+  it('la primera que está en escena', () => {
+    expect(nowIndex(acts, new Set([2, 3]), new Date('2027-01-29T02:10:00Z'))).toBe(1)
+  })
+
+  it('sin nadie en escena a la vista, la primera que todavía no empezó', () => {
+    expect(nowIndex(acts, new Set(), new Date('2027-01-29T00:30:00Z'))).toBe(1)
+  })
+
+  it('si ya pasó todo, ninguna', () => {
+    expect(nowIndex(acts, new Set(), new Date('2027-01-29T05:00:00Z'))).toBe(-1)
+  })
+})
+
+describe('priceFitsBeside', () => {
+  it('un precio corto va al lado de un nombre corto', () => {
+    expect(priceFitsBeside('Velódromo', 'Gratis')).toBe(true)
+    expect(priceFitsBeside('Teatro de Verano', '$ 150')).toBe(true)
+  })
+
+  it('un precio largo o un nombre largo lo mandan abajo', () => {
+    expect(priceFitsBeside('Ficticio Centro', 'Precio ficticio: $ 150')).toBe(false)
+    expect(priceFitsBeside('Escenario Popular del Prado Norte', 'Gratis')).toBe(false)
   })
 })

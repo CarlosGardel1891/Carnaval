@@ -31,9 +31,12 @@ interface SectionHeaderProps {
   title: string
   /** El id del título, para `aria-labelledby` de la sección. */
   id?: string
-  /** «Ver todo»: un enlace a la derecha. */
-  action?: { label: string; to: To }
+  /** «Ver todo»: un enlace a la derecha, o un botón si no cambia de pantalla. */
+  action?: { label: string; to: To } | { label: string; onClick: () => void }
 }
+
+const sectionAction =
+  'text-accent -my-2 inline-flex min-h-11 shrink-0 items-center text-[0.9375rem] font-bold'
 
 export function SectionHeader({ title, id, action }: SectionHeaderProps) {
   return (
@@ -41,14 +44,16 @@ export function SectionHeader({ title, id, action }: SectionHeaderProps) {
       <h2 id={id} className="text-[1.1875rem] leading-tight font-extrabold tracking-tight">
         {title}
       </h2>
-      {action && (
-        <Link
-          to={action.to}
-          className="text-accent -my-2 inline-flex min-h-11 shrink-0 items-center text-[0.9375rem] font-bold"
-        >
-          {action.label}
-        </Link>
-      )}
+      {action &&
+        ('to' in action ? (
+          <Link to={action.to} className={sectionAction}>
+            {action.label}
+          </Link>
+        ) : (
+          <button type="button" onClick={action.onClick} className={sectionAction}>
+            {action.label}
+          </button>
+        ))}
     </div>
   )
 }

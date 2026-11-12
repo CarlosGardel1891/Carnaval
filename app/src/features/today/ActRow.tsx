@@ -10,6 +10,8 @@ import { useDistanceLabel } from '../location/useDistanceLabel'
 import { groupPath } from '../groups/groupPath'
 import { useStagePath } from '../stages/stagePath'
 
+import { NOW_ANCHOR_ID } from './board'
+
 interface ActRowProps {
   act: Act
   onStage: boolean
@@ -17,13 +19,21 @@ interface ActRowProps {
   showStage?: boolean
   /** En «cerca mío» por hora, cada fila lleva su distancia. */
   showDistance?: boolean
+  /** La fila de la hora actual en la lista por hora: hasta acá baja «Ver todo». */
+  anchor?: boolean
 }
 
 /**
  * Una actuación del pizarrón (decisión 92): la hora y el conjunto mandan; la categoría va
  * debajo, como píldora en su color. Toda la fila lleva a la ficha del conjunto.
  */
-export function ActRow({ act, onStage, showStage = false, showDistance = false }: ActRowProps) {
+export function ActRow({
+  act,
+  onStage,
+  showStage = false,
+  showDistance = false,
+  anchor = false,
+}: ActRowProps) {
   const { t } = useTranslation()
   const locale = useLocale()
   const distanceLabel = useDistanceLabel()
@@ -39,7 +49,10 @@ export function ActRow({ act, onStage, showStage = false, showDistance = false }
 
   return (
     <li
-      className={`relative flex items-center gap-3 px-4 py-3.5 ${onStage ? 'bg-sun-soft/60' : ''}`}
+      id={anchor ? NOW_ANCHOR_ID : undefined}
+      className={`relative flex scroll-mt-28 items-center gap-3 px-4 py-3.5 ${
+        onStage ? 'bg-sun-soft/60' : ''
+      }`}
     >
       <time
         dateTime={act.inicio}

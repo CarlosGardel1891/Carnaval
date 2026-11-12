@@ -44,13 +44,17 @@ export function NightSummary({ acts, stages, onStage }: SummaryProps) {
 }
 
 /** El carrusel «Ahora en escena»: los conjuntos que están actuando en este momento. */
-export function NowOnStage({ acts }: { acts: Act[] }) {
+export function NowOnStage({ acts, onSeeAll }: { acts: Act[]; onSeeAll?: () => void }) {
   const { t } = useTranslation()
   const headingId = useId()
   if (acts.length === 0) return null
   return (
     <section aria-labelledby={headingId} className="pt-1">
-      <SectionHeader id={headingId} title={t('today.onStage')} />
+      <SectionHeader
+        id={headingId}
+        title={t('today.onStage')}
+        action={onSeeAll && { label: t('today.seeAll'), onClick: onSeeAll }}
+      />
       <ul className="no-scrollbar -mx-4 flex gap-3 overflow-x-auto px-4 pb-4">
         {acts.map((act) => (
           <li key={act.actuacion_id} className="w-[11.5rem] shrink-0">

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router'
 import { Constants } from '@cuerda/shared'
@@ -16,6 +16,7 @@ import {
   categoriesPresent,
   countStagesWithoutLocation,
   filterByCategories,
+  NOW_ANCHOR_ID,
   onlyLocatedStages,
   onStageNow,
 } from './board'
@@ -105,6 +106,17 @@ export function TodayPage() {
     () => (acts ?? []).filter((act) => onStage.has(act.actuacion_id)),
     [acts, onStage],
   )
+  // «Ver todo»: pasa a la lista por hora y baja hasta la hora actual.
+  const [jump, setJump] = useState(0)
+  const seeAll = useCallback(() => {
+    update({ view: 'time' })
+    setJump((n) => n + 1)
+  }, [update])
+  useEffect(() => {
+    if (jump === 0 || filters.view !== 'time') return
+    document.getElementById(NOW_ANCHOR_ID)?.scrollIntoView?.({ behavior: 'smooth', block: 'start' })
+  }, [jump, filters.view])
+
   const title = isTonight ? t('today.title') : t('today.otherNight')
   const hasBoard = Boolean(acts && (acts.length > 0 || active))
 
@@ -166,7 +178,7 @@ export function TodayPage() {
               <EmptyNight noche={noche} />
             ) : (
               <>
-                <NowOnStage acts={liveActs} />
+                <NowOnStage acts={liveActs} onSeeAll={seeAll} />
                 <FilterBar
                   filters={filters}
                   categories={categories}
@@ -206,6 +218,7 @@ export function TodayPage() {
                       onStage={onStage}
                       view={filters.view}
                       byDistance={byDistance}
+                      now={isTonight ? now : null}
                     />
                   </section>
                 )}

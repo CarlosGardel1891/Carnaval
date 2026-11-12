@@ -42,19 +42,26 @@ describe('los colores de las categorías', () => {
     })
   })
 
-  it('el texto de cada píldora tiene contraste AA (4,5:1) sobre su fondo', () => {
-    const luminance = (hex: string) => {
-      const channels = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255)
-      const [r, g, b] = channels.map((c) =>
-        c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4,
-      )
-      return 0.2126 * r! + 0.7152 * g! + 0.0722 * b!
+  const luminance = (hex: string) => {
+    const channels = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255)
+    const [r, g, b] = channels.map((c) => (c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4))
+    return 0.2126 * r! + 0.7152 * g! + 0.0722 * b!
+  }
+  const read = (name: string) => css.match(new RegExp(`${name}: (#[0-9a-f]{6});`))![1]!
+  const contrast = (a: string, b: string) => {
+    const [la, lb] = [luminance(read(a)), luminance(read(b))]
+    return (Math.max(la, lb) + 0.05) / (Math.min(la, lb) + 0.05)
+  }
+
+  it('el texto secundario tiene contraste AA sobre el fondo, las tarjetas y lo realzado', () => {
+    for (const background of ['--color-ground', '--color-surface', '--color-raised']) {
+      expect(contrast('--color-soft', background), background).toBeGreaterThanOrEqual(4.5)
     }
-    const read = (name: string) => css.match(new RegExp(`${name}: (#[0-9a-f]{6});`))![1]!
+  })
+
+  it('el texto de cada píldora tiene contraste AA (4,5:1) sobre su fondo', () => {
     for (const category of Constants.public.Enums.categoria_conjunto) {
-      const ink = luminance(read(`--cat-${category}-ink`))
-      const soft = luminance(read(`--cat-${category}-soft`))
-      const ratio = (Math.max(ink, soft) + 0.05) / (Math.min(ink, soft) + 0.05)
+      const ratio = contrast(`--cat-${category}-ink`, `--cat-${category}-soft`)
       expect(ratio, category).toBeGreaterThanOrEqual(4.5)
     }
   })

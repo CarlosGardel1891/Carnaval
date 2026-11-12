@@ -123,3 +123,28 @@ export function onlyLocatedStages(acts: Act[]): Act[] {
 export function countStagesWithoutLocation(acts: Act[]): number {
   return groupByStage(acts).filter((g) => !g.hasLocation).length
 }
+
+/** El id de la fila de la hora actual en la lista por hora: hasta ahí baja «Ver todo». */
+export const NOW_ANCHOR_ID = 'ahora'
+
+/**
+ * La fila de «ahora» en la lista por hora: la primera que está en escena o, si no hay ninguna
+ * a la vista, la primera que todavía no empezó. -1 si ya pasó todo.
+ */
+export function nowIndex(
+  acts: Pick<Act, 'actuacion_id' | 'inicio'>[],
+  onStage: ReadonlySet<number>,
+  now: Date,
+): number {
+  const live = acts.findIndex((act) => onStage.has(act.actuacion_id))
+  if (live !== -1) return live
+  return acts.findIndex((act) => new Date(act.inicio).getTime() >= now.getTime())
+}
+
+/**
+ * Si el precio entra al lado del nombre del escenario sin partirlo, en el teléfono más angosto
+ * (360 px: unos 296 de tarjeta). El nombre va en letra más grande que la píldora, y pesa más.
+ */
+export function priceFitsBeside(name: string, price: string): boolean {
+  return name.length * 1.4 + price.length <= 30
+}

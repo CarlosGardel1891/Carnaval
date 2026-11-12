@@ -6,7 +6,7 @@ import { joinParts, priceLabel } from '../../lib/labels'
 import { useDistanceLabel } from '../location/useDistanceLabel'
 import { useStagePath } from '../stages/stagePath'
 import { ActRow } from './ActRow'
-import type { StageGroup } from './board'
+import { priceFitsBeside, type StageGroup } from './board'
 
 interface StageCardProps {
   group: StageGroup
@@ -25,32 +25,39 @@ export function StageCard({ group, onStage }: StageCardProps) {
 
   const summary = joinParts([group.tipo && t(`stageType.${group.tipo}`), group.barrio])
   const price = priceLabel(t, group.gratis, group.precio_texto)
+  const pill = price && (
+    <Pill tone={group.gratis === true ? 'ok' : 'neutral'} className="max-w-full">
+      <span className="truncate">{price}</span>
+    </Pill>
+  )
+  // El precio va al lado del nombre sólo si entra sin partirlo; si no, baja a la línea del
+  // tipo y el barrio.
+  const beside = price !== null && priceFitsBeside(group.nombre, price)
 
   return (
     <section aria-labelledby={headingId}>
       <Card>
-        <Link
-          to={stagePath(group.slug)}
-          className="flex min-h-14 items-start gap-3 px-4 pt-4 pb-3.5"
-        >
-          <div className="min-w-0 flex-1">
+        <Link to={stagePath(group.slug)} className="block min-h-14 px-4 pt-4 pb-3.5">
+          {/* Si igual no entrara (letra grande), la píldora baja sola antes de partir el nombre. */}
+          <div className="flex flex-wrap items-start justify-between gap-x-3 gap-y-1">
             <h2
               id={headingId}
               className="text-[1.1875rem] leading-tight font-extrabold tracking-tight"
             >
               {group.nombre}
             </h2>
-            {summary && <p className="text-soft mt-0.5 text-[0.9375rem]">{summary}</p>}
-            {group.distancia_m !== null && (
-              <p className="text-accent mt-0.5 text-[0.9375rem] font-bold">
-                {distanceLabel(group.distancia_m)}
-              </p>
-            )}
+            {beside && <span className="mt-0.5 flex min-w-0 shrink-0">{pill}</span>}
           </div>
-          {price && (
-            <Pill tone={group.gratis === true ? 'ok' : 'neutral'} className="mt-0.5 max-w-[45%]">
-              <span className="truncate">{price}</span>
-            </Pill>
+          {(summary || (pill && !beside)) && (
+            <p className="text-soft mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-[0.9375rem]">
+              {summary && <span>{summary}</span>}
+              {!beside && pill}
+            </p>
+          )}
+          {group.distancia_m !== null && (
+            <p className="text-accent mt-0.5 text-[0.9375rem] font-bold">
+              {distanceLabel(group.distancia_m)}
+            </p>
           )}
         </Link>
         <ul className="divide-line border-line divide-y border-t">
