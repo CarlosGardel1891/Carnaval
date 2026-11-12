@@ -33,15 +33,22 @@ interface SectionHeaderProps {
   id?: string
   /** «Ver todo»: un enlace a la derecha, o un botón si no cambia de pantalla. */
   action?: { label: string; to: To } | { label: string; onClick: () => void }
+  /** Un título que arranca en minúscula (un mes, una fecha) se muestra con mayúscula inicial. */
+  capitalize?: boolean
 }
 
 const sectionAction =
   'text-accent -my-2 inline-flex min-h-11 shrink-0 items-center text-[0.9375rem] font-bold'
 
-export function SectionHeader({ title, id, action }: SectionHeaderProps) {
+export function SectionHeader({ title, id, action, capitalize = false }: SectionHeaderProps) {
   return (
     <div className="flex items-baseline justify-between gap-3 px-1 pt-1 pb-2.5">
-      <h2 id={id} className="text-[1.1875rem] leading-tight font-extrabold tracking-tight">
+      <h2
+        id={id}
+        className={`text-[1.1875rem] leading-tight font-extrabold tracking-tight ${
+          capitalize ? 'first-letter:uppercase' : ''
+        }`}
+      >
         {title}
       </h2>
       {action &&

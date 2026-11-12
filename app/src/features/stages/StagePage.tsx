@@ -192,12 +192,11 @@ export function StagePage() {
       )}
 
       <section aria-labelledby="grilla">
-        <div className="first-letter:uppercase">
-          <SectionHeader
-            id="grilla"
-            title={isTonight ? t('stage.tonight') : formatNight(noche, locale)}
-          />
-        </div>
+        <SectionHeader
+          id="grilla"
+          title={isTonight ? t('stage.tonight') : formatNight(noche, locale)}
+          capitalize
+        />
         {night.isError && night.data && !night.isFetching && (
           <p role="alert" className="text-danger px-1 pb-2 text-sm font-semibold">
             {t('today.refreshError')}

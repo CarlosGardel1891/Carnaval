@@ -59,7 +59,7 @@ describe('calendario', () => {
       within(january)
         .getAllByRole('link', { name: /^Ver la noche del/ })
         .map((link) => link.textContent),
-    ).toEqual(['6mié', '21jue', '25lun', '30sáb'])
+    ).toEqual(['mié6', 'jue21', 'lun25', 'sáb30'])
   })
 
   it('cada evento dice su tipo y su lugar', async () => {
@@ -160,15 +160,16 @@ describe('calendario', () => {
     }
   })
 
-  it('la pretemporada va rotulada', async () => {
+  it('la pretemporada va rotulada, salvo que la fecha sea estimada: una sola etiqueta', async () => {
     renderApp('/calendario')
     await screen.findByText('Desfile Inaugural del Carnaval')
-    for (const name of [
-      'Prueba de Admisión al Concurso Oficial 2027',
-      'Llamadas de San Baltasar',
-    ]) {
-      expect(within(eventRow(name)).getByText('Pretemporada')).toBeInTheDocument()
-    }
+    expect(
+      within(eventRow('Prueba de Admisión al Concurso Oficial 2027')).getByText('Pretemporada'),
+    ).toBeInTheDocument()
+    // Estimado y de pretemporada: manda que la fecha no es firme.
+    const baltasar = within(eventRow('Llamadas de San Baltasar'))
+    expect(baltasar.getByText('Fecha estimada')).toBeInTheDocument()
+    expect(baltasar.queryByText('Pretemporada')).not.toBeInTheDocument()
     // El Inaugural es el primer día de la temporada: ya no es pretemporada.
     expect(
       within(eventRow('Desfile Inaugural del Carnaval')).queryByText('Pretemporada'),
@@ -230,7 +231,9 @@ describe('calendario', () => {
     expect(
       within(eventRow('Llamadas de San Baltasar')).getByText('Estimated date'),
     ).toBeInTheDocument()
-    expect(within(eventRow('Llamadas de San Baltasar')).getByText('Pre-season')).toBeInTheDocument()
+    expect(
+      within(eventRow('Prueba de Admisión al Concurso Oficial 2027')).getByText('Pre-season'),
+    ).toBeInTheDocument()
     expect(
       screen.getByRole('link', { name: 'See the night of Saturday, January 30' }),
     ).toBeInTheDocument()
