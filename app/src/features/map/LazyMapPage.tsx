@@ -8,9 +8,13 @@ const MapPage = lazy(() => import('./MapPage').then((module) => ({ default: modu
 function MapPageFallback() {
   const { t } = useTranslation()
   return (
-    <main className="space-y-1 px-4 pt-4">
-      <h1 className="text-2xl font-bold">{t('map.title')}</h1>
-      <p className="text-soft">{t('map.loading')}</p>
+    <main className="px-3 pt-3">
+      <div className="bg-surface shadow-card rounded-[1.375rem] px-4 py-3">
+        <h1 className="text-[1.5rem] leading-tight font-extrabold tracking-tight">
+          {t('map.title')}
+        </h1>
+        <p className="text-soft mt-1 text-sm">{t('map.loading')}</p>
+      </div>
     </main>
   )
 }

@@ -102,6 +102,6 @@ describe('markerShape', () => {
   })
 
   it('un escenario sin tipo usa un marcador neutro', () => {
-    expect(markerShape(null).color).toBe('#cbd5e1')
+    expect(markerShape(null).color).toBe('#5b6b82')
   })
 })

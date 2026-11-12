@@ -280,17 +280,46 @@ interface PrimaryButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   icon?: ReactNode
 }
 
+const primary =
+  'pressable bg-brand shadow-button inline-flex min-h-13 items-center justify-center gap-2 rounded-2xl px-6 text-[1.0625rem] font-bold text-white disabled:opacity-60'
+
 /** El botón principal: lleno, azul, con texto blanco. */
 export function PrimaryButton({ icon, children, className = '', ...props }: PrimaryButtonProps) {
   return (
-    <button
-      type="button"
-      className={`pressable bg-brand shadow-button inline-flex min-h-13 items-center justify-center gap-2 rounded-2xl px-6 text-[1.0625rem] font-bold text-white disabled:opacity-60 ${className}`}
-      {...props}
-    >
+    <button type="button" className={`${primary} ${className}`} {...props}>
       {icon}
       {children}
     </button>
+  )
+}
+
+/** Lo mismo, cuando lleva a otra pantalla (`to`) o afuera de la app (`href`). */
+export function PrimaryLink({
+  to,
+  href,
+  icon,
+  children,
+  className = '',
+}: {
+  to?: To
+  href?: string
+  icon?: ReactNode
+  children: ReactNode
+  className?: string
+}) {
+  if (to === undefined) {
+    return (
+      <a href={href} target="_blank" rel="noreferrer" className={`${primary} ${className}`}>
+        {icon}
+        {children}
+      </a>
+    )
+  }
+  return (
+    <Link to={to} className={`${primary} ${className}`}>
+      {icon}
+      {children}
+    </Link>
   )
 }
 

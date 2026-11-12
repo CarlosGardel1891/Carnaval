@@ -176,6 +176,15 @@ body {
   display: none;
 }
 
+/*
+ * Los controles de MapLibre, por encima de lo que flota abajo (la barra de pestañas). Con un
+ * selector más específico que el de MapLibre, que se carga después.
+ */
+.maplibregl-map .maplibregl-ctrl-bottom-right,
+.maplibregl-map .maplibregl-ctrl-bottom-left {
+  bottom: var(--map-bottom, 0px);
+}
+
 /* Quien pidió menos movimiento en su teléfono no ve latidos ni rebotes. */
 @media (prefers-reduced-motion: reduce) {
   .live-dot::after {

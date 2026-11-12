@@ -66,24 +66,27 @@ export interface MarkerShape {
 
 const CIRCLE = 'M12 3a9 9 0 1 0 0 18a9 9 0 0 0 0-18Z'
 
-/** Un marcador por tipo de escenario: cambia la forma además del color. */
+/**
+ * Un marcador por tipo de escenario: redondo, del color del tipo, con una forma blanca adentro
+ * (el color nunca va solo). Los colores tienen contraste de sobra con el blanco y con el mapa.
+ */
 const SHAPES: Record<TipoEscenario, MarkerShape> = {
   teatro_verano: {
     path: 'M12 2l2.9 6.6 7.1.7-5.4 4.8 1.6 7L12 17.4 5.8 21.1l1.6-7L2 9.3l7.1-.7Z',
-    color: '#fbbf24',
+    color: '#b45309',
   },
-  privado: { path: 'M4.5 4.5h15v15h-15Z', color: '#c4b5fd' },
-  popular: { path: CIRCLE, color: '#7dd3fc' },
-  movil: { path: 'M12 2 22 12 12 22 2 12Z', color: '#86efac' },
-  gratuito: { path: 'M12 3 22 20H2Z', color: '#f9a8d4' },
-  barrio_a_barrio: { path: 'M12 2l8.7 5v10L12 22l-8.7-5V7Z', color: '#fdba74' },
+  privado: { path: 'M4.5 4.5h15v15h-15Z', color: '#7c3aed' },
+  popular: { path: CIRCLE, color: '#0448a7' },
+  movil: { path: 'M12 2 22 12 12 22 2 12Z', color: '#15803d' },
+  gratuito: { path: 'M12 3 22 20H2Z', color: '#be185d' },
+  barrio_a_barrio: { path: 'M12 2l8.7 5v10L12 22l-8.7-5V7Z', color: '#c2410c' },
 }
 
-const UNKNOWN: MarkerShape = { path: CIRCLE, color: '#cbd5e1' }
+const UNKNOWN: MarkerShape = { path: CIRCLE, color: '#5b6b82' }
 
 export function markerShape(tipo: TipoEscenario | null): MarkerShape {
   return tipo ? SHAPES[tipo] : UNKNOWN
 }
 
-/** Borde oscuro de los marcadores, para que se despeguen del mapa. */
-export const MARKER_STROKE = '#0a0f1c'
+/** La forma de adentro y el borde de los marcadores: blancos. */
+export const MARKER_STROKE = '#ffffff'

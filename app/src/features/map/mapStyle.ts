@@ -10,11 +10,11 @@ import type { StyleSpecification } from 'maplibre-gl'
 export const BLANK_STYLE: StyleSpecification = {
   version: 8,
   sources: {},
-  layers: [{ id: 'fondo', type: 'background', paint: { 'background-color': '#141b2d' } }],
+  layers: [{ id: 'fondo', type: 'background', paint: { 'background-color': '#e7edf7' } }],
 }
 
 export const streetsStyleUrl = (apiKey: string) =>
-  `https://api.maptiler.com/maps/streets-v2-dark/style.json?key=${apiKey}`
+  `https://api.maptiler.com/maps/streets-v2/style.json?key=${apiKey}`
 
 /** Por qué un mapa está sobre fondo liso: falta la key, o no se pudieron cargar las calles. */
 export type BlankReason = 'no-key' | 'no-network'

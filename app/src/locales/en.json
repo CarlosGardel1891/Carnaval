@@ -5,7 +5,7 @@
   },
   "map": {
     "label": "Map of stages",
-    "missingKey": "The MapTiler key (VITE_MAPTILER_KEY) is missing: stages are shown, but streets are not.",
+    "missingKey": "We can't show the streets yet, but every stage is in its place.",
     "title": "Map",
     "you": "Your location",
     "legend": "Legend",
@@ -13,7 +13,9 @@
     "error": "We couldn't load the stages.",
     "empty": "No stages have a location on file yet.",
     "notOnMap_one": "{{count}} of tonight's stages is not on the map: it has no location on file yet.",
-    "notOnMap_other": "{{count}} of tonight's stages are not on the map: they have no location on file yet."
+    "notOnMap_other": "{{count}} of tonight's stages are not on the map: they have no location on file yet.",
+    "close": "Close",
+    "openStage": "View stage"
   },
   "season": {
     "title": "Carnival {{year}}",

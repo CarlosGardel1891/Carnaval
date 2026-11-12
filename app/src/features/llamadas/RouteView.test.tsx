@@ -147,7 +147,7 @@ describe('Llamadas: recorrido', () => {
 describe('estilo del mapa', () => {
   it('con key y con red, las calles de MapTiler', () => {
     expect(initialStyle('mi-key', true)).toEqual({
-      style: 'https://api.maptiler.com/maps/streets-v2-dark/style.json?key=mi-key',
+      style: 'https://api.maptiler.com/maps/streets-v2/style.json?key=mi-key',
       blank: null,
     })
   })

@@ -138,15 +138,28 @@ describe('mapa', () => {
     ).toBeInTheDocument()
   })
 
-  it('tocar un marcador lleva a la ficha del escenario', async () => {
+  it('tocar un marcador abre su tarjeta, y de ahí se va a la ficha del escenario', async () => {
     const { router } = renderApp('/mapa')
     await userEvent.click(await screen.findByRole('button', { name: /22:15/ }))
+    const card = screen.getByRole('region', { name: 'Escenario Móvil' })
+    expect(card).toHaveTextContent('Escenario móvil · 22:15 · Esquina ficticia 2')
+    expect(router.state.location.pathname).toBe('/mapa')
+    await userEvent.click(within(card).getByRole('link', { name: 'Ver escenario' }))
     expect(router.state.location.pathname).toBe('/escenarios/ficticio-movil')
+  })
+
+  it('la tarjeta se puede cerrar', async () => {
+    renderApp('/mapa')
+    await userEvent.click(await screen.findByRole('button', { name: /Tablado Centro/ }))
+    const card = screen.getByRole('region', { name: 'Tablado Centro' })
+    await userEvent.click(within(card).getByRole('button', { name: 'Cerrar' }))
+    expect(screen.queryByRole('region', { name: 'Tablado Centro' })).not.toBeInTheDocument()
   })
 
   it('con otra noche en la URL, consulta esa noche y la ficha abre en ella', async () => {
     const { router } = renderApp('/mapa?noche=2027-02-05')
     await userEvent.click(await screen.findByRole('button', { name: /Tablado Centro/ }))
+    await userEvent.click(screen.getByRole('link', { name: 'Ver escenario' }))
     expect(fetchLocatedStages).toHaveBeenCalledWith('2027-02-05')
     expect(router.state.location.pathname).toBe('/escenarios/ficticio-centro')
     expect(router.state.location.search).toBe('?noche=2027-02-05')
