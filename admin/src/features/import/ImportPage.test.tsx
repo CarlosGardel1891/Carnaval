@@ -105,7 +105,7 @@ beforeEach(() => {
   loaded = {}
   vi.mocked(api.fetchCatalog).mockResolvedValue({ groups: GROUPS, stages: STAGES })
   vi.mocked(api.fetchSeasons).mockResolvedValue([
-    { anio: 2026, fecha_inicio: '2026-01-22', fecha_fin: '2026-03-08' },
+    { id: 1, anio: 2026, fecha_inicio: '2026-01-22', fecha_fin: '2026-03-08' },
   ])
   vi.mocked(api.previewGrid).mockImplementation((noche, rows) =>
     Promise.resolve(fakePreview(noche, rows)),
@@ -363,7 +363,7 @@ describe('importar una grilla', () => {
 
   it('avisa si la noche está fuera de la temporada, sin bloquear', async () => {
     vi.mocked(api.fetchSeasons).mockResolvedValue([
-      { anio: 2027, fecha_inicio: '2027-01-21', fecha_fin: '2027-03-07' },
+      { id: 2, anio: 2027, fecha_inicio: '2027-01-21', fecha_fin: '2027-03-07' },
     ])
     await open(POSTER)
     expect(await screen.findByText(/está fuera de la temporada/)).toBeInTheDocument()

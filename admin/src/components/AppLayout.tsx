@@ -28,7 +28,7 @@ export function AppLayout() {
               <NavLink
                 key={to}
                 to={to}
-                end={to === '/'}
+                end
                 className={({ isActive }) =>
                   `rounded-lg px-3 py-1.5 text-sm ${
                     isActive ? 'bg-slate-800 text-white' : 'text-slate-700 hover:bg-slate-100'

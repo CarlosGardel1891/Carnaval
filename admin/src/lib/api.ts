@@ -83,6 +83,7 @@ export async function fetchCatalog(): Promise<{ groups: CatalogGroup[]; stages: 
 }
 
 export interface Season {
+  id: number
   anio: number
   fecha_inicio: string
   fecha_fin: string
@@ -91,7 +92,7 @@ export interface Season {
 export async function fetchSeasons(): Promise<Season[]> {
   const { data, error } = await supabase
     .from('temporadas')
-    .select('anio, fecha_inicio, fecha_fin')
+    .select('id, anio, fecha_inicio, fecha_fin')
     .order('anio')
   if (error) throw error
   return data
@@ -328,4 +329,114 @@ export async function undoSuspension(id: number): Promise<number> {
   const { data, error } = await supabase.rpc('deshacer_suspension', { p_suspension_id: id })
   if (error) throw new Error(error.message, { cause: error })
   return data
+}
+
+// ---------------------------------------------------------------- conjuntos
+
+export interface GroupRow {
+  id: number
+  slug: string
+  nombre: string
+  alias: string[]
+  categoria: CategoriaConjunto
+  barrio: string | null
+  instagram: string | null
+  facebook: string | null
+  verificado: boolean
+  fuente_url: string[]
+  /** Su participación en cada temporada (decisión 26): sin fila, no participa. */
+  conjunto_temporada: { temporada_id: number; en_concurso: boolean | null; en_llamadas: boolean }[]
+}
+
+export async function fetchGroups(): Promise<GroupRow[]> {
+  const { data, error } = await supabase
+    .from('conjuntos')
+    .select(
+      'id, slug, nombre, alias, categoria, barrio, instagram, facebook, verificado, fuente_url, conjunto_temporada(temporada_id, en_concurso, en_llamadas)',
+    )
+    .order('nombre')
+  if (error) throw error
+  return data
+}
+
+export type GroupFields = Omit<GroupRow, 'id' | 'conjunto_temporada'>
+
+/** Crea (sin `id`) o cambia un conjunto. Devuelve su id. */
+export async function saveGroup(id: number | null, fields: GroupFields): Promise<number> {
+  const query = id
+    ? supabase.from('conjuntos').update(fields).eq('id', id).select('id')
+    : supabase.from('conjuntos').insert(fields).select('id')
+  const { data, error } = await query
+  if (error) throw new Error(error.message, { cause: error })
+  const [row] = data
+  if (!row) throw new Error('No se guardó: el conjunto ya no existe o no hay permiso.')
+  return row.id
+}
+
+export interface Participation {
+  en_concurso: boolean | null
+  en_llamadas: boolean
+}
+
+/** Pone o quita (`null`) la participación de un conjunto en una temporada. */
+export async function setParticipation(
+  conjuntoId: number,
+  temporadaId: number,
+  participation: Participation | null,
+): Promise<void> {
+  const { error } = participation
+    ? await supabase
+        .from('conjunto_temporada')
+        .upsert({ conjunto_id: conjuntoId, temporada_id: temporadaId, ...participation })
+    : await supabase
+        .from('conjunto_temporada')
+        .delete()
+        .eq('conjunto_id', conjuntoId)
+        .eq('temporada_id', temporadaId)
+  if (error) throw new Error(error.message, { cause: error })
+}
+
+// ---------------------------------------------------------------- escenarios
+
+export interface StageRow {
+  id: number
+  slug: string
+  nombre: string
+  alias: string[]
+  tipo: TipoEscenario | null
+  direccion: string | null
+  barrio: string | null
+  precio_texto: string | null
+  gratis: boolean | null
+  activo: boolean
+  itinerante: boolean | null
+  fuente_url: string[]
+  lat: number | null
+  lng: number | null
+}
+
+export async function fetchStages(): Promise<StageRow[]> {
+  const { data, error } = await supabase.rpc('escenarios_con_ubicacion')
+  if (error) throw error
+  return data as StageRow[]
+}
+
+export type StageFields = Omit<StageRow, 'id'>
+
+/** Crea (sin `id`) o cambia un escenario, con su ubicación. Devuelve su id. */
+export async function saveStage(id: number | null, fields: StageFields): Promise<number> {
+  const { lat, lng, ...rest } = fields
+  const row = {
+    ...rest,
+    // La columna es un punto de PostGIS: longitud primero.
+    ubicacion: lat !== null && lng !== null ? `SRID=4326;POINT(${lng} ${lat})` : null,
+  }
+  const query = id
+    ? supabase.from('escenarios').update(row).eq('id', id).select('id')
+    : supabase.from('escenarios').insert(row).select('id')
+  const { data, error } = await query
+  if (error) throw new Error(error.message, { cause: error })
+  const [saved] = data
+  if (!saved) throw new Error('No se guardó: el escenario ya no existe o no hay permiso.')
+  return saved.id
 }

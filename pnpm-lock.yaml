@@ -211,6 +211,9 @@ importers:
       i18next:
         specifier: ^26.5.5
         version: 26.5.5(typescript@6.0.3)
+      maplibre-gl:
+        specifier: ^6.15.0
+        version: 6.15.0
       react:
         specifier: ^19.3.1
         version: 19.3.1

@@ -8,7 +8,9 @@
   "nav": {
     "home": "Inicio",
     "import": "Importar grilla",
-    "night": "Noche"
+    "night": "Noche",
+    "groups": "Conjuntos",
+    "stages": "Escenarios"
   },
   "login": {
     "title": "Carnavalero · Admin",
@@ -26,7 +28,9 @@
     "intro": "Elegí qué querés cargar.",
     "cards": {
       "import": "Pegá la cartelera de una noche o subí un CSV, revisá la vista previa y publicá.",
-      "night": "Las actuaciones de una noche: corregir una hora, agregar, borrar y suspender por lluvia."
+      "night": "Las actuaciones de una noche: corregir una hora, agregar, borrar y suspender por lluvia.",
+      "groups": "El catálogo de conjuntos: nombres, alias, categoría y si participan en la temporada.",
+      "stages": "Los escenarios, con su dirección y su ubicación en el mapa."
     }
   },
   "category": {
@@ -218,5 +222,82 @@
     "system": "el sistema",
     "undoneAt": "deshecha el {{when}}",
     "undo": "Deshacer"
+  },
+  "groups": {
+    "title": "Conjuntos",
+    "intro": "El catálogo. Los alias son los otros nombres con los que una cartelera puede nombrar a un conjunto.",
+    "search": "Buscar un conjunto",
+    "new": "Nuevo",
+    "newTitle": "Conjunto nuevo",
+    "loadFailed": "No se pudieron cargar los conjuntos.",
+    "count": "{{count}} de {{total}} conjuntos",
+    "saved": "Conjunto guardado.",
+    "close": "Cerrar",
+    "field": {
+      "name": "Nombre",
+      "category": "Categoría",
+      "alias": "Alias",
+      "aliasHint": "Uno por línea. Un alias no puede ser el nombre ni el alias de otro conjunto.",
+      "sources": "Fuentes",
+      "sourcesHint": "Un enlace por línea.",
+      "neighborhood": "Barrio",
+      "instagram": "Instagram",
+      "facebook": "Facebook",
+      "verified": "Datos verificados"
+    },
+    "season": "Temporada {{anio}}",
+    "participates": "Participa en el carnaval {{anio}}",
+    "contest": "En el Concurso Oficial",
+    "contestPending": "Pendiente (todavía no se sabe)",
+    "contestYes": "Sí",
+    "contestNo": "No",
+    "parade": "Clasificó a las Llamadas"
+  },
+  "stages": {
+    "title": "Escenarios",
+    "intro": "Los tablados y escenarios. Sin ubicación, un escenario no aparece en el mapa ni en «cerca mío».",
+    "search": "Buscar un escenario",
+    "new": "Nuevo",
+    "newTitle": "Escenario nuevo",
+    "loadFailed": "No se pudieron cargar los escenarios.",
+    "count": "{{count}} de {{total}} escenarios",
+    "onlyMissing": "Sólo los que no tienen ubicación ({{count}})",
+    "saved": "Escenario guardado.",
+    "inactive": "inactivo",
+    "itinerant": "itinerante",
+    "noLocation": "sin ubicación",
+    "located": "en el mapa",
+    "yes": "Sí",
+    "no": "No",
+    "unknown": "No se sabe",
+    "field": {
+      "name": "Nombre",
+      "type": "Tipo",
+      "alias": "Alias",
+      "aliasHint": "Uno por línea: los nombres con los que lo nombran DAECPU y la prensa.",
+      "sources": "Fuentes",
+      "address": "Dirección",
+      "neighborhood": "Barrio",
+      "price": "Precio (texto)",
+      "free": "Es gratis",
+      "itinerant": "Es itinerante",
+      "active": "Funciona esta temporada"
+    },
+    "location": "Ubicación",
+    "itinerantNoLocation": "Un escenario itinerante no tiene un lugar fijo: la parada de cada noche se carga en cada actuación."
+  },
+  "location": {
+    "search": "Buscar una dirección",
+    "searchPlaceholder": "Calle y número, o esquina",
+    "searchButton": "Buscar",
+    "searching": "Buscando…",
+    "searchFailed": "No se pudo buscar la dirección. Podés poner el punto tocando el mapa.",
+    "noResults": "No apareció esa dirección. Probá con la esquina, o poné el punto tocando el mapa.",
+    "noKey": "Falta la key de MapTiler (VITE_MAPTILER_KEY): no hay calles ni buscador de direcciones.",
+    "map": "Mapa para elegir la ubicación",
+    "point": "Punto elegido: {{lat}}, {{lon}}",
+    "none": "Sin ubicación.",
+    "clear": "Quitar la ubicación",
+    "hint": "Tocá el mapa para poner el punto y arrastralo para ajustarlo. El buscador sólo propone: mirá que el punto quede donde es."
   }
 }

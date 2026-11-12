@@ -871,6 +871,25 @@ export type Database = {
           tipo: Database['public']['Enums']['tipo_escenario']
         }[]
       }
+      escenarios_con_ubicacion: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          activo: boolean
+          alias: string[]
+          barrio: string
+          direccion: string
+          fuente_url: string[]
+          gratis: boolean
+          id: number
+          itinerante: boolean
+          lat: number
+          lng: number
+          nombre: string
+          precio_texto: string
+          slug: string
+          tipo: Database['public']['Enums']['tipo_escenario']
+        }[]
+      }
       fixture_del_concurso: {
         Args: { p_anio: number }
         Returns: {

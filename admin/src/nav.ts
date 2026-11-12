@@ -3,4 +3,6 @@ export const sections: { to: string; label: string }[] = [
   { to: '/', label: 'home' },
   { to: '/grilla/importar', label: 'import' },
   { to: '/grilla', label: 'night' },
+  { to: '/conjuntos', label: 'groups' },
+  { to: '/escenarios', label: 'stages' },
 ]
