@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { focusManager, QueryClient, QueryObserver } from '@tanstack/react-query'
 import { nightActsQuery, REFRESH_MS } from '../features/today/useNightActs'
+import i18n from '../i18n'
 import { fetchNightActs, setAuthActive } from './api'
 import { initLifecycle } from './lifecycle'
 
@@ -94,6 +95,41 @@ describe('ciclo de vida de la app', () => {
 
     unsubscribe()
     queryClient.unmount()
+  })
+
+  it('el idioma sigue al del teléfono: al volver al frente y cuando el sistema avisa', async () => {
+    const languages = vi.spyOn(navigator, 'languages', 'get')
+    const language = vi.spyOn(navigator, 'language', 'get')
+    const changed = () => new Promise((resolve) => i18n.on('languageChanged', resolve))
+
+    languages.mockReturnValue(['es-UY', 'es'])
+    let done = changed()
+    emit('appStateChange', { isActive: true })
+    await done
+    expect(i18n.resolvedLanguage).toBe('es')
+
+    languages.mockReturnValue(['en-US', 'en'])
+    done = changed()
+    window.dispatchEvent(new Event('languagechange'))
+    await done
+    expect(i18n.resolvedLanguage).toBe('en')
+
+    // Un idioma que la app no tiene: español.
+    languages.mockReturnValue(['pt-BR'])
+    language.mockReturnValue('pt-BR')
+    done = changed()
+    emit('appStateChange', { isActive: true })
+    await done
+    expect(i18n.resolvedLanguage).toBe('es')
+
+    // Volver a segundo plano no lo mira.
+    languages.mockReturnValue(['en-US'])
+    emit('appStateChange', { isActive: false })
+    await vi.advanceTimersByTimeAsync(0)
+    expect(i18n.resolvedLanguage).toBe('es')
+
+    languages.mockRestore()
+    language.mockRestore()
   })
 
   it('el botón «atrás» vuelve en el historial y, si no hay adónde, minimiza la app', () => {

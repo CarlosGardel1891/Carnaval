@@ -162,6 +162,7 @@ En el emulador Android, la app reescribe `127.0.0.1`/`localhost` a `10.0.2.2` pa
 - Con el modo Llamadas activo, la app abre en `/llamadas` (`useOpenInLlamadas`, sólo en el arranque en `/`). Toda hora del desfile sale de `@cuerda/shared` (`departureTime`, `passTime`) y se muestra con `EstimatedTime`, que le pone el «≈»: nunca una hora estimada sola (decisión 63).
 - El glosario son textos de la app (`llamadas.glossary` en los locales); la lista y el orden de los términos están en `features/llamadas/glossary.ts`.
 - El mapa del recorrido es `features/map/ParadeMap.tsx`, que se carga aparte (`LazyParadeMap`). Sin key, o si el estilo no carga, dibuja sobre el fondo liso (`mapStyle.ts`).
+- El idioma es el del teléfono (decisión 94): no se guarda ni se elige en la app. `followPhoneLanguage` (`app/src/i18n.ts`) lo vuelve a mirar cuando el sistema avisa que cambió y cada vez que la app vuelve al frente (`lib/lifecycle.ts`).
 - «Ahora» es siempre `useNow()` o `now()` de `lib/clock.ts`, nunca `new Date()`: así vale el reloj simulado.
 - **La ubicación no sale del teléfono** (decisión 90): `useNightActs` recibe la posición y calcula ahí las distancias (`withDistances`, `lib/distance.ts`); ni `fetchNightActs` ni ninguna otra función de `api.ts` la reciben. No sumar parámetros de posición a una función de la base.
 - Toda distancia que se muestra pasa por `useDistanceLabel` (`features/location/`): con una ubicación aproximada va redondeada al kilómetro (decisión 42).

@@ -97,7 +97,7 @@ export const CONTENT = {
         {
           h: 'Qué queda en tu teléfono',
           p: [
-            'Para abrir rápido y andar sin señal, la app guarda en tu teléfono la sesión anónima, la última grilla que bajó (hasta 24 horas; lo de las Llamadas, hasta una semana) y el idioma. Se borra al borrar tus datos desde la app o al desinstalarla.',
+            'Para abrir rápido y andar sin señal, la app guarda en tu teléfono la sesión anónima y la última grilla que bajó (hasta 24 horas; lo de las Llamadas, hasta una semana). Se borra al borrar tus datos desde la app o al desinstalarla.',
           ],
         },
         {
@@ -293,7 +293,7 @@ export const CONTENT = {
         {
           h: 'What stays on your phone',
           p: [
-            'To open fast and work offline, the app keeps on your phone the anonymous session, the last schedule it downloaded (up to 24 hours; Llamadas data, up to a week) and the language. It is removed when you delete your data from the app or uninstall it.',
+            'To open fast and work offline, the app keeps on your phone the anonymous session and the last schedule it downloaded (up to 24 hours; Llamadas data, up to a week). It is removed when you delete your data from the app or uninstall it.',
           ],
         },
         {
