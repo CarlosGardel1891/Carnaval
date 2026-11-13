@@ -6,7 +6,7 @@ App para iPhone y Android con la información del carnaval en Uruguay, con foco 
 
 - `docs/PLAN.md` — el plan por fases (qué hacer y cuándo).
 - `docs/OPERACION.md` — el manual para quien carga los datos en temporada, y qué hacer si algo falla.
-- `docs/IOS.md` — de la Mac a TestFlight.
+- `docs/IOS.md` — de la Mac al iPhone (probar la beta) y a TestFlight.
 - `docs/QA.md` — el plan de pruebas, la lista de verificación antes de cada envío y cómo quedó cada pasada.
 - `docs/DECISIONES.md` — decisiones tomadas; mandan sobre el plan.
 - `research/CAMBIOS.md` — estado de los datos semilla y pendientes.
@@ -136,6 +136,7 @@ pnpm --filter app android        # build + sync + correr en emulador/dispositivo
 pnpm --filter app android:local  # igual, pero permitiendo http al Supabase local
 pnpm --filter app android:open   # abrir en Android Studio
 pnpm --filter app ios            # (en Mac) build + sync + correr en simulador
+pnpm --filter app ios:beta       # (en Mac) build de la beta + sync, para probar en el iPhone (docs/IOS.md)
 pnpm --filter app ios:open       # (en Mac) abrir en Xcode
 ```
 
@@ -321,7 +322,7 @@ adb install -r app\android\app\build\outputs\apk\release\app-release.apk
 
 El script compila en ese modo, sincroniza Capacitor sin el permiso de http del Supabase local y corre Gradle. El AAB queda en `app/android/app/build/outputs/bundle/release/app-release.aab`. Antes de subir uno nuevo a Play Console, subir `build` en `app/version.json`.
 
-- **iOS** (decisión 82): se compila en la Mac del equipo, con Xcode 26 o posterior. El paso a paso, de instalar a TestFlight, está en `docs/IOS.md`. En el repo ya están el manifest de privacidad (`app/ios/App/App/PrivacyInfo.xcprivacy`, con el motivo CA92.1 por Preferences y los datos que se declaran), `ITSAppUsesNonExemptEncryption` en `Info.plist` y el texto del permiso de ubicación en español y en inglés (`es.lproj` y `en.lproj`); falta sumarlos al target desde Xcode, dejar la app sólo para iPhone y elegir el equipo de firma. Si cambia qué datos maneja la app, cambia también el manifest.
+- **iOS** (decisión 82): se compila en la Mac del equipo, con Xcode 26 o posterior. El paso a paso, de instalar a TestFlight, está en `docs/IOS.md`. En el repo ya están el manifest de privacidad (`app/ios/App/App/PrivacyInfo.xcprivacy`, con el motivo CA92.1 por Preferences y los datos que se declaran), `ITSAppUsesNonExemptEncryption` en `Info.plist` y el texto del permiso de ubicación en español y en inglés (`es.lproj` y `en.lproj`); falta sumarlos al target desde Xcode, dejar la app sólo para iPhone y elegir el equipo de firma. Sin `GoogleService-Info.plist` la app abre igual: el plugin de avisos (8.6) no configura Firebase si falta el archivo, y con `VITE_PUSH_ENABLED` vacío la app no lo llama. Si cambia qué datos maneja la app, cambia también el manifest.
 - **Firma** (nada de esto va al repo): la clave de subida está en `C:\Users\<usuario>\.carnavalero\` (`carnavalero-upload.jks` y `keystore.properties`, con su contraseña y el alias `upload`); la creó `pnpm android:keystore`, que no pisa una que ya exista. `build.gradle` firma el release si encuentra ese `keystore.properties` (o el que diga `CARNAVALERO_KEYSTORE_PROPS`); sin él, el release sale sin firmar y el script se niega a seguir. Hay que guardar una copia de los dos archivos fuera de la máquina. Con Play App Signing la clave de la app la guarda Google: si la de subida se pierde, se crea otra y se pide el cambio en Play Console (Configuración → Integridad de la app → solicitar el restablecimiento de la clave de subida).
 - Si el emulador no carga nada, mirar que tenga red: `adb shell svc wifi enable` y `adb shell svc data enable` (quedan apagadas después de probar sin señal).
 

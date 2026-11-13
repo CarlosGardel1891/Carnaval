@@ -14,6 +14,7 @@
     "android:local": "pnpm build && cross-env CUERDA_LOCAL=1 cap sync android && cross-env CUERDA_LOCAL=1 cap run android",
     "android:open": "cap open android",
     "ios": "pnpm build && cap sync ios && cap run ios",
+    "ios:beta": "tsc -p tsconfig.json && vite build --mode beta && cap sync ios",
     "ios:open": "cap open ios"
   },
   "dependencies": {
