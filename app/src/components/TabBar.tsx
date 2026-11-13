@@ -20,7 +20,7 @@ function Tab({ to, label, icon, withChildren = false }: TabProps) {
         // Las pestañas no apilan historial: «atrás» desde una pestaña no recorre las otras.
         replace
         className={({ isActive }) =>
-          `flex min-h-14 flex-col items-center justify-center gap-0.5 rounded-2xl px-1 text-[0.6875rem] font-bold transition-colors duration-150 ${
+          `flex min-h-14 flex-col items-center justify-center gap-0.5 rounded-2xl text-[0.6875rem] font-bold tracking-tight transition-colors duration-150 ${
             isActive ? 'bg-brand-soft text-brand' : 'text-soft'
           }`
         }
@@ -41,9 +41,9 @@ export function TabBar() {
   return (
     <nav
       aria-label={t('nav.label')}
-      className="pointer-events-none fixed inset-x-0 bottom-0 z-40 px-3 pb-[calc(var(--safe-bottom)+0.625rem)]"
+      className="pointer-events-none fixed inset-x-0 bottom-0 z-40 px-2 pb-[calc(var(--safe-bottom)+0.625rem)]"
     >
-      <ul className="shadow-float pointer-events-auto mx-auto flex max-w-md gap-0.5 rounded-[1.75rem] border border-white/70 bg-white/85 p-1.5 backdrop-blur-xl backdrop-saturate-150">
+      <ul className="shadow-float pointer-events-auto mx-auto flex max-w-md rounded-[1.75rem] border border-white/70 bg-white/85 p-1 backdrop-blur-xl backdrop-saturate-150">
         <Tab to="/" label={t('nav.today')} icon={<HomeIcon />} />
         <Tab to="/llamadas" label={t('nav.llamadas')} icon={<DrumIcon />} withChildren />
         <Tab to="/mapa" label={t('nav.map')} icon={<MapPinIcon />} />

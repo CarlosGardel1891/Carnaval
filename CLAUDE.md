@@ -154,7 +154,7 @@ En el emulador Android, la app reescribe `127.0.0.1`/`localhost` a `10.0.2.2` pa
 - «Mis conjuntos» es `?mios=1` y lo filtra la base (`p_solo_favoritos`). Esa consulta no se guarda en el teléfono y se vuelve a pedir cuando cambian los seguidos.
 - La noche que se muestra sale de `nocheLogica()` o de `?noche=YYYY-MM-DD`; los filtros viven en la URL.
 - Las fechas de los eventos y de las etapas son fechas puras (`YYYY-MM-DD`): se comparan como texto y se formatean en UTC (`formatIsoDate`, `formatNight`, `formatMonth`, `formatDayParts` en `lib/format.ts`). «Hoy» es siempre `nocheLogica()`. Una fecha con `estado = 'estimado'` nunca se muestra sin su marca (decisión 56).
-- El Concurso está en `/calendario/concurso`, antes que `/calendario/:slug` en `routes.tsx`. Un fixture sin etapas no es una lista vacía: es «todavía no se publicó».
+- El Concurso está en `/calendario/concurso`, antes que `/calendario/:slug` en `routes.tsx`. Un fixture sin etapas no es una lista vacía: es «todavía no se publicó». Muestra una rueda por vez (`?rueda=`); sin elegir, la que está en curso o la que viene (`currentRound`).
 - Para compilar la app contra el proyecto remoto: `app/.env.remoto` (ver «Proyecto remoto»).
 - `/mapa` se carga aparte (`features/map/LazyMapPage.tsx`), así «Hoy» arranca sin MapLibre. Fuera de `features/map/`, nadie importa `MapPage` ni `MontevideoMap`.
 - Las consultas se guardan en el teléfono 24 horas (`app/src/lib/queryCache.ts`, decisión 37). Si cambia la forma de lo que devuelve una consulta, subir `CACHE_VERSION`. La posición del usuario no va en ninguna consulta (decisión 90).
@@ -170,7 +170,7 @@ En el emulador Android, la app reescribe `127.0.0.1`/`localhost` a `10.0.2.2` pa
 
 ### Diseño
 
-Decisión 92: un único diseño, claro, que se ve igual con el teléfono en modo claro o en modo oscuro. La guía es `docs/diseno/referencia.png`; las capturas de antes y de después están en `docs/diseno/`.
+Decisiones 92 y 93: un único diseño, claro, que se ve igual con el teléfono en modo claro o en modo oscuro. La guía es `docs/diseno/referencia.png`; las capturas de antes y de después están en `docs/diseno/` (`despues/en`, `despues/chico` y `despues/oscuro`: en inglés, en un teléfono de 360 × 640 y con el teléfono en modo oscuro).
 
 - **El sistema está en `app/src/index.css`:** los colores (`ground`, `surface`, `ink`, `soft`, `brand`, `sun`, `amber`, `danger`, `ok` y sus versiones suaves), la tipografía (Plus Jakarta Sans, dentro de la app, sólo el subconjunto latino), las sombras y el degradé de los encabezados (`.brand-gradient`). Todo lo que se toca va en `brand`. No usar colores sueltos en las pantallas: si falta uno, se suma ahí.
 - **Las piezas, en `app/src/components/ui/`:** `primitives.tsx` (tarjeta, encabezado de sección, segmentado, chip de filtro, píldoras, avatar, cuadradito de fecha, botones, fila, estado vacío), `TabHeader.tsx` (el encabezado con degradé de cada pestaña), `icons.tsx` (un solo juego de íconos), `illustrations.tsx` (las de los estados vacíos) y `scroll.tsx` (el título que se achica y tirar para actualizar). `/muestra` las tiene todas juntas; sólo existe en desarrollo y se llega desde «Acerca de».
@@ -180,6 +180,7 @@ Decisión 92: un único diseño, claro, que se ve igual con el teléfono en modo
 - **La barra de pestañas flota** sobre el contenido: el contenedor que scrollea deja libre `--tabbar-space` abajo. Una pantalla con algo fijo abajo tiene que contar ese espacio.
 - **El scroll es uno solo** (`AppLayout`): al entrar a una pantalla arranca arriba y al volver atrás queda donde estaba (`useScrollPerScreen`); cambiar un filtro no lo mueve. Un mapa dentro de una pantalla que scrollea lleva `cooperativeGestures` (`ParadeMap`); el de `/mapa` es de pantalla completa (`fixed inset-0`) y sus controles se corren con `--map-bottom`.
 - **Volver y compartir:** `components/ui/BackButton.tsx` (vuelve, o va a un destino si la app abrió directo ahí) y `lib/share.ts`. La vibración al tocar Seguir sale de `lib/haptics.ts`. Los dos plugins (`@capacitor/share`, `@capacitor/haptics`) sólo se cargan en el teléfono.
+- **Lo que hay que mirar al tocar una pantalla:** que entre en un teléfono de 360 px de ancho (la barra de pestañas, los chips de Llamadas) y en inglés, donde las horas llevan «PM» (el cuadradito de fecha se ensancha solo). En el emulador: `adb shell wm size 720x1280` y `adb shell wm density 320` (y `reset` para volver), y `adb shell cmd uimode night yes` para el modo oscuro.
 - Los tests buscan por rol y por texto, no por clases: al rediseñar una pantalla, conservar los roles, los nombres accesibles y los textos. Una fila entera que se toca lleva el enlace en el nombre, con `after:absolute after:inset-0`.
 
 ### Simular la fecha

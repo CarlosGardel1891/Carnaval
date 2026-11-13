@@ -2,7 +2,8 @@ import { Component, useEffect, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useRouteError } from 'react-router'
 import { reportError } from '../lib/errors'
-import { Button } from './Button'
+import { OfflineArt } from './ui/illustrations'
+import { PrimaryButton } from './ui/primitives'
 
 /** Lo que se ve cuando una pantalla se rompe: qué pasó, en criollo, y cómo seguir. */
 function Broken() {
@@ -10,13 +11,20 @@ function Broken() {
   return (
     <main
       role="alert"
-      className="mx-auto flex min-h-dvh max-w-2xl flex-col justify-center px-4 py-8"
+      className="mx-auto flex min-h-dvh max-w-2xl flex-col items-center justify-center px-6 py-8 text-center"
     >
-      <p className="text-accent font-semibold tracking-wide uppercase">{t('app.name')}</p>
-      <h1 className="mt-1 text-3xl font-bold">{t('error.title')}</h1>
-      <p className="text-soft mt-3 text-lg">{t('error.body')}</p>
+      <OfflineArt />
+      <p className="text-brand mt-5 text-[0.8125rem] font-extrabold tracking-[0.08em] uppercase">
+        {t('app.name')}
+      </p>
+      <h1 className="mt-1 text-[1.875rem] leading-tight font-extrabold tracking-tight">
+        {t('error.title')}
+      </h1>
+      <p className="text-soft mt-3 max-w-sm text-[1.0625rem]">{t('error.body')}</p>
       <div className="mt-6">
-        <Button onClick={() => window.location.assign('/')}>{t('error.retry')}</Button>
+        <PrimaryButton onClick={() => window.location.assign('/')}>
+          {t('error.retry')}
+        </PrimaryButton>
       </div>
     </main>
   )

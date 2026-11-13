@@ -271,12 +271,15 @@ interface DateBadgeProps {
 export function DateBadge({ top, bottom, today = false }: DateBadgeProps) {
   return (
     <span
-      className={`inline-flex size-[3.75rem] shrink-0 flex-col items-center justify-center rounded-2xl leading-none ${
+      // Cuadrado, salvo que lo de abajo sea largo (una hora en formato de 12 horas): ahí se ensancha.
+      className={`inline-flex h-[3.75rem] min-w-[3.75rem] shrink-0 flex-col items-center justify-center rounded-2xl px-2 leading-none ${
         today ? 'bg-brand text-white' : 'bg-brand-soft text-brand'
       }`}
     >
       <span className="text-[0.6875rem] font-extrabold tracking-wide uppercase">{top}</span>
-      <span className="mt-1 text-[1.125rem] font-extrabold tabular-nums">{bottom}</span>
+      <span className="mt-1 text-[1.125rem] font-extrabold whitespace-nowrap tabular-nums">
+        {bottom}
+      </span>
     </span>
   )
 }

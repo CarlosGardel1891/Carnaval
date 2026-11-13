@@ -20,7 +20,7 @@ setWorkerUrl(workerUrl)
 
 const INITIAL_ZOOM = 12
 /** Lo que tapan el encabezado flotante y la barra de pestañas, para encuadrar los marcadores. */
-const TOP_SPACE = 170
+const TOP_SPACE = 240
 const BOTTOM_SPACE = 130
 const SVG_NS = 'http://www.w3.org/2000/svg'
 
@@ -95,7 +95,8 @@ export function MontevideoMap({
   const { t } = useTranslation()
   const container = useRef<HTMLDivElement>(null)
   const [map, setMap] = useState<MapLibreMap | null>(null)
-  const fitted = useRef(false)
+  /** Si el usuario ya movió el mapa: desde ahí no se lo reacomoda. */
+  const touched = useRef(false)
   const apiKey = import.meta.env.VITE_MAPTILER_KEY || undefined
 
   // Los últimos `labelOf` y `onOpen`, sin rearmar los marcadores cuando cambian.
@@ -115,9 +116,13 @@ export function MontevideoMap({
     })
     instance.addControl(new NavigationControl({ showCompass: false }), 'bottom-right')
     instance.on('click', () => handlers.current.onBackground?.())
+    instance.on('movestart', (event) => {
+      // Sólo los movimientos de un dedo o del mouse: los que hace la app no cuentan.
+      if ((event as { originalEvent?: unknown }).originalEvent) touched.current = true
+    })
     setMap(instance)
     return () => {
-      fitted.current = false
+      touched.current = false
       setMap(null)
       instance.remove()
     }
@@ -133,9 +138,9 @@ export function MontevideoMap({
       registry.set(marker.key, element)
       return new Marker({ element }).setLngLat([marker.lng, marker.lat]).addTo(map)
     })
-    // La primera vez que hay marcadores, el mapa se acomoda para mostrarlos todos.
-    if (!fitted.current && markers.length > 0) {
-      fitted.current = true
+    // El mapa se acomoda para mostrar todos los marcadores, también cuando llegan más (los
+    // escenarios fijos y las paradas vienen de dos consultas), hasta que el usuario lo mueve.
+    if (!touched.current && markers.length > 0) {
       const bounds = new LngLatBounds()
       for (const marker of markers) bounds.extend([marker.lng, marker.lat])
       // El encabezado puede haber crecido en este mismo render: primero, el tamaño real.
